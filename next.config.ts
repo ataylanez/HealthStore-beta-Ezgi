@@ -17,9 +17,12 @@ const nextConfig: NextConfig = {
       { source: "/DS/", destination: "/DS/index.html" },
       { source: "/DS/Audits", destination: "/DS/Audits/index.html" },
       { source: "/DS/Audits/", destination: "/DS/Audits/index.html" },
-      // The sitemap lives at /Sitemap, outside the design-system reference.
-      { source: "/Sitemap", destination: "/Sitemap/index.html" },
-      { source: "/Sitemap/", destination: "/Sitemap/index.html" },
+      // The sitemap lives at /sitemap, outside the design-system reference.
+      { source: "/sitemap", destination: "/sitemap/index.html" },
+      { source: "/sitemap/", destination: "/sitemap/index.html" },
+      // Keep the old capitalised path working.
+      { source: "/Sitemap", destination: "/sitemap/index.html" },
+      { source: "/Sitemap/", destination: "/sitemap/index.html" },
     ];
   },
   async redirects() {

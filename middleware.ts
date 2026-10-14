@@ -25,6 +25,6 @@ export const config = {
   matcher: [
     // Exclude api/ai, api/ai-advisor and api/express-interest so APIs return JSON instead of redirecting for fetch clients.
     // `DS` and `templates` are standalone, static reference sites under public/ — kept publicly reachable and outside auth (not linked from the product).
-    '/((?!api/ai|api/ai-advisor|api/express-interest|DS|Sitemap|templates|_next/static|_next/image|logos|favicon\\.ico|.*\\.svg|.*\\.png|.*\\.jpg).*)',
+    '/((?!api/ai|api/ai-advisor|api/express-interest|DS|sitemap|Sitemap|templates|_next/static|_next/image|logos|favicon\\.ico|.*\\.svg|.*\\.png|.*\\.jpg).*)',
   ],
 }
