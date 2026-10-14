@@ -1,8 +1,6 @@
-import Link from 'next/link'
 import type { App } from '@/lib/data'
 import type { ProductNarrative } from '@/lib/content/productModel'
 import type { CommissionerContext } from '@/lib/context/types'
-import { contextToSearchParams } from '@/lib/context/types'
 import { pdpSectionTitle, pdpPatientCohortLabel, resolvePdpLocalArea } from '@/lib/pdpSections'
 import { computeMycopdImpactMetrics } from '@/lib/localData/mycopdImpact'
 import { getDtxImpactRanges } from '@/lib/localData/workspaceData'
@@ -78,7 +76,6 @@ export default function PdpLocalValue({
   const { areaLabel, isExample, ref } = area
 
   const isMycopd = app.slug === 'mycopd'
-  const changeHref = `/start/place?${contextToSearchParams(context).toString()}`
 
   const ranges = getDtxImpactRanges()
   const highRisk = ref.high_risk_cohort ?? Math.round(ref.eligible_cohort * 0.2)
@@ -106,11 +103,10 @@ export default function PdpLocalValue({
 
   return (
     <div className="hs-pdp-spine-group mb-6 space-y-4">
-      {/* R2-1: context line reusing the guided-start place picker */}
+      {/* R2-1: context line showing which area the projections apply to */}
       {!isExample ? (
         <p className="hs-text-caption" style={{ color: 'var(--text-muted)', margin: 0 }}>
-          Showing projected figures for <strong style={{ color: 'var(--text-secondary)' }}>{areaLabel}</strong>.{' '}
-          <Link href={changeHref} style={{ color: 'var(--nhs-blue)' }}>Change area</Link>
+          Showing projected figures for <strong style={{ color: 'var(--text-secondary)' }}>{areaLabel}</strong>.
         </p>
       ) : null}
 

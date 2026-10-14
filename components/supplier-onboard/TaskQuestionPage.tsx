@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BackLink } from '@/components/BackLink'
 import { NhsFileUpload } from '@/components/nhs/NhsFileUpload'
@@ -10,14 +10,17 @@ import {
   CHECKBOX_SEPARATOR,
   CONFIRMED_VALUE,
   MULTI_UPLOAD_CONFIRMED_SUFFIX,
-  SUPPLIER_ONBOARD_BASE_PATH,
   UPLOAD_REFERENCE_SUFFIX,
+  fieldKey,
+  formBasePath,
+  isQuestionVisible,
   isTaskComplete,
   nextPageHref,
   parseUploadedDocuments,
+  prevPageHref,
   questionKeys,
   serializeUploadedDocuments,
-  taskStepHref,
+  visibleQuestions,
   type UploadedDocument,
   type OnboardingQuestion,
   type OnboardingTask,
@@ -38,42 +41,68 @@ import { useOnboardingProgress } from './useOnboardingProgress'
  *  - multi-upload: several documents added one at a time with a "Mark as complete"
  *    gate (MoJ Multi file upload pattern rebuilt from NHS components — see MultiUploadField)
  *
+ * Routing: the questionnaire branches on earlier answers (see `showIf` in
+ * lib/supplierOnboarding.ts). Next / back targets and the "question x of y"
+ * caption are computed from the saved answers merged with this page's draft, so
+ * they follow the answer being given. A page whose question is not on the
+ * current route redirects to the next one that is.
+ *
  * Actions:
  *  - Save and Next  — saves, then goes to the next page in journey order: the next
- *                     question in this task, or the first page of the next task (across
- *                     sections). Absent only on the final page of the final task.
+ *                     visible question in this task, or the first page of the next
+ *                     task (across sections). Absent only on the final page of the
+ *                     final task.
  *  - Save and Exit  — saves and returns to the task list; the task is marked
- *                     Completed once every required question has an answer
+ *                     Completed once every visible required question has an answer
  *  - Cancel         — discards unsaved changes on this page and returns to the task list
  */
 export default function TaskQuestionPage({
+  formId,
   task,
   step,
 }: {
+  formId: string
   task: OnboardingTask
   step: number
 }) {
   const router = useRouter()
-  const { hydrated, getAnswers, saveTask } = useOnboardingProgress()
+  const { hydrated, getAnswers, saveTask } = useOnboardingProgress(formId)
+  const taskListHref = formBasePath(formId)
 
   const question = task.questions[step - 1]
-  const total = task.questions.length
-  const multiPage = total > 1
-  /** Next page anywhere in the journey; null only on the final page of the final task. */
-  const nextHref = nextPageHref(task, step)
-  const isLast = nextHref === null
 
   /** Unsaved answers for this page only, keyed like TaskAnswers. */
   const [draft, setDraft] = useState<TaskAnswers>({})
 
+  const saved = getAnswers(task.id)
+  /** Saved answers with this page's draft applied — the basis for routing. */
+  const merged = useMemo(() => ({ ...saved, ...draft }), [saved, draft])
+
+  const visible = visibleQuestions(task, merged)
+  const position = visible.findIndex((v) => v.step === step) + 1
+  const total = visible.length
+  const multiPage = total > 1
+  /** Next page anywhere in the journey; null only on the final page of the final task. */
+  const nextHref = nextPageHref(formId, task, step, merged)
+  const isLast = nextHref === null
+  const backHref = prevPageHref(formId, task, step, merged)
+
   // Prefill from saved answers once storage has been read.
   useEffect(() => {
     if (!hydrated) return
-    const saved = getAnswers(task.id)
+    const stored = getAnswers(task.id)
     const initial: TaskAnswers = {}
-    for (const key of questionKeys(question)) initial[key] = saved[key] ?? ''
+    for (const key of questionKeys(question)) initial[key] = stored[key] ?? ''
     setDraft(initial)
   }, [hydrated, getAnswers, task.id, question])
+
+  // A question that is not on the supplier's route (e.g. reached via a stale
+  // link or the browser history) is skipped to the next one that is.
+  const offRoute = hydrated && !isQuestionVisible(question, task, saved)
+  useEffect(() => {
+    if (!offRoute) return
+    router.replace(nextPageHref(formId, task, step, saved) ?? taskListHref)
+  }, [offRoute, router, formId, task, step, saved, taskListHref])
 
   const patch = (changes: TaskAnswers) => setDraft((d) => ({ ...d, ...changes }))
 
@@ -101,24 +130,25 @@ export default function TaskQuestionPage({
 
   function saveAndExit() {
     save()
-    router.push(SUPPLIER_ONBOARD_BASE_PATH)
+    router.push(taskListHref)
   }
 
   function cancel() {
-    router.push(SUPPLIER_ONBOARD_BASE_PATH)
+    router.push(taskListHref)
   }
 
-  const backHref = step > 1 ? taskStepHref(task, step - 1) : SUPPLIER_ONBOARD_BASE_PATH
+  if (offRoute) return null
 
   return (
     <div className="hs-page">
       <div className="max-w-2xl">
         <BackLink href={backHref} />
-        {/* Caption gives task context; omitted when it would just repeat the question heading. */}
-        {(multiPage || question.label !== task.title) && (
+        {/* Caption gives task context (and the questionnaire reference, e.g. C1.1.1). */}
+        {(multiPage || question.code || question.label !== task.title) && (
           <span className="nhsuk-caption-l">
             {task.title}
-            {multiPage ? ` — question ${step} of ${total}` : ''}
+            {question.code ? ` — ${question.code}` : ''}
+            {multiPage && position > 0 ? ` — question ${position} of ${total}` : ''}
           </span>
         )}
 
@@ -155,13 +185,15 @@ export default function TaskQuestionPage({
 
 /* ------------------------------------------------------------------------ */
 
-type FieldProps = {
+export type QuestionFieldProps = {
   question: OnboardingQuestion
   draft: TaskAnswers
   patch: (changes: TaskAnswers) => void
   /** Patch and persist immediately (see TaskQuestionPage.commit). */
   commit: (changes: TaskAnswers) => void
 }
+
+type FieldProps = QuestionFieldProps
 
 /**
  * Hint body (guidance text plus, for single uploads, the list of expected
@@ -195,7 +227,12 @@ function Hint({ question, id }: { question: OnboardingQuestion; id: string }) {
   )
 }
 
-function QuestionField({ question, draft, patch, commit }: FieldProps) {
+/**
+ * The NHS control(s) for one question, with the question as the page heading.
+ * Exported so other one-question-per-page journeys (Company information) render
+ * identically.
+ */
+export function QuestionField({ question, draft, patch, commit }: FieldProps) {
   const hintId = `${question.id}-hint`
   const hasHint = !!hintContent(question)
   const describedBy = hasHint ? hintId : undefined
@@ -205,11 +242,16 @@ function QuestionField({ question, draft, patch, commit }: FieldProps) {
     case 'radios':
     case 'checkboxes': {
       const isCheckbox = question.type === 'checkboxes'
+      const options = question.options.filter((o) => !o.hidden)
       const selected = isCheckbox
         ? (draft[question.id] ?? '').split(CHECKBOX_SEPARATOR).filter(Boolean)
         : []
+      const exclusiveValues = options.filter((o) => o.exclusive).map((o) => o.value)
       const toggle = (value: string) => {
-        const next = selected.includes(value) ? selected.filter((v) => v !== value) : [...selected, value]
+        let next: string[]
+        if (selected.includes(value)) next = selected.filter((v) => v !== value)
+        else if (exclusiveValues.includes(value)) next = [value] // "None of the above" clears the rest
+        else next = [...selected.filter((v) => !exclusiveValues.includes(v)), value]
         patch({ [question.id]: next.join(CHECKBOX_SEPARATOR) })
       }
       return (
@@ -223,7 +265,7 @@ function QuestionField({ question, draft, patch, commit }: FieldProps) {
             </legend>
             <Hint question={question} id={hintId} />
             <div className={isCheckbox ? 'nhsuk-checkboxes' : 'nhsuk-radios'}>
-              {question.options.map((o) => {
+              {options.map((o) => {
                 const id = `${question.id}-${o.value}`
                 return (
                   <div key={o.value} className={isCheckbox ? 'nhsuk-checkboxes__item' : 'nhsuk-radios__item'}>
@@ -269,6 +311,74 @@ function QuestionField({ question, draft, patch, commit }: FieldProps) {
             value={draft[question.id] ?? ''}
             onChange={(e) => patch({ [question.id]: e.target.value })}
           />
+        </div>
+      )
+
+    case 'text': {
+      const inputType = question.inputType ?? 'text'
+      const noSpellCheck = inputType === 'url' || inputType === 'email'
+      const width = inputType === 'url' ? undefined : inputType === 'tel' ? 'nhsuk-input--width-10' : 'nhsuk-input--width-20'
+      return (
+        <div className="nhsuk-form-group">
+          <h1 className="nhsuk-label-wrapper">
+            <label className="nhsuk-label nhsuk-label--l" htmlFor={question.id}>
+              {question.label}
+              {optionalSuffix}
+            </label>
+          </h1>
+          <Hint question={question} id={hintId} />
+          <TextInput
+            id={question.id}
+            name={question.id}
+            type={inputType}
+            inputMode={inputType === 'text' ? undefined : inputType}
+            autoComplete={inputType === 'email' ? 'email' : inputType === 'tel' ? 'tel' : inputType === 'url' ? 'url' : undefined}
+            spellCheck={noSpellCheck ? false : undefined}
+            className={width}
+            aria-describedby={describedBy}
+            value={draft[question.id] ?? ''}
+            onChange={(e) => patch({ [question.id]: e.target.value })}
+          />
+        </div>
+      )
+    }
+
+    case 'fields':
+      return (
+        <div className="nhsuk-form-group">
+          <fieldset className="nhsuk-fieldset" aria-describedby={describedBy}>
+            <legend className="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+              <h1 className="nhsuk-fieldset__heading">
+                {question.label}
+                {optionalSuffix}
+              </h1>
+            </legend>
+            <Hint question={question} id={hintId} />
+            {question.fields.map((field) => {
+              const key = fieldKey(question.id, field)
+              const id = `${question.id}-${field.key}`
+              const inputType = field.inputType ?? 'text'
+              return (
+                <div key={field.key} className="nhsuk-form-group">
+                  <label className="nhsuk-label" htmlFor={id}>
+                    {field.label}
+                    {field.optional ? ' (optional)' : ''}
+                  </label>
+                  <TextInput
+                    id={id}
+                    name={key}
+                    type={inputType}
+                    inputMode={inputType === 'text' ? undefined : inputType}
+                    autoComplete={field.autoComplete}
+                    spellCheck={inputType === 'url' || inputType === 'email' ? false : undefined}
+                    className={field.width}
+                    value={draft[key] ?? ''}
+                    onChange={(e) => patch({ [key]: e.target.value })}
+                  />
+                </div>
+              )
+            })}
+          </fieldset>
         </div>
       )
 
@@ -337,10 +447,11 @@ function DateField({ question, draft, patch, describedBy, hintId, optionalSuffix
   )
 }
 
-/** NHS File upload plus a required reference name. */
+/** NHS File upload plus a required reference name (omitted when `noReference` is set). */
 function UploadField({ question, draft, patch, optionalSuffix }: SubFieldProps) {
   const fileId = `${question.id}-file`
   const referenceKey = `${question.id}${UPLOAD_REFERENCE_SUFFIX}`
+  const withReference = !(question.type === 'upload' && question.noReference)
   const storedFileName = draft[question.id] ?? ''
   // A file input cannot be re-populated from storage, so on return visits we
   // show the saved name until the user picks a file in this session.
@@ -370,22 +481,24 @@ function UploadField({ question, draft, patch, optionalSuffix }: SubFieldProps) 
         </p>
       )}
 
-      <div className="nhsuk-form-group">
-        <label className="nhsuk-label" htmlFor={referenceKey}>
-          Required reference name
-        </label>
-        <div className="nhsuk-hint" id={`${referenceKey}-hint`}>
-          Label the document with your company name, the question number and the date of submission.
+      {withReference && (
+        <div className="nhsuk-form-group">
+          <label className="nhsuk-label" htmlFor={referenceKey}>
+            Required reference name
+          </label>
+          <div className="nhsuk-hint" id={`${referenceKey}-hint`}>
+            Label the document with your company name, the question number and the date of submission.
+          </div>
+          <TextInput
+            className="nhsuk-input--width-20"
+            id={referenceKey}
+            name={referenceKey}
+            aria-describedby={`${referenceKey}-hint`}
+            value={draft[referenceKey] ?? ''}
+            onChange={(e) => patch({ [referenceKey]: e.target.value })}
+          />
         </div>
-        <TextInput
-          className="nhsuk-input--width-20"
-          id={referenceKey}
-          name={referenceKey}
-          aria-describedby={`${referenceKey}-hint`}
-          value={draft[referenceKey] ?? ''}
-          onChange={(e) => patch({ [referenceKey]: e.target.value })}
-        />
-      </div>
+      )}
     </>
   )
 }

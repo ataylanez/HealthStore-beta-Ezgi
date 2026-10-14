@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { SUPPLIER_ONBOARD_BASE_PATH } from '@/lib/supplierOnboarding'
+import { formBasePath } from '@/lib/supplierOnboarding'
 import { useOnboardingProgress } from './useOnboardingProgress'
 
 /**
@@ -12,14 +12,14 @@ import { useOnboardingProgress } from './useOnboardingProgress'
  * number, then "What happens next". Guard: without a recorded submission there
  * is nothing to confirm, so direct visits return to the task list.
  */
-export default function OnboardingConfirmationPage() {
+export default function OnboardingConfirmationPage({ formId }: { formId: string }) {
   const router = useRouter()
-  const { hydrated, submission } = useOnboardingProgress()
+  const { hydrated, submission } = useOnboardingProgress(formId)
   const headingRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
-    if (hydrated && !submission) router.replace(SUPPLIER_ONBOARD_BASE_PATH)
-  }, [hydrated, submission, router])
+    if (hydrated && !submission) router.replace(formBasePath(formId))
+  }, [hydrated, submission, router, formId])
 
   useEffect(() => {
     if (submission) {

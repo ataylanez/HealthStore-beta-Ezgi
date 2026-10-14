@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
-import { CHECK_ANSWERS_PATH, SECTIONS, taskHref } from '@/lib/supplierOnboarding'
+import { PortalStatusTag } from '@/components/supplier-portal/PortalStatusTag'
+import { SECTIONS, checkAnswersPath, taskHref } from '@/lib/supplierOnboarding'
 import { useOnboardingProgress } from './useOnboardingProgress'
 
 /**
@@ -14,17 +15,17 @@ import { useOnboardingProgress } from './useOnboardingProgress'
  * official NHS Task list (`.nhsuk-task-list`).
  * https://service-manual.nhs.uk/design-system/patterns/complete-multiple-tasks
  *
- * Statuses follow the NHS guidance exactly:
- *  - Incomplete -> blue NHS Tag (`.nhsuk-tag--blue`)
+ * Statuses:
+ *  - Incomplete -> white NHS Tag (same as portal Incomplete status)
  *  - Completed  -> plain black text (`.nhsuk-task-list__status--completed`), no tag,
  *                  so attention stays on tasks that still need action.
  *
  * Footer row: Submit (NHS button, disabled until every task is Completed) and a
  * prototype "Mark all as complete" shortcut on the far right.
  */
-export default function SupplierOnboardingTaskList() {
+export default function SupplierOnboardingTaskList({ formId }: { formId: string }) {
   const router = useRouter()
-  const { isComplete, allComplete, markAllComplete } = useOnboardingProgress()
+  const { isComplete, allComplete, markAllComplete } = useOnboardingProgress(formId)
 
   return (
     <>
@@ -43,7 +44,7 @@ export default function SupplierOnboardingTaskList() {
                   <div className="nhsuk-task-list__name-and-hint">
                     <Link
                       className="nhsuk-task-list__link nhsuk-link"
-                      href={taskHref(task)}
+                      href={taskHref(formId, task)}
                       aria-describedby={statusId}
                     >
                       {task.title}
@@ -55,7 +56,7 @@ export default function SupplierOnboardingTaskList() {
                     </div>
                   ) : (
                     <div className="nhsuk-task-list__status" id={statusId}>
-                      <strong className="nhsuk-tag nhsuk-tag--blue">Incomplete</strong>
+                      <PortalStatusTag status="incomplete" />
                     </div>
                   )}
                 </li>
@@ -72,7 +73,7 @@ export default function SupplierOnboardingTaskList() {
           type="button"
           disabled={!allComplete}
           title={allComplete ? undefined : 'Complete every task before submitting'}
-          onClick={() => router.push(CHECK_ANSWERS_PATH)}
+          onClick={() => router.push(checkAnswersPath(formId))}
         >
           Submit
         </Button>

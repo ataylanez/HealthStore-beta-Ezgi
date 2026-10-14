@@ -202,21 +202,3 @@ export interface IcbReferenceData {
   completeness: 'full' | 'partial' | 'illustrative'
 }
 
-export interface OpportunityData {
-  condition_id: string
-  condition_label: string
-  need_summary: string
-  pathway_gap: string
-  why_addressable: string
-  intervention_types: string[]
-  product_slugs: string[]
-  impact_headline: {
-    metric: string
-    conservative: string
-    central: string
-    evidence_led: string
-    basis: EvidenceBasis
-    source: string
-  }[]
-  commissioning_considerations: string[]
-}

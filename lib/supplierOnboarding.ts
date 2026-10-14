@@ -1,28 +1,56 @@
 /**
  * Supplier onboarding task list — single source of truth for the structure of
- * the `/supplier-onboard` journey.
+ * the product onboarding form in the Supplier portal.
  *
  * Follows the NHS "Complete multiple tasks" pattern:
  * https://service-manual.nhs.uk/design-system/patterns/complete-multiple-tasks
  *
- * Sections group related tasks. Each task has its own page at
- * `/supplier-onboard/[slug]` and its own Completed / Incomplete status.
+ * Each product awaiting onboarding has its own copy of the form at
+ * `/supplier-portal/products/onboard/[formId]`. Sections group related tasks;
+ * each task has its own page at `.../[formId]/[slug]` and its own Completed /
+ * Incomplete status.
+ *
+ * The questionnaire is multi-routed: a question may declare `showIf` conditions
+ * on earlier answers in the same task. Hidden questions are skipped by
+ * Save and Next, ignored by the Completed check and omitted from Check your
+ * answers. See `isQuestionVisible`. The routes are documented in
+ * docs/SUPPLIER_PORTAL_FLOWS.md ("Product onboarding question routes").
  */
+
+import { PORTAL_PATHS } from '@/lib/supplierPortal'
 
 export const SERVICE_NAME = 'HealthStore Onboarding'
 
-export const SUPPLIER_ONBOARD_BASE_PATH = '/supplier-onboard'
+/** localStorage key prefix; one entry per form (client-side prototype). */
+export const STORAGE_KEY_PREFIX = 'hs-supplier-portal:onboarding:'
 
-/** localStorage key for per-task completion state (client-side prototype). */
-export const STORAGE_KEY = 'hs-supplier-onboard:tasks'
-
-/** True for the task list and every task / question page beneath it. */
-export function isSupplierOnboardPath(pathname: string | null | undefined): boolean {
-  if (!pathname) return false
-  return pathname === SUPPLIER_ONBOARD_BASE_PATH || pathname.startsWith(`${SUPPLIER_ONBOARD_BASE_PATH}/`)
+export function storageKey(formId: string): string {
+  return `${STORAGE_KEY_PREFIX}${formId}`
 }
 
-export type QuestionOption = { value: string; label: string }
+/** Task list page for one product's form. */
+export function formBasePath(formId: string): string {
+  return `${PORTAL_PATHS.onboard}/${formId}`
+}
+
+export type QuestionOption = {
+  value: string
+  label: string
+  /** Not rendered (kept in the model so a route can be switched on later). */
+  hidden?: boolean
+  /** Checkboxes only: selecting this clears every other option, and vice versa ("None of the above"). */
+  exclusive?: boolean
+}
+
+/**
+ * Routing condition on an earlier answer in the same task. `in` holds when any
+ * selected value is listed; `notIn` holds when none is. An unanswered (or
+ * hidden) referenced question never satisfies a condition, so follow-up
+ * questions only appear once their parent has been answered.
+ */
+export type AnswerCondition =
+  | { questionId: string; in?: string[]; notIn?: string[] }
+  | { anyOf: AnswerCondition[] }
 
 /**
  * One question = one page (NHS/GOV.UK "one thing per page"). The question
@@ -30,25 +58,56 @@ export type QuestionOption = { value: string; label: string }
  */
 type QuestionBase = {
   id: string
+  /** Questionnaire reference (e.g. "C1.1.1"), shown in the page caption and on Check your answers. */
+  code?: string
   label: string
   hint?: string
   /** Optional questions (e.g. "if applicable") do not block the task from being Completed. */
   optional?: boolean
+  /** Shown only when every condition holds (see `isQuestionVisible`). Absent = always shown. */
+  showIf?: AnswerCondition | AnswerCondition[]
+  /** Short row key for read-only summaries (e.g. "Company name"); the question `label` is used when omitted. */
+  summaryLabel?: string
+  /** Leave the row out of read-only summaries (e.g. a Yes/No gate whose answer is implied by the next row). */
+  hideInSummary?: boolean
+}
+
+export type TextInputType = 'text' | 'url' | 'email' | 'tel'
+
+/** One input in a `fields` question (e.g. Address line 1, First name). */
+export type FieldSpec = {
+  key: string
+  label: string
+  optional?: boolean
+  inputType?: TextInputType
+  autoComplete?: string
+  /** NHS input width modifier, e.g. 'nhsuk-input--width-10'. Full width when omitted. */
+  width?: string
+  /** On Check your answers, show on the same line as the previous field (e.g. first and last name). */
+  inline?: boolean
 }
 
 export type OnboardingQuestion =
   | (QuestionBase & { type: 'radios'; options: QuestionOption[] })
   | (QuestionBase & { type: 'checkboxes'; options: QuestionOption[] })
   | (QuestionBase & { type: 'textarea' })
+  /** Single-line NHS Text input (links, email addresses, phone numbers, percentages, short dates). */
+  | (QuestionBase & { type: 'text'; inputType?: TextInputType })
+  /**
+   * Several short text inputs under one heading (NHS Addresses pattern, a
+   * person's name, contact details). Each field is stored under
+   * `${id}${FIELD_SEPARATOR}${field.key}` — see `fieldKey`.
+   */
+  | (QuestionBase & { type: 'fields'; fields: FieldSpec[] })
   /** NHS Date input (day / month / year). Stored as YYYY-MM-DD. */
   | (QuestionBase & { type: 'date' })
   /**
    * File upload plus a required reference name (GOV.UK File upload — the NHS
    * design system has no equivalent). `documents` lists the evidence that may be
    * supplied. The file name is stored under `id`; the reference name under
-   * `${id}${UPLOAD_REFERENCE_SUFFIX}`.
+   * `${id}${UPLOAD_REFERENCE_SUFFIX}`. Set `noReference` to ask for the file only.
    */
-  | (QuestionBase & { type: 'upload'; documents?: string[] })
+  | (QuestionBase & { type: 'upload'; documents?: string[]; noReference?: boolean })
   /**
    * Several documents, added one at a time (file + reference name, then
    * "Upload file"), listed with a Remove action. Adapted from the MoJ Multi file
@@ -63,6 +122,12 @@ export type OnboardingQuestion =
 export const UPLOAD_REFERENCE_SUFFIX = '__reference'
 export const MULTI_UPLOAD_CONFIRMED_SUFFIX = '__confirmed'
 export const CONFIRMED_VALUE = 'yes'
+export const FIELD_SEPARATOR = '__'
+
+/** Answer key for one input of a `fields` question. */
+export function fieldKey(questionId: string, field: Pick<FieldSpec, 'key'>): string {
+  return `${questionId}${FIELD_SEPARATOR}${field.key}`
+}
 
 /** One entry in a multi-upload list. Prototype: metadata only, no file bytes. */
 export type UploadedDocument = {
@@ -112,276 +177,609 @@ export const ONBOARDING_NOTICE =
 export const SUBMISSION_DECLARATION =
   'By submitting you confirm you understand that under UK MDR, manufacturers are solely liable for all clinical, efficacy and regulatory claims. All answers are objective, evidence-based and aligned with NHS clinical guidelines.'
 
-export const CHECK_ANSWERS_PATH = `${SUPPLIER_ONBOARD_BASE_PATH}/check-answers`
-export const CONFIRMATION_PATH = `${SUPPLIER_ONBOARD_BASE_PATH}/confirmation`
+export function checkAnswersPath(formId: string): string {
+  return `${formBasePath(formId)}/check-answers`
+}
+
+export function confirmationPath(formId: string): string {
+  return `${formBasePath(formId)}/confirmation`
+}
 
 function task(slug: string, title: string, questions: OnboardingQuestion[] = []): OnboardingTask {
   return { id: slug, slug, title, questions }
 }
+
+/* ----------------------------- option sets ------------------------------ */
 
 const YES_NO: QuestionOption[] = [
   { value: 'yes', label: 'Yes' },
   { value: 'no', label: 'No' },
 ]
 
+const YES_NO_NA: QuestionOption[] = [
+  { value: 'yes', label: 'Yes' },
+  { value: 'no', label: 'No' },
+  { value: 'not-applicable', label: 'Not applicable' },
+]
+
+const PROVIDED_NOT_PROVIDED: QuestionOption[] = [
+  { value: 'provided', label: 'Provided' },
+  { value: 'not-provided', label: 'Not provided' },
+]
+
+const CONFIRM_CANNOT_CONFIRM: QuestionOption[] = [
+  { value: 'confirm', label: 'Confirm' },
+  { value: 'cannot-confirm', label: 'Cannot confirm' },
+]
+
+const CONFIRMED_UNABLE: QuestionOption[] = [
+  { value: 'confirmed', label: 'Confirmed' },
+  { value: 'unable-to-confirm', label: 'Unable to confirm' },
+]
+
+const UPLOAD_HINT = 'Label the document with your company name, the question number and the date of submission.'
+
+/* -------------------------------- content ------------------------------- */
+
 export const SECTIONS: OnboardingSection[] = [
   {
-    id: 'supplier-product-classification',
-    title: 'Supplier, Product Metadata & Clinical Classification',
-    description:
-      "This section establishes your organisation's financial profile. Complete this section providing details of the therapeutic being submitted.",
+    id: 'product-details',
+    title: 'Product details',
+    description: 'Tell us which product, and which version of it, this form is for.',
     tasks: [
-      task('corporate-financial-stability-check', 'Corporate Financial Stability Check', [
+      task('product-details', 'Product details', [
         {
-          id: 'financial-stability',
+          id: 'a2-product-name',
+          code: 'A2',
+          type: 'text',
+          label: 'What is the name of your product?',
+        },
+        {
+          id: 'a3-product-version',
+          code: 'A3',
+          type: 'text',
+          label: 'Which version number of your product does this form correspond to?',
+          hint: 'For example, 3.2.0.',
+        },
+        {
+          id: 'a4-product-type',
+          code: 'A4',
           type: 'radios',
-          label: 'Corporate Financial Stability Check',
-          hint: 'Confirm the organisation is not undergoing bankruptcy, winding-up, or administration.',
+          label: 'What type of product is it?',
+          options: [
+            { value: 'standalone-application', label: 'Standalone application' },
+            { value: 'wearable', label: 'Wearable' },
+            { value: 'saas', label: 'Software as a service (SaaS)' },
+            { value: 'other', label: 'Other' },
+          ],
+        },
+        {
+          id: 'a4-product-type-other',
+          code: 'A4',
+          type: 'textarea',
+          label: 'Describe the type of product',
+          showIf: { questionId: 'a4-product-type', in: ['other'] },
+        },
+      ]),
+    ],
+  },
+  {
+    id: 'value-proposition',
+    title: 'Value proposition',
+    description:
+      'Set out the clinical, economic or behavioural benefits of your product to support the review of your technology. This section is not scored but provides the context of the product undergoing assessment. Where possible, give details relating to the specific technology and not generally to your organisation.',
+    tasks: [
+      task('value-proposition', 'Value proposition', [
+        {
+          id: 'b1-intended-use',
+          code: 'B1',
+          type: 'radios',
+          label: 'What is the intended use of the product?',
+          options: [
+            { value: 'patient-care-support', label: 'Patient care or support' },
+            { value: 'diagnostics', label: 'Diagnostics' },
+            { value: 'clinical-support', label: 'Clinical support' },
+            { value: 'workforce-support', label: 'Workforce support' },
+            { value: 'other', label: 'Other' },
+          ],
+        },
+        {
+          id: 'b2-description',
+          code: 'B2',
+          type: 'textarea',
+          label: 'Describe what the product is designed to do and how it is expected to be used',
+          hint: 'A clear, high-level summary.',
+        },
+        {
+          id: 'b3-users-benefits',
+          code: 'B3',
+          type: 'textarea',
+          label: 'Describe the intended users and proven benefits, and confirm if and how the benefits have been validated',
+          hint: 'A high-level summary, including any trial details.',
+        },
+        {
+          id: 'b4-data-flow',
+          code: 'B4',
+          type: 'radios',
+          label: 'Can you provide information about the data flow between the product and the health IT system?',
+          hint: 'Attach a user journey map where applicable.',
+          options: [
+            { value: 'provided', label: 'Provided' },
+            { value: 'not-available', label: 'Not available' },
+          ],
+        },
+        {
+          id: 'b4-data-flow-upload',
+          code: 'B4',
+          type: 'upload',
+          label: 'Upload your data flow or user journey map',
+          hint: UPLOAD_HINT,
+          showIf: { questionId: 'b4-data-flow', in: ['provided'] },
+        },
+      ]),
+    ],
+  },
+  {
+    id: 'technical-questions',
+    title: 'Technical questions (assessed standards)',
+    description:
+      'Suppliers must provide responses and documentation relating to the specific version of the product that is subject to assessment.',
+    tasks: [
+      task('clinical-safety', 'Clinical safety (DCB 0129)', [
+        {
+          id: 'c1-1-1-samd',
+          code: 'C1.1.1',
+          type: 'radios',
+          label: 'Does your product qualify as software or AI as a medical device under UK MDR 2002?',
+          hint: 'If yes, you will be asked to upload a completed Pre-acquisition questionnaire (PAQ) form for medical devices in respect of the product or its component.',
           options: YES_NO,
         },
-      ]),
-      task('nice-information', 'NICE information', [
         {
-          id: 'nice-guidance-reference',
-          type: 'textarea',
-          label: 'NICE Guidance Alignment Reference',
-          hint: 'Provide specific NICE Health Technology Guidance reference (e.g., NICE HTG736 or HTG718).',
+          id: 'c1-1-1-paq-upload',
+          code: 'C1.1.1',
+          type: 'upload',
+          label: 'Upload your completed Pre-acquisition questionnaire (PAQ) form',
+          hint: UPLOAD_HINT,
+          showIf: { questionId: 'c1-1-1-samd', in: ['yes'] },
         },
         {
-          id: 'nice-recommendation-pathway',
-          type: 'textarea',
-          label: 'NICE recommendation pathway',
-          hint: 'Is the product recommended for routine use or advised under an Early Value Assessment (EVA)?',
-        },
-        {
-          id: 'nice-evidence-generation-status',
-          type: 'textarea',
-          label: 'NICE evidence generation status',
-          hint: 'If applicable, describe where the app stands in its NICE evidence gathering program.',
-        },
-      ]),
-      task('supervision-care-model-and-classification', 'Supervision care model and Classification', [
-        {
-          id: 'supervision-care-model',
+          id: 'c1-1-2-standalone',
+          code: 'C1.1.2',
           type: 'radios',
-          label: 'Supervision care model',
-          hint: 'State if the app operates as self-management or clinician-led remote monitoring.',
+          label: 'Is your product classified as a standalone medical device?',
+          options: YES_NO,
+          showIf: { questionId: 'c1-1-1-samd', in: ['yes'] },
+        },
+        {
+          id: 'c1-2-direct-care',
+          code: 'C1.2',
+          type: 'radios',
+          label: 'Is your product designed to support or manage real-time or direct care?',
+          options: YES_NO,
+        },
+        {
+          id: 'c1-2-1-justification',
+          code: 'C1.2.1',
+          type: 'textarea',
+          label: 'Explain why the product is out of scope of DCB 0129',
+          hint: 'You answered No to C1.2. Provide your justification.',
+          showIf: { questionId: 'c1-2-direct-care', in: ['no'] },
+        },
+        {
+          id: 'c1-2-2-crm-activities',
+          code: 'C1.2.2',
+          type: 'radios',
+          label: 'Have you undertaken clinical risk management activities complying with DCB 0129?',
+          options: YES_NO,
+        },
+        {
+          id: 'c1-2-3-crm-system',
+          code: 'C1.2.3',
+          type: 'radios',
+          label: 'Can you detail your clinical risk management system?',
+          options: PROVIDED_NOT_PROVIDED,
+        },
+        {
+          id: 'c1-2-3-crm-system-details',
+          code: 'C1.2.3',
+          type: 'textarea',
+          label: 'Describe your clinical risk management system',
+          showIf: { questionId: 'c1-2-3-crm-system', in: ['provided'] },
+        },
+        {
+          id: 'c1-2-4-safety-case',
+          code: 'C1.2.4',
+          type: 'radios',
+          label: 'Can you supply your Clinical Safety Case Report and Hazard Log?',
+          options: PROVIDED_NOT_PROVIDED,
+        },
+        {
+          id: 'c1-2-4-safety-case-report-upload',
+          code: 'C1.2.4',
+          type: 'upload',
+          label: 'Upload your Clinical Safety Case Report',
+          hint: UPLOAD_HINT,
+          showIf: { questionId: 'c1-2-4-safety-case', in: ['provided'] },
+        },
+        {
+          id: 'c1-2-4-hazard-log-upload',
+          code: 'C1.2.4',
+          type: 'upload',
+          label: 'Upload your Hazard Log',
+          hint: UPLOAD_HINT,
+          showIf: { questionId: 'c1-2-4-safety-case', in: ['provided'] },
+        },
+        {
+          id: 'c1-2-5-cso',
+          code: 'C1.2.5',
+          type: 'textarea',
+          label: 'Provide the details of your Clinical Safety Officer (CSO)',
+          hint: 'Name, profession and professional registration number.',
+        },
+      ]),
+      task('data-protection', 'Data protection (UK GDPR)', [
+        {
+          id: 'c2-1-dspt',
+          code: 'C2.1',
+          type: 'radios',
+          label: 'Confirm compliance with the annual Data Security and Protection Toolkit (DSPT) assessment',
+          hint: 'Standards met or exceeded.',
           options: [
-            { value: 'self-managed', label: 'Self-Managed' },
-            { value: 'clinically-supervised', label: 'Clinically Supervised' },
-            { value: 'hybrid', label: 'Hybrid' },
+            { value: 'confirmed', label: 'Confirmed' },
+            { value: 'unable-to-confirm', label: 'Unable to confirm' },
+            { value: 'no-patient-data', label: 'No access to patient data' },
           ],
         },
         {
-          id: 'medical-device-classification',
+          id: 'c2-2-personal-data',
+          code: 'C2.2',
           type: 'radios',
-          label: 'Medical Device Classification',
-          hint: 'Provide UK MHRA medical device risk class under current regulations.',
+          label: 'Does the product process personal data or data about deceased individuals?',
+          options: YES_NO,
+        },
+        {
+          id: 'c2-2-1-ico',
+          code: 'C2.2.1',
+          type: 'radios',
+          label: "Can you provide evidence of current registration with the Information Commissioner's Office (ICO)?",
+          options: PROVIDED_NOT_PROVIDED,
+        },
+        {
+          id: 'c2-2-1-ico-upload',
+          code: 'C2.2.1',
+          type: 'upload',
+          label: 'Upload your ICO registration certificate',
+          hint: UPLOAD_HINT,
+          showIf: { questionId: 'c2-2-1-ico', in: ['provided'] },
+        },
+        {
+          id: 'c2-2-2-dpia',
+          code: 'C2.2.2',
+          type: 'radios',
+          label: 'Can you provide the Data Protection Impact Assessment (DPIA) relating to the product?',
+          options: PROVIDED_NOT_PROVIDED,
+        },
+        {
+          id: 'c2-2-2-dpia-upload',
+          code: 'C2.2.2',
+          type: 'upload',
+          label: 'Upload your Data Protection Impact Assessment (DPIA)',
+          hint: UPLOAD_HINT,
+          showIf: { questionId: 'c2-2-2-dpia', in: ['provided'] },
+        },
+        {
+          id: 'c2-2-3-privacy-notice',
+          code: 'C2.2.3',
+          type: 'radios',
+          label: "Can you provide a link to your product's transparency information (privacy notice)?",
+          options: PROVIDED_NOT_PROVIDED,
+        },
+        {
+          id: 'c2-2-3-privacy-notice-link',
+          code: 'C2.2.3',
+          type: 'text',
+          inputType: 'url',
+          label: 'Link to your privacy notice',
+          hint: 'For example, https://www.example.com/privacy',
+          showIf: { questionId: 'c2-2-3-privacy-notice', in: ['provided'] },
+        },
+        {
+          id: 'c2-2-4-terms',
+          code: 'C2.2.4',
+          type: 'radios',
+          label: 'Can you provide product terms and conditions regarding user data, an end user licence agreement (EULA) or equivalent?',
+          options: PROVIDED_NOT_PROVIDED,
+        },
+        {
+          id: 'c2-2-4-terms-upload',
+          code: 'C2.2.4',
+          type: 'upload',
+          label: 'Upload your terms and conditions, EULA or equivalent',
+          hint: UPLOAD_HINT,
+          showIf: { questionId: 'c2-2-4-terms', in: ['provided'] },
+        },
+        {
+          id: 'c2-2-4-terms-reason',
+          code: 'C2.2.4',
+          type: 'textarea',
+          label: 'Explain why terms and conditions, an EULA or equivalent cannot be provided',
+          showIf: { questionId: 'c2-2-4-terms', in: ['not-provided'] },
+        },
+        {
+          id: 'c2-2-5-data-location',
+          code: 'C2.2.5',
+          type: 'radios',
+          label: 'Where does your product store and process data?',
           options: [
-            { value: 'class-i', label: 'Class I' },
-            { value: 'class-iia', label: 'Class IIa' },
-            { value: 'class-iib', label: 'Class IIb' },
-            { value: 'class-iii', label: 'Class III' },
+            { value: 'uk-only', label: 'UK only' },
+            { value: 'outside-uk', label: 'Outside of the UK' },
           ],
+        },
+        {
+          id: 'c2-2-6-outside-uk',
+          code: 'C2.2.6',
+          type: 'textarea',
+          label: 'Name the country where data is stored or processed and set out your compliance safeguards',
+          hint: 'For example, an International Data Transfer Agreement (IDTA) or adequacy regulations.',
+          showIf: { questionId: 'c2-2-5-data-location', in: ['outside-uk'] },
+        },
+      ]),
+      task('technical-security', 'Technical security', [
+        {
+          id: 'c3-1-cyber-essentials',
+          code: 'C3.1',
+          type: 'radios',
+          label: 'Can you provide a valid Cyber Essentials certificate?',
+          options: PROVIDED_NOT_PROVIDED,
+        },
+        {
+          id: 'c3-1-cyber-essentials-upload',
+          code: 'C3.1',
+          type: 'upload',
+          label: 'Upload your Cyber Essentials certificate',
+          hint: UPLOAD_HINT,
+          showIf: { questionId: 'c3-1-cyber-essentials', in: ['provided'] },
+        },
+        {
+          id: 'c3-2-charter',
+          code: 'C3.2',
+          type: 'radios',
+          label: 'Have you signed the Cyber Security Charter for Suppliers to the NHS?',
+          hint: 'If yes, the remaining technical security questions are skipped.',
+          options: YES_NO,
+        },
+        {
+          id: 'c3-3-pen-test',
+          code: 'C3.3',
+          type: 'radios',
+          label: 'Can you provide an external penetration test summary report from the last 12 months?',
+          hint: 'Including the OWASP Top 10.',
+          options: PROVIDED_NOT_PROVIDED,
+          showIf: { questionId: 'c3-2-charter', in: ['no'] },
+        },
+        {
+          id: 'c3-3-pen-test-upload',
+          code: 'C3.3',
+          type: 'upload',
+          label: 'Upload your penetration test summary report',
+          hint: UPLOAD_HINT,
+          showIf: { questionId: 'c3-3-pen-test', in: ['provided'] },
+        },
+        {
+          id: 'c3-4-code-of-practice',
+          code: 'C3.4',
+          type: 'radios',
+          label: 'Confirm your software adheres to the DSIT and NCSC Software Security Code of Practice',
+          options: CONFIRMED_UNABLE,
+          showIf: { questionId: 'c3-2-charter', in: ['no'] },
+        },
+        {
+          id: 'c3-5-mfa-plan',
+          code: 'C3.5',
+          type: 'radios',
+          label: 'Do you have a plan for implementing multi-factor authentication (MFA) across all accounts?',
+          options: YES_NO,
+          showIf: { questionId: 'c3-2-charter', in: ['no'] },
+        },
+        {
+          id: 'c3-5-1-privileged-mfa',
+          code: 'C3.5.1',
+          type: 'radios',
+          label: 'Do privileged supplier access accounts have MFA enabled, or equivalent MFA applied at the remote end when accessing the product?',
+          options: YES_NO_NA,
+          showIf: { questionId: 'c3-2-charter', in: ['no'] },
+        },
+        {
+          id: 'c3-6-logging',
+          code: 'C3.6',
+          type: 'radios',
+          label: 'Have logging and reporting requirements been defined?',
+          options: YES_NO,
+          showIf: { questionId: 'c3-2-charter', in: ['no'] },
+        },
+      ]),
+      task('interoperability', 'Interoperability', [
+        {
+          id: 'c4-1-apis',
+          code: 'C4.1',
+          type: 'radios',
+          label: 'Does your product expose any APIs or integration channels for other health products?',
+          options: YES_NO,
+        },
+        {
+          id: 'c4-1-1-standards',
+          code: 'C4.1.1',
+          type: 'textarea',
+          label: 'Confirm your APIs use international or industry standards',
+          hint: 'List the standards used and your justification.',
+          showIf: { questionId: 'c4-1-apis', in: ['yes'] },
+        },
+        {
+          id: 'c4-1-2-open-api',
+          code: 'C4.1.2',
+          type: 'radios',
+          label: 'Confirm your APIs follow GDS Open API guidance and are openly documented',
+          options: CONFIRM_CANNOT_CONFIRM,
+          showIf: { questionId: 'c4-1-apis', in: ['yes'] },
+        },
+        {
+          id: 'c4-1-3-documentation',
+          code: 'C4.1.3',
+          type: 'textarea',
+          label: 'Set out the basis on which your APIs are documented',
+          hint: 'You could not confirm C4.1.2.',
+          showIf: { questionId: 'c4-1-2-open-api', in: ['cannot-confirm'] },
+        },
+        {
+          id: 'c4-2-data-sharing',
+          code: 'C4.2',
+          type: 'radios',
+          label: 'Is your product intended to share or receive data from national or local care systems?',
+          options: YES_NO,
+        },
+        {
+          id: 'c4-2-1-nhs-number',
+          code: 'C4.2.1',
+          type: 'radios',
+          label: 'Is your product capable of using the NHS number to identify patient data during exchange?',
+          options: YES_NO,
+          showIf: { questionId: 'c4-2-data-sharing', in: ['yes'] },
+        },
+        {
+          id: 'c4-2-2-pds',
+          code: 'C4.2.2',
+          type: 'radios',
+          label: 'Does your product integrate with the NHS Personal Demographics Service (PDS) or local systems to validate NHS numbers?',
+          options: YES_NO,
+          showIf: { questionId: 'c4-2-data-sharing', in: ['yes'] },
+        },
+        {
+          id: 'c4-2-3-identification',
+          code: 'C4.2.3',
+          type: 'textarea',
+          label: 'Set out the approach taken to correctly identify patient records',
+          hint: 'You answered No to C4.2.1 or C4.2.2.',
+          showIf: {
+            anyOf: [
+              { questionId: 'c4-2-1-nhs-number', in: ['no'] },
+              { questionId: 'c4-2-2-pds', in: ['no'] },
+            ],
+          },
+        },
+        {
+          id: 'c4-2-4-nhs-login',
+          code: 'C4.2.4',
+          type: 'radios',
+          label: 'If used directly by patients, do you use NHS login to verify identity and authenticate users?',
+          options: YES_NO_NA,
+          showIf: { questionId: 'c4-2-data-sharing', in: ['yes'] },
+        },
+        {
+          id: 'c4-2-5-dapb3051',
+          code: 'C4.2.5',
+          type: 'radios',
+          label: 'If used by public health or social care, does the product support the DAPB3051 identity standard?',
+          options: YES_NO_NA,
+          showIf: { questionId: 'c4-2-data-sharing', in: ['yes'] },
+        },
+        {
+          id: 'c4-2-6-authentication',
+          code: 'C4.2.6',
+          type: 'textarea',
+          label: 'Set out your authentication approach and data protection measures',
+          hint: 'You are not using NHS login.',
+          showIf: { questionId: 'c4-2-4-nhs-login', in: ['no', 'not-applicable'] },
         },
       ]),
     ],
   },
   {
-    id: 'clinical-safety-dtac',
-    title: 'Clinical Safety & DTAC Evidence Base (DCB 0129 / 0160)',
-    description:
-      'Evidence of robust clinical safety risk management is mandatory. Central verification of these documents acts as a pre-production gate to protect public trust. Local deploying organisations retain risk ownership under DCB 0160.',
+    id: 'usability-accessibility',
+    title: 'Key principles for success (usability and accessibility)',
+    description: 'Establishing that your product has followed best practice.',
     tasks: [
-      task('completed-dtac-form', 'Completed DTAC Version 2.0 Form', [
+      task('usability-accessibility', 'Usability and accessibility', [
         {
-          id: 'dtac-form',
-          type: 'multi-upload',
-          label: 'Completed DTAC Version 2.0 Form',
-          hint: 'Please ensure that when providing evidence, documents are clearly labelled with the name of your company, the question number and the date of submission.',
-          documents: [
-            'A11 - CQC Report',
-            'B4 - User journeys and data flows',
-            'C1.1 - Pre-Acquisition Questionnaire Form',
-            'C1.2.3 - Clinical Safety Case Report',
-            'C1.3.4 - Hazard Log',
-            "C2.2.1 - Information Commissioner's registration",
-            'C2.2.2 - Data Protection Impact Assessment (DPIA)',
-            'C2.2.4 - Products terms and conditions regarding use of user data, end user licence agreement or equivalent',
-            'C3.1 - Cyber Essentials Certification',
-            'C3.2 - External Penetration Test Summary Report',
-            'D1.1 - User Journeys and/or how the product fits into a user pathway or journey',
-          ],
+          id: 'd1-1-pathways',
+          code: 'D1.1',
+          type: 'radios',
+          label: 'Can you provide information about how the product fits into existing systems such as care pathways or staff journeys?',
+          hint: 'For example, instructions for use.',
+          options: PROVIDED_NOT_PROVIDED,
         },
-      ]),
-      task('post-market-surveillance', 'Post-Market Surveillance', [
         {
-          id: 'post-market-surveillance-report',
+          id: 'd1-1-pathways-upload',
+          code: 'D1.1',
           type: 'upload',
-          label: 'Post-Market Surveillance',
-          hint: 'Upload most recent Periodic Safety Update Report (PSUR) or Post Market Surveillance Report (PMSR).',
+          label: 'Upload your pathway or journey document',
+          hint: UPLOAD_HINT,
+          showIf: { questionId: 'd1-1-pathways', in: ['provided'] },
         },
-      ]),
-    ],
-  },
-  {
-    id: 'technical-security-integration',
-    title: 'Technical Security, Integration & EMIS Systems',
-    description:
-      'All third-party connections and technical specifications are mapped to prevent misleading local integration claims and expose hidden API costs prior to local commissioning.',
-    tasks: [
-      task('vulnerability-remediation-plan', 'Vulnerability Remediation Plan', [
         {
-          id: 'vulnerability-remediation-plan',
-          type: 'upload',
-          label: 'Vulnerability Remediation Plan',
-          hint: 'If applicable, upload remediation roadmap addressing any open security findings.',
-          optional: true,
+          id: 'd1-2-user-testing',
+          code: 'D1.2',
+          type: 'radios',
+          label: 'Do you undertake testing with intended users to validate product usability?',
+          options: YES_NO,
         },
-      ]),
-      task('integrations', 'Integrations', [
         {
-          id: 'clinical-system-integrations',
+          id: 'd1-3-ais',
+          code: 'D1.3',
+          type: 'radios',
+          label: 'Confirm you have read the Accessible Information Standard and considered its design requirements',
+          options: CONFIRM_CANNOT_CONFIRM,
+        },
+        {
+          id: 'd1-4-platforms',
+          code: 'D1.4',
           type: 'checkboxes',
-          label: 'Clinical System Integrations',
-          hint: 'Check all systems with active integrations.',
+          label: 'Which digital platforms does your product support?',
+          hint: 'Select all that apply.',
           options: [
-            { value: 'emis-web', label: 'EMIS Web' },
-            { value: 'systmone', label: 'SystmOne' },
-            { value: 'vision', label: 'Vision' },
+            { value: 'ios', label: 'iOS' },
+            { value: 'android', label: 'Android' },
+            { value: 'web', label: 'Web' },
+            // Hidden for now. When shown and selected, the rest of this section is skipped.
+            { value: 'none', label: 'None of the above', hidden: true, exclusive: true },
           ],
         },
         {
-          id: 'integration-capabilities',
-          type: 'textarea',
-          label: 'Integration Capabilities Description',
-          hint: 'Describe level of integration (e.g., bi-directional push/pull, read-only PDF transfer).',
+          id: 'd1-4-1-wcag',
+          code: 'D1.4.1',
+          type: 'radios',
+          label: 'Does your product comply with WCAG 2.2 at level AA or higher?',
+          options: [
+            { value: 'yes', label: 'Yes' },
+            { value: 'no-plan-in-place', label: 'No, but a plan is in place' },
+            { value: 'no', label: 'No' },
+            { value: 'not-applicable', label: 'Not applicable' },
+          ],
+          showIf: { questionId: 'd1-4-platforms', notIn: ['none'] },
         },
         {
-          id: 'integration-licensing-fees',
-          type: 'textarea',
-          label: 'Associated Integration Licensing Fees',
-          hint: 'Clearly disclose any API or clinical interface licensing fees charged to buyers.',
+          id: 'd1-4-2-timescale',
+          code: 'D1.4.2',
+          type: 'text',
+          label: 'Set out the timescale by which you plan to be WCAG 2.2 AA compliant',
+          hint: 'For example, March 2027.',
+          showIf: { questionId: 'd1-4-1-wcag', in: ['no-plan-in-place', 'no'] },
         },
-      ]),
-    ],
-  },
-  {
-    id: 'usability-accessibility-equality',
-    title: 'Usability, Accessibility (WCAG 2.2 AA) & Equality Governance',
-    description:
-      'Products must align with national public sector accessibility standards to support NHS App integration and address health inequality cohorts.',
-    tasks: [
-      task('accessibility-audit', 'Accessibility Audit', [
         {
-          id: 'accessibility-audit-date',
-          type: 'date',
-          label: 'Accessibility Audit Date',
-          hint: 'Date of last formal accessibility audit (required for NHS App integration). For example, 15 3 2025.',
+          id: 'd1-4-3-accessibility-statement',
+          code: 'D1.4.3',
+          type: 'text',
+          inputType: 'url',
+          label: 'Link to your published accessibility statement',
+          hint: 'For example, https://www.example.com/accessibility',
+          showIf: { questionId: 'd1-4-platforms', notIn: ['none'] },
         },
-      ]),
-    ],
-  },
-  {
-    id: 'clinical-evidence-outcomes',
-    title: 'Clinical Evidence, Expected Outcomes & Pathway Benefits',
-    description:
-      'Provide neutral, evidence-based intelligence focused on hospital utilisation, patient flow, and bed capacity impacts to justify high-stakes local business cases.',
-    tasks: [
-      task('product-public-summary', 'Product Public Summary', [
         {
-          id: 'product-public-summary',
-          type: 'textarea',
-          label: 'Product Public Summary',
-          hint: 'Enter a concise description of what the app does and how it benefits clinical pathways.',
-        },
-      ]),
-      task('clinical-evidence-baseline', 'Clinical Evidence Baseline', [
-        {
-          id: 'clinical-evidence-baseline',
-          type: 'textarea',
-          label: 'Clinical Evidence Baseline',
-          hint: 'Summarise verified clinical outcomes, citing peer-reviewed studies or clinical trial data.',
-        },
-      ]),
-      task('hospital-utilisation-bed-flow-impact', 'Hospital Utilisation & Bed Flow Impact', [
-        {
-          id: 'hospital-utilisation-bed-flow-impact',
-          type: 'textarea',
-          label: 'Hospital Utilisation & Bed Flow Impact',
-          hint: 'Describe evidence demonstrating reduced admissions, bed days, or outpatient bottlenecks.',
-        },
-      ]),
-      task('expected-patient-outcomes', 'Expected Patient Outcomes', [
-        {
-          id: 'expected-patient-outcomes',
-          type: 'textarea',
-          label: 'Expected Patient Outcomes',
-          hint: 'Outline quantitative and qualitative patient benefits (e.g., symptom reduction, quality of life).',
-        },
-      ]),
-      task('implementation-or-staffing-requirements', 'Implementation or staffing requirements', [
-        {
-          id: 'human-wrapper-requirements',
-          type: 'textarea',
-          label: 'Human Wrapper Requirements',
-          hint: 'Specify the implementation support or clinical staffing required locally to ensure adoption.',
-        },
-      ]),
-    ],
-  },
-  {
-    id: 'commercial-pricing-procurement',
-    title: 'Commercial Implementation, Pricing & Procurement Packs',
-    description:
-      'To reduce procurement lead times from months to weeks, please provide complete commercial materials and licensing transparency below.',
-    tasks: [
-      task('nhs-deployment-locations', 'NHS Deployment Locations', [
-        {
-          id: 'nhs-deployment-locations',
-          type: 'textarea',
-          label: 'NHS Deployment Locations',
-          hint: 'List all active NHS trusts or ICBs currently deploying your product.',
-        },
-      ]),
-      task('active-deployment-verification-contact', 'Active Deployment Verification Contact', [
-        {
-          id: 'active-deployment-verification-contact',
-          type: 'textarea',
-          label: 'Active Deployment Verification Contact',
-          hint: 'Provide email address of an NHS clinical or procurement lead for reciprocity checking.',
-        },
-      ]),
-      task('approved-procurement-frameworks', 'Approved Procurement Frameworks', [
-        {
-          id: 'approved-procurement-frameworks',
-          type: 'textarea',
-          label: 'Approved Procurement Frameworks',
-          hint: 'Specify any frameworks (e.g., G-Cloud, Spark) where your product is listed.',
-        },
-      ]),
-      task('pricing-structure-transparency', 'Pricing Structure Transparency', [
-        {
-          id: 'pricing-structure-transparency',
-          type: 'textarea',
-          label: 'Pricing Structure Transparency',
-          hint: 'Outline commercial cost models (e.g., per-user licenses, block contracts, setup costs).',
-        },
-      ]),
-      task('buyer-pack-commercial-materials', 'Buyer Pack / Commercial Materials', [
-        {
-          id: 'buyer-pack-commercial-materials',
-          type: 'upload',
-          label: 'Buyer Pack / Commercial Materials',
-          hint: 'Upload official NHS Buyer Pack and commercial route onboarding materials.',
-        },
-      ]),
-      task('deployment-implementation-manual', 'Deployment & Implementation Manual', [
-        {
-          id: 'deployment-implementation-manual',
-          type: 'upload',
-          label: 'Deployment & Implementation Manual',
-          hint: 'Upload supplier-led pathway deployment manuals and technical integration guides.',
+          id: 'd1-5-availability',
+          code: 'D1.5',
+          type: 'text',
+          label: 'What was your average service availability over the past 12 months?',
+          hint: 'Percentage to 2 decimal places, for example 99.95%.',
+          showIf: { questionId: 'd1-4-platforms', notIn: ['none'] },
         },
       ]),
     ],
@@ -399,25 +797,13 @@ export function findTask(slug: string): { task: OnboardingTask; section: Onboard
   return null
 }
 
-export function taskHref(task: OnboardingTask): string {
-  return `${SUPPLIER_ONBOARD_BASE_PATH}/${task.slug}`
+export function taskHref(formId: string, task: OnboardingTask): string {
+  return `${formBasePath(formId)}/${task.slug}`
 }
 
 /** URL for question page `step` (1-based). Step 1 is the bare task URL. */
-export function taskStepHref(task: OnboardingTask, step: number): string {
-  return step <= 1 ? taskHref(task) : `${taskHref(task)}/${step}`
-}
-
-/**
- * "Save and Next" target: the next question in this task, else the first page
- * of the next task in journey order (crossing section boundaries), else `null`
- * on the final page of the final task.
- */
-export function nextPageHref(task: OnboardingTask, step: number): string | null {
-  if (step < task.questions.length) return taskStepHref(task, step + 1)
-  const index = ALL_TASKS.findIndex((t) => t.id === task.id)
-  const next = ALL_TASKS.slice(index + 1).find((t) => t.questions.length > 0)
-  return next ? taskHref(next) : null
+export function taskStepHref(formId: string, task: OnboardingTask, step: number): string {
+  return step <= 1 ? taskHref(formId, task) : `${taskHref(formId, task)}/${step}`
 }
 
 /**
@@ -437,9 +823,11 @@ export function isAnswered(value: string | undefined): boolean {
 export function questionKeys(q: OnboardingQuestion): string[] {
   switch (q.type) {
     case 'upload':
-      return [q.id, `${q.id}${UPLOAD_REFERENCE_SUFFIX}`]
+      return q.noReference ? [q.id] : [q.id, `${q.id}${UPLOAD_REFERENCE_SUFFIX}`]
     case 'multi-upload':
       return [q.id, `${q.id}${MULTI_UPLOAD_CONFIRMED_SUFFIX}`]
+    case 'fields':
+      return q.fields.map((f) => fieldKey(q.id, f))
     default:
       return [q.id]
   }
@@ -457,7 +845,9 @@ export function isValidIsoDate(value: string | undefined): boolean {
 export function isQuestionAnswered(q: OnboardingQuestion, answers: TaskAnswers): boolean {
   switch (q.type) {
     case 'upload':
-      return isAnswered(answers[q.id]) && isAnswered(answers[`${q.id}${UPLOAD_REFERENCE_SUFFIX}`])
+      return isAnswered(answers[q.id]) && (q.noReference || isAnswered(answers[`${q.id}${UPLOAD_REFERENCE_SUFFIX}`]))
+    case 'fields':
+      return q.fields.every((f) => f.optional || isAnswered(answers[fieldKey(q.id, f)]))
     case 'multi-upload':
       return (
         parseUploadedDocuments(answers[q.id]).length > 0 &&
@@ -470,10 +860,70 @@ export function isQuestionAnswered(q: OnboardingQuestion, answers: TaskAnswers):
   }
 }
 
-/** True when every required question in the task has an answer. */
+/* -------------------------------- routing ------------------------------- */
+
+/** Selected value(s) of a question: checkboxes split on the separator; others a single value. */
+export function selectedValues(q: OnboardingQuestion, answers: TaskAnswers): string[] {
+  const raw = answers[q.id]
+  if (!isAnswered(raw)) return []
+  return q.type === 'checkboxes' ? raw!.split(CHECKBOX_SEPARATOR).filter(Boolean) : [raw!.trim()]
+}
+
+function conditionHolds(cond: AnswerCondition, task: OnboardingTask, answers: TaskAnswers): boolean {
+  if ('anyOf' in cond) return cond.anyOf.some((c) => conditionHolds(c, task, answers))
+  const parent = task.questions.find((q) => q.id === cond.questionId)
+  // A hidden parent can hold a stale answer; it must never reveal its children.
+  if (!parent || !isQuestionVisible(parent, task, answers)) return false
+  const values = selectedValues(parent, answers)
+  if (values.length === 0) return false
+  if (cond.in && !values.some((v) => cond.in!.includes(v))) return false
+  if (cond.notIn && values.some((v) => cond.notIn!.includes(v))) return false
+  return true
+}
+
+/**
+ * True when the question is on the supplier's current route: it has no
+ * `showIf`, or every condition holds against answers in the same task
+ * (transitively — the referenced question must itself be visible).
+ */
+export function isQuestionVisible(q: OnboardingQuestion, task: OnboardingTask, answers: TaskAnswers): boolean {
+  if (!q.showIf) return true
+  const conditions = Array.isArray(q.showIf) ? q.showIf : [q.showIf]
+  return conditions.every((c) => conditionHolds(c, task, answers))
+}
+
+/** Questions on the current route, in page order, each with its physical 1-based step. */
+export function visibleQuestions(
+  task: OnboardingTask,
+  answers: TaskAnswers,
+): Array<{ question: OnboardingQuestion; step: number }> {
+  return task.questions
+    .map((question, i) => ({ question, step: i + 1 }))
+    .filter(({ question }) => isQuestionVisible(question, task, answers))
+}
+
+/**
+ * "Save and Next" target: the next visible question in this task, else the
+ * first page of the next task in journey order (crossing section boundaries),
+ * else `null` on the final page of the final task.
+ */
+export function nextPageHref(formId: string, task: OnboardingTask, step: number, answers: TaskAnswers): string | null {
+  const next = visibleQuestions(task, answers).find((v) => v.step > step)
+  if (next) return taskStepHref(formId, task, next.step)
+  const index = ALL_TASKS.findIndex((t) => t.id === task.id)
+  const nextTask = ALL_TASKS.slice(index + 1).find((t) => t.questions.length > 0)
+  return nextTask ? taskHref(formId, nextTask) : null
+}
+
+/** Back-link target: the previous visible question in this task, else the task list. */
+export function prevPageHref(formId: string, task: OnboardingTask, step: number, answers: TaskAnswers): string {
+  const before = visibleQuestions(task, answers).filter((v) => v.step < step)
+  const prev = before[before.length - 1]
+  return prev ? taskStepHref(formId, task, prev.step) : formBasePath(formId)
+}
+
+/** True when every visible required question in the task has an answer. */
 export function isTaskComplete(task: OnboardingTask, answers: TaskAnswers): boolean {
-  return (
-    task.questions.length > 0 &&
-    task.questions.every((q) => q.optional || isQuestionAnswered(q, answers))
-  )
+  const visible = visibleQuestions(task, answers)
+  return visible.length > 0 && visible.every(({ question }) => question.optional || isQuestionAnswered(question, answers))
 }

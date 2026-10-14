@@ -7,15 +7,14 @@ import type { App } from '@/lib/data'
 import Nav from './Nav'
 import BackToTop from './BackToTop'
 import { CompareBasketProvider } from './CompareBasketProvider'
-import { BookmarkProvider } from './BookmarkProvider'
 import { EoiProvider } from './EoiProvider'
 import { ToastProvider } from './ui/Toast'
 import ClearDataModal from './ClearDataModal'
 import AiAdvisorPanel, { type AiAdvisorClientProfile } from './ai/AiAdvisorPanel'
 import NhsFrontendInit from '@/components/nhs/NhsFrontendInit'
 import { AUTH_DISABLED } from '@/lib/authMode'
-import { SUPPLIER_ONBOARD_BASE_PATH, isSupplierOnboardPath } from '@/lib/supplierOnboarding'
-import { clearOnboardingProgress } from '@/components/supplier-onboard/useOnboardingProgress'
+import { PORTAL_NAME, PORTAL_PATHS, isSupplierPortalPath } from '@/lib/supplierPortal'
+import { clearSupplierPortal } from '@/components/supplier-portal/useSupplierPortal'
 
 export default function AppShell({
   children,
@@ -32,9 +31,8 @@ export default function AppShell({
 }) {
   const pathname = usePathname()
   const router = useRouter()
-  const isLoginPage = pathname === '/login'
   const isGatePage = pathname === '/gate'
-  const isSupplierOnboard = isSupplierOnboardPath(pathname)
+  const isSupplierPortal = isSupplierPortalPath(pathname)
   const [showClearData, setShowClearData] = useState(false)
   const [aiPanelOpen, setAiPanelOpen] = useState(false)
   /** Open-access treats everyone as able to use catalogue tools; hide auth/org chrome. */
@@ -43,8 +41,8 @@ export default function AppShell({
   const icbSubheaderLabel =
     !openAccess && isLoggedIn && commissioningContextLabel ? commissioningContextLabel : ''
 
-  /** Auth routes render without global nav/footer but still need landmarks + skip link (WCAG 2.4.1, 1.3.1). */
-  if (isGatePage || (isLoginPage && !openAccess)) {
+  /** The gate route renders without global nav/footer but still needs landmarks + skip link (WCAG 2.4.1, 1.3.1). */
+  if (isGatePage) {
     return (
       <>
         <a href="#main-content" className="nhsuk-skip-link">
@@ -56,30 +54,28 @@ export default function AppShell({
   }
 
   return (
-    <div className="hs-app-shell">
+    <div className={`hs-app-shell${isSupplierPortal ? ' hs-supplier-portal' : ''}`}>
       <a href="#main-content" className="nhsuk-skip-link">Skip to main content</a>
       <ToastProvider>
         <CompareBasketProvider allApps={allApps}>
-          <BookmarkProvider>
-            <EoiProvider>
-              <Nav
-                commissioningContextLabel={icbSubheaderLabel}
-                isLoggedIn={showAuthChrome}
-                onOpenAiPanel={showAuthChrome && aiProfile ? () => setAiPanelOpen(true) : undefined}
+          <EoiProvider>
+            <Nav
+              commissioningContextLabel={icbSubheaderLabel}
+              isLoggedIn={showAuthChrome}
+              onOpenAiPanel={showAuthChrome && aiProfile ? () => setAiPanelOpen(true) : undefined}
+            />
+            <main id="main-content" className="hs-app-shell__main" tabIndex={-1}>{children}</main>
+            {showAuthChrome && aiProfile && (
+              <AiAdvisorPanel
+                open={aiPanelOpen}
+                onClose={() => setAiPanelOpen(false)}
+                profile={aiProfile}
               />
-              <main id="main-content" className="hs-app-shell__main" tabIndex={-1}>{children}</main>
-              {showAuthChrome && aiProfile && (
-                <AiAdvisorPanel
-                  open={aiPanelOpen}
-                  onClose={() => setAiPanelOpen(false)}
-                  profile={aiProfile}
-                />
-              )}
-              {showAuthChrome && (
-                <ClearDataModal open={showClearData} onClose={() => setShowClearData(false)} />
-              )}
-            </EoiProvider>
-          </BookmarkProvider>
+            )}
+            {showAuthChrome && (
+              <ClearDataModal open={showClearData} onClose={() => setShowClearData(false)} />
+            )}
+          </EoiProvider>
         </CompareBasketProvider>
       </ToastProvider>
       <BackToTop />
@@ -106,14 +102,17 @@ export default function AppShell({
                     </button>
                   </li>
                 )}
-                {isSupplierOnboard && (
+                <li className="nhsuk-footer__list-item nhsuk-footer-default__list-item">
+                  <Link className="nhsuk-footer__list-item-link" href={PORTAL_PATHS.dashboard}>{PORTAL_NAME}</Link>
+                </li>
+                {isSupplierPortal && (
                   <li className="nhsuk-footer__list-item nhsuk-footer-default__list-item">
-                    {/* Prototype control: wipes saved onboarding answers and task statuses. */}
+                    {/* Prototype control: signs out and wipes every onboarding form, draft and status. */}
                     <button
                       type="button"
                       onClick={() => {
-                        clearOnboardingProgress()
-                        router.push(SUPPLIER_ONBOARD_BASE_PATH)
+                        clearSupplierPortal()
+                        router.push(PORTAL_PATHS.signIn)
                       }}
                       className="nhsuk-footer__list-item-link nhsuk-u-padding-0"
                       style={{ background: 'none', border: 0, cursor: 'pointer' }}

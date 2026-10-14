@@ -1,14 +1,12 @@
-import { getAllAppsUnfiltered, getAppBySlug, getCommissionerFacingFunding } from '@/lib/data'
+import { getAllAppsUnfiltered, getAppBySlug } from '@/lib/data'
 import { getCommissioningSnapshot } from '@/lib/commissioningSnapshot'
 import { getDeploymentRegister } from '@/lib/deploymentRegister'
-import { splitPdpEvidence } from '@/lib/pdpEvidence'
 import { resolveProductNarrative, getProductNarrative } from '@/lib/content/productNarratives'
 import PdpNarrativeSpine from '@/components/product/PdpNarrativeSpine'
 import PdpLocalValue from '@/components/product/PdpLocalValue'
 import PdpAssurancePassport from '@/components/product/PdpAssurancePassport'
 import PdpImplementation from '@/components/product/PdpImplementation'
 import PdpNhsExperience from '@/components/product/PdpNhsExperience'
-import PdpClinicalPublications from '@/components/product/PdpClinicalPublications'
 import PdpResources from '@/components/product/PdpResources'
 import PdpExpressInterestCallout from '@/components/product/PdpExpressInterestCallout'
 import PdpFundingLevers from '@/components/product/PdpFundingLevers'
@@ -23,22 +21,8 @@ import {
 } from '@/components/Badges'
 import { CompareToggleButton } from '@/components/CompareToggleButton'
 import { STORE_ACCENT } from '@/lib/storeAccent'
-import {
-  ScaleAndMaturitySection,
-  WhatItTakesLocallySection,
-  ImpactAndCaseStudiesSection,
-  TechnicalIntegrationTable,
-  CommercialModelAndCostSection,
-  IndicativeFinancialContextSection,
-  RelatedFundingSection,
-  hasWhatItTakesContent,
-  shouldShowImpactSection,
-} from '@/components/AppDetailSections'
-import { PdpSection } from '@/components/PdpSection'
-import { PdpTabs, type PdpTab } from '@/components/PdpTabs'
 import { PdpSharePrintProvider, PdpShareRegion } from '@/components/PdpSharePrintContext'
 import { DeviceClassDetails } from '@/components/DeviceClassDetails'
-import { EvidenceCard } from './pdpBlocks'
 import { PageBreadcrumb } from '@/components/PageBreadcrumb'
 import PdpSupplierContactCard from '@/components/PdpSupplierContactCard'
 import PdpOnThisPage from '@/components/PdpOnThisPage'
@@ -87,40 +71,16 @@ export default async function AppPage({
     (showNarrativeSpine && narrative.decision_summary?.one_line_proposition) || app.one_line_value_proposition
 
   const linkedFundingIds = app.linked_funding_ids ?? app.funding_ids ?? []
-  const showIndicativeFinancialInTab = !(showNarrativeSpine && (app.condition_tags?.includes('copd') ?? false))
-  const showCommercialTab = !showNarrativeSpine || showIndicativeFinancialInTab
   const commissioningCards = getCommissioningSnapshot(
     app,
     showNarrativeSpine
       ? { commercialHref: '#how-to-buy', interopHref: '#resources', demoHref: '#resources' }
-      : { demoHref: '#demo-access' },
+      : undefined,
   )
   const showLocalValue = showNarrativeSpine && (app.condition_tags?.includes('copd') ?? false)
   const hasNhsExperience =
     showNarrativeSpine &&
     (getDeploymentRegister(app).length > 0 || (app.case_studies?.length ?? 0) > 0)
-  // When the NHS experience section is shown, case studies move out of the Evidence
-  // tab; the "expected impact" section should then only render for prose/videos.
-  const hasImpactProse = !!(app.expected_benefit_note && String(app.expected_benefit_note).trim())
-  const showExpectedImpactSection = hasNhsExperience
-    ? hasImpactProse
-    : showNarrativeSpine
-      ? !!(hasImpactProse || (app.case_studies?.length ?? 0) > 0)
-      : shouldShowImpactSection(app)
-
-  // Narrative products surface the evidence record in the spine — publications and
-  // NICE guidance inside "Assurance and evidence", real-world programme write-ups as
-  // NHS experience case-study cards. The tab keeps only whatever isn't covered there;
-  // non-narrative products keep the full record in the tab.
-  const evidenceSplit = splitPdpEvidence(app, { showNarrativeSpine, hasNhsExperience })
-  const evidenceForTab = evidenceSplit.tab
-  const showClinicalPublicationsInTab = !showNarrativeSpine && evidenceSplit.publications.length > 0
-  const showClinicalEvidenceSection =
-    evidenceForTab.length > 0 || (!showNarrativeSpine && evidenceSplit.publications.length === 0)
-  const showNiceGuidanceSection = !showNarrativeSpine
-  const rcts = evidenceForTab.filter((s: any) => s.type === 'RCT')
-  const observational = evidenceForTab.filter((s: any) => ['observational', 'real_world'].includes(s.type))
-  const niceAndImpl = evidenceForTab.filter((s: any) => ['nice_assessment', 'implementation_science', 'grey_lit', 'evidence_gap'].includes(s.type))
 
   const onThisPageLinks = buildPdpOnThisPageLinks({
     app,
@@ -134,210 +94,6 @@ export default async function AppPage({
   const hasPdpAlerts =
     !!app.clinical_safety_alert ||
     app.dtac_status === 'required_not_confirmed'
-
-  const tabs: PdpTab[] = [
-    {
-      id: 'evidence',
-      label: 'Clinical evidence & outcomes',
-      anchors: showClinicalEvidenceSection ? ['clinical-evidence'] : [],
-      panel: (
-        <>
-          {showExpectedImpactSection && (
-            <PdpSection
-          shareKey="expected-impact"
-              title={hasNhsExperience ? 'Expected impact' : 'Expected impact and case studies'}
-              description="Outcomes commissioners should expect and illustrative deployments. Distinct from the formal clinical evidence record below."
-            >
-              <ImpactAndCaseStudiesSection app={app} showCaseStudies={!hasNhsExperience} showVideos={!showNarrativeSpine} />
-            </PdpSection>
-          )}
-
-          {showClinicalPublicationsInTab && (
-            <PdpClinicalPublications publications={evidenceSplit.publications} className="mb-6" />
-          )}
-
-          {showClinicalEvidenceSection && (
-          <PdpSection
-            id="clinical-evidence"
-            shareKey="clinical-evidence"
-            title="Clinical evidence"
-            description="Full evidence record. Links to source publications provided where available."
-          >
-            {rcts.length > 0 && (
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 'var(--text-label)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 8 }}>
-                  Randomised controlled trials ({rcts.length})
-                </div>
-                {rcts.map((s: any) => <EvidenceCard key={s.id} study={s} accent={accent} />)}
-              </div>
-            )}
-
-            {observational.length > 0 && (
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 'var(--text-label)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 8 }}>
-                  Real-world & observational evidence ({observational.length})
-                </div>
-                {observational.map((s: any) => <EvidenceCard key={s.id} study={s} accent={accent} />)}
-              </div>
-            )}
-
-            {niceAndImpl.length > 0 && (
-              <div>
-                <div style={{ fontSize: 'var(--text-label)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 8 }}>
-                  NICE assessments, implementation science & other sources ({niceAndImpl.length})
-                </div>
-                {niceAndImpl.map((s: any) => <EvidenceCard key={s.id} study={s} accent={accent} />)}
-              </div>
-            )}
-
-            {rcts.length === 0 && observational.length === 0 && niceAndImpl.length === 0 && (
-              <p className="hs-text-label m-0" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                No individual study records are currently listed for this product.
-              </p>
-            )}
-          </PdpSection>
-          )}
-
-          {showNiceGuidanceSection && (
-          <PdpSection
-            shareKey="nice-guidance"
-            title="NICE guidance"
-            description="NICE publications and programme references linked to this product."
-          >
-            <ul className="m-0 space-y-2 p-0 list-none">
-              {app.nice_guidance_refs.map((r: any) => (
-                <li key={r.ref} className="hs-text-body" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                  <a href={r.url} className="hover:underline" style={{ color: accent }}>
-                    {r.ref}
-                  </a>
-                  {[r.type, r.date, r.note].filter(Boolean).length > 0 ? (
-                    <>
-                      {' — '}
-                      {[r.type, r.date, r.note].filter(Boolean).join(', ')}
-                    </>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          </PdpSection>
-          )}
-
-          {app.contradictory_evidence?.length > 0 && (
-            <PdpSection
-          shareKey="data-quality-flags"
-              title="Data quality flags"
-              description="Issues identified during review that commissioners should be aware of."
-            >
-              <div className="space-y-4">
-                {app.contradictory_evidence.map((c: any, i: number) => (
-                  <div key={i} className="rounded-xl border p-4" style={{ background: '#FDECEA', borderColor: '#D5281B33' }}>
-                    <div className="hs-font-bold hs-text-label mb-2" style={{ color: '#7A1210' }}>{c.domain}</div>
-                    <div className="hs-text-caption space-y-2" style={{ color: '#5A1010' }}>
-                      <div><strong>Company claim:</strong> {c.claim_a}</div>
-                      <div><strong>Issue:</strong> {c.claim_b}</div>
-                      {c.commissioner_impact && (
-                        <div className="mt-2 p-2 rounded" style={{ background: 'rgba(255,255,255,0.5)' }}>
-                          <strong>Commissioner action:</strong> {c.commissioner_impact}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </PdpSection>
-          )}
-        </>
-      ),
-    },
-    {
-      id: 'deployment',
-      label: 'Deployment & adoption',
-      anchors: ['scale-and-maturity'],
-      panel: (
-        <>
-          <PdpSection
-            id="scale-and-maturity"
-            shareKey="scale-and-maturity"
-            title="Scale and maturity"
-            description="Deployment reach, evidence posture, and where the product is in use."
-          >
-            <ScaleAndMaturitySection app={app} showDeploymentRegister={!hasNhsExperience} />
-          </PdpSection>
-
-          {hasWhatItTakesContent(app) && (
-            <PdpSection
-          shareKey="what-it-takes-locally"
-              title="What it takes locally"
-              description="Operational effort, onboarding, training, and prerequisites for a successful deployment."
-            >
-              <WhatItTakesLocallySection app={app} accent={accent} />
-            </PdpSection>
-          )}
-        </>
-      ),
-    },
-    {
-      id: 'commercial',
-      label: 'Commercial, cost & funding',
-      anchors: showNarrativeSpine ? [] : ['commercial-model', 'related-funding'],
-      panel: (
-        <>
-          {!showNarrativeSpine && (
-          <PdpSection
-            id="commercial-model"
-            shareKey="commercial-model"
-            title="Commercial model and cost"
-            description="How the product is priced, what is included, and how to procure it."
-          >
-            <CommercialModelAndCostSection app={app} />
-          </PdpSection>
-          )}
-
-          {showIndicativeFinancialInTab && (
-          <PdpSection
-            shareKey="indicative-financial"
-            title="Indicative financial context"
-            description="Expected benefits, tariff, provider income and ROI considerations for local modelling."
-          >
-            <IndicativeFinancialContextSection app={app} />
-          </PdpSection>
-          )}
-
-          {!showNarrativeSpine && getCommissionerFacingFunding(linkedFundingIds).length > 0 && (
-          <PdpSection
-            id="related-funding"
-            shareKey="related-funding"
-            title="Related funding opportunities"
-            description="Cash or adoption support for commissioners — not supplier R&D or NICE reporting obligations (see NICE guidance)."
-          >
-            <RelatedFundingSection fundingIds={linkedFundingIds} />
-          </PdpSection>
-          )}
-        </>
-      ),
-    },
-    {
-      id: 'technical',
-      label: 'Technical & integration',
-      anchors: ['nhs-integrations'],
-      panel: (
-        <PdpSection
-          id="nhs-integrations"
-          shareKey="nhs-integrations"
-          title="NHS and care system integrations"
-          description="Technical integration detail. NHS App, NHS Login and NHS Notify are summarised in the product summary at the top of the page."
-        >
-          <TechnicalIntegrationTable app={app} />
-        </PdpSection>
-      ),
-    },
-  ].filter((tab) => {
-    if (tab.id === 'commercial' && !showCommercialTab) return false
-    if (tab.id === 'evidence' && showNarrativeSpine) return false
-    if (tab.id === 'technical' && showNarrativeSpine) return false
-    if (tab.id === 'deployment' && showNarrativeSpine) return false
-    return true
-  })
 
   return (
       <div className="hs-pdp">
@@ -540,8 +296,6 @@ export default async function AppPage({
             )}
 
             <div className="space-y-4">
-              {slug !== 'myheart' && tabs.length > 0 && <PdpTabs tabs={tabs} />}
-
               {!showNarrativeSpine && (
               <PdpShareRegion shareKey="express-interest" label="Express interest callout" excludeFromShareUi>
               <div className="hs-surface-card-sm rounded-b-xl border overflow-hidden" style={{ borderColor: accent }}>

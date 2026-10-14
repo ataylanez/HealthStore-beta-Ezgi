@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
       { source: "/DS/", destination: "/DS/index.html" },
       { source: "/DS/Audits", destination: "/DS/Audits/index.html" },
       { source: "/DS/Audits/", destination: "/DS/Audits/index.html" },
+      // The sitemap lives at /Sitemap, outside the design-system reference.
+      { source: "/Sitemap", destination: "/Sitemap/index.html" },
+      { source: "/Sitemap/", destination: "/Sitemap/index.html" },
     ];
   },
   async redirects() {
@@ -24,6 +27,9 @@ const nextConfig: NextConfig = {
       { source: "/DS/Report-v:slug", destination: "/DS/Audits/Report-v:slug/index.html", permanent: true },
       { source: "/DS/Report-v:slug/", destination: "/DS/Audits/Report-v:slug/index.html", permanent: true },
       { source: "/DS/Report-v:slug/index.html", destination: "/DS/Audits/Report-v:slug/index.html", permanent: true },
+      // Supplier onboarding now lives inside the Supplier portal.
+      { source: "/supplier-onboard", destination: "/supplier-portal", permanent: false },
+      { source: "/supplier-onboard/:path*", destination: "/supplier-portal", permanent: false },
     ];
   },
 };

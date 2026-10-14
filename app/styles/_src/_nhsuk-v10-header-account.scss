@@ -1,0 +1,140 @@
+// NHS.UK frontend v10 Header — account section only.
+//
+// "Header with account information and links"
+// https://service-manual.nhs.uk/design-system/components/header
+//
+// Provenance: NHS. Rules copied unchanged from
+// nhsuk-frontend-v10/dist/nhsuk/components/header/_index.scss (the
+// `.nhsuk-header__account*` blocks and the private link-style mixin they use).
+// The rest of the v10 header is not compiled because the page uses the v9
+// header and the two would conflict.
+
+@use "nhsuk/core/settings" as *;
+@use "nhsuk/core/tools" as *;
+@use "nhsuk/core/helpers" as *;
+
+$nhsuk-header-reverse-item-colour: $nhsuk-reverse-text-colour;
+$nhsuk-header-reverse-item-hover-colour: $nhsuk-reverse-text-colour;
+$nhsuk-header-reverse-item-active-colour: $nhsuk-reverse-text-colour;
+
+$_header-item-padding: 12px;
+
+@mixin _header-link-style(
+  $link-colour: $nhsuk-header-reverse-item-colour,
+  $link-hover-colour: $nhsuk-header-reverse-item-hover-colour,
+  $link-active-colour: $nhsuk-header-reverse-item-active-colour
+) {
+  & {
+    color: $link-colour;
+  }
+
+  @include nhsuk-link-style-visited($link-colour);
+  @include nhsuk-link-style-hover($link-hover-colour);
+  @include nhsuk-link-style-active($link-active-colour);
+  @include nhsuk-link-style-focus;
+
+  &:focus {
+    color: $nhsuk-focus-text-colour;
+    box-shadow: inset 0 ($nhsuk-focus-width * -1) $nhsuk-focus-text-colour;
+  }
+
+  @media print {
+    color: inherit;
+
+    &::after {
+      content: "";
+    }
+  }
+}
+
+.nhsuk-header__account-button,
+.nhsuk-header__account-link {
+  @include _header-link-style;
+}
+
+.nhsuk-header__account {
+  flex-grow: 1;
+
+  margin-top: nhsuk-spacing(3);
+
+  overflow: hidden;
+
+  border: 1px solid nhsuk-shade($nhsuk-brand-colour, 20%);
+  border-radius: nhsuk-px-to-rem($nhsuk-border-radius);
+
+  background-color: nhsuk-shade($nhsuk-brand-colour, 20%);
+
+  .nhsuk-icon--user {
+    flex-shrink: 0;
+    width: nhsuk-px-to-rem(24px);
+    height: nhsuk-px-to-rem(24px);
+  }
+
+  @media print {
+    display: none;
+  }
+
+  @media #{nhsuk-from-breakpoint(tablet)} {
+    align-self: start;
+    margin: -1px;
+  }
+}
+
+.nhsuk-header__account-list {
+  display: flex;
+
+  position: relative;
+
+  flex-wrap: wrap;
+
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+
+  list-style: none;
+
+  gap: 1px;
+}
+
+.nhsuk-header__account-item {
+  display: flex;
+
+  flex-grow: 1;
+
+  margin: 0;
+  padding: nhsuk-spacing(2) $_header-item-padding;
+
+  outline: 1px solid $nhsuk-brand-colour;
+
+  overflow-wrap: anywhere;
+
+  gap: nhsuk-spacing(2);
+  @include nhsuk-font(16);
+
+  &:nth-last-child(2) {
+    margin-right: auto;
+  }
+
+  &:last-child {
+    flex-grow: 0;
+    outline: none;
+  }
+}
+
+.nhsuk-header__account-button,
+.nhsuk-header__account-link {
+  display: flex;
+  margin: nhsuk-spacing(-2) ($_header-item-padding * -1);
+  padding: nhsuk-spacing(2) $_header-item-padding;
+  overflow-wrap: anywhere;
+  gap: nhsuk-spacing(2);
+}
+
+.nhsuk-header__account-button {
+  border: 0;
+  background: none;
+  text-decoration: underline;
+  cursor: pointer;
+  @include nhsuk-font(16);
+}

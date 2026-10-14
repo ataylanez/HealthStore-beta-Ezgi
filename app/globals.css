@@ -379,9 +379,30 @@
   button.nhsuk-header__navigation-link {
     background: transparent;
     cursor: pointer;
-    font: inherit;
+    /* Family only: `font: inherit` overrode the NHS 16px link size. */
+    font-family: inherit;
     text-align: left;
     width: auto;
+  }
+  /*
+   * Header with account information (supplier portal). The v9 header has no
+   * account slot, so reproduce the v10 layout: logo grows, account box sits
+   * at the right from tablet and stacks below the logo on mobile.
+   * [Provenance: NHS] service-manual.nhs.uk/design-system/components/header
+   */
+  .nhsuk-header__container:has(.nhsuk-header__account) {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .nhsuk-header__container:has(.nhsuk-header__account) .nhsuk-header__logo {
+    flex-grow: 999;
+  }
+  .nhsuk-header__account-button {
+    font-family: inherit;
+  }
+  /* v9 fills icons NHS blue; v10 icons use the text colour. */
+  .nhsuk-header__account .nhsuk-icon {
+    fill: currentcolor;
   }
   /*
    * Active nav indicator: white 4px line flush with the bottom of the blue bar.
@@ -426,6 +447,60 @@
   .nhsuk-header__drop-down .nhsuk-header__navigation-link[aria-current="page"],
   .nhsuk-header__drop-down .nhsuk-header__navigation-item--current > .nhsuk-header__navigation-link {
     border-bottom-color: var(--nhs-blue);
+  }
+
+  /*
+   * Supplier portal: keep links in the unvisited colour. Users revisit the same
+   * tasks, tables and cards, so the purple visited colour is noise.
+   * Matches NHS `.nhsuk-link--no-visited-state`.
+   * [Provenance: NHS] service-manual.nhs.uk/design-system/styles/colour
+   */
+  .hs-supplier-portal main a:visited,
+  .hs-supplier-portal .nhsuk-header__drop-down a:visited {
+    color: var(--nhs-blue);
+  }
+  /* Error summary links stay NHS red, including after they have been followed. */
+  .hs-supplier-portal main .nhsuk-error-summary__list a:link,
+  .hs-supplier-portal main .nhsuk-error-summary__list a:visited,
+  .hs-supplier-portal main .nhsuk-error-summary__list a:hover,
+  .hs-supplier-portal main .nhsuk-error-summary__list a:active {
+    color: var(--nhs-red);
+    font-weight: 600;
+  }
+  .hs-supplier-portal main .nhsuk-error-summary__list a:focus {
+    color: var(--text-primary);
+  }
+
+  /* Two statuses can apply at once (Action needed, then Draft changes). */
+  .hs-portal-status-tags {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .hs-supplier-portal main a:visited .nhsuk-icon,
+  .hs-supplier-portal .nhsuk-header__drop-down a:visited .nhsuk-icon {
+    fill: var(--nhs-blue);
+  }
+
+  /*
+   * A content field or document the review sent back: 4px NHS red line, the
+   * same weight and colour as the error summary border. On larger screens the
+   * summary list row is a table row, so the line sits on the label cell.
+   */
+  .nhsuk-summary-list__row.hs-action-needed {
+    border-left: 4px solid var(--nhs-red);
+    padding-left: 16px;
+  }
+  @media (min-width: 40.0625em) {
+    .nhsuk-summary-list__row.hs-action-needed {
+      border-left: 0;
+      padding-left: 0;
+    }
+    .nhsuk-summary-list__row.hs-action-needed > .nhsuk-summary-list__key {
+      border-left: 4px solid var(--nhs-red);
+      padding-left: 16px;
+    }
   }
 
   @media (max-width: 639px) {

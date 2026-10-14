@@ -25,7 +25,8 @@
       title: 'Overview',
       items: [
         { key: 'home', label: 'Home', href: '/DS/index.html' },
-        { key: 'whats-new', label: "What's changed", href: '/DS/whats-new/index.html' }
+        { key: 'whats-new', label: "What's changed", href: '/DS/whats-new/index.html' },
+        { key: 'sitemap', label: 'Sitemap', href: '/Sitemap/index.html' }
       ]
     },
     {
@@ -314,7 +315,12 @@
     var layout = el('div', { class: 'ds-layout' });
     document.body.insertBefore(layout, root);
 
-    layout.appendChild(buildSidenav(activeKey));
+    /* Pages can opt out of the side navigation with data-ds-nav="none". */
+    if (root.getAttribute('data-ds-nav') === 'none') {
+      layout.classList.add('ds-layout--no-nav');
+    } else {
+      layout.appendChild(buildSidenav(activeKey));
+    }
     var main = el('main', { class: 'ds-content', id: 'ds-main', tabindex: '-1' });
     layout.appendChild(main);
     main.appendChild(root);

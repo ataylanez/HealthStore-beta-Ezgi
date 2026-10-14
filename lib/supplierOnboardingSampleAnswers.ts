@@ -5,6 +5,11 @@
  * realistic content rather than "Not provided". Written for a fictional
  * supplier ("Aurora Health") and product ("Respira CBT"); nothing here is real.
  *
+ * The choices deliberately take the fuller routes through the questionnaire
+ * (medical device, direct care, data outside the UK, Charter not signed, APIs
+ * exposed, data shared with care systems, no NHS login, WCAG plan in place) so
+ * that every conditional follow-up page gets exercised.
+ *
  * Any question without an entry gets a type-appropriate fallback from
  * `sampleAnswerFor`. Existing real answers are never overwritten.
  */
@@ -14,7 +19,9 @@ import {
   CONFIRMED_VALUE,
   MULTI_UPLOAD_CONFIRMED_SUFFIX,
   UPLOAD_REFERENCE_SUFFIX,
+  fieldKey,
   isQuestionAnswered,
+  isQuestionVisible,
   serializeUploadedDocuments,
   type OnboardingQuestion,
   type OnboardingTask,
@@ -26,95 +33,162 @@ const SUPPLIER = 'Aurora Health'
 const SUBMISSION_DATE = '2026-09-22'
 
 const TEXT: Record<string, string> = {
-  'nice-guidance-reference':
-    'NICE HTG736 — Digitally enabled therapy for anxiety disorders (guided self-help). Respira CBT is listed as one of the recommended technologies.',
-  'nice-recommendation-pathway':
-    'Recommended for use in NHS Talking Therapies while further evidence is generated (Early Value Assessment, conditional recommendation).',
-  'nice-evidence-generation-status':
-    'Evidence generation plan agreed with NICE in March 2026. Real-world data collection is underway across 4 NHS Talking Therapies services, with the interim report due Q2 2027.',
-  'integration-capabilities':
-    'Bi-directional integration with EMIS Web and SystmOne via the IM1 pairing interface: referrals are pulled from the clinical record and completed outcome measures (PHQ-9, GAD-7) are written back as coded entries. Vision integration is read-only PDF transfer of the discharge summary.',
-  'integration-licensing-fees':
-    'No API or clinical-interface fees are charged to buyers. IM1 partner costs are absorbed by Aurora Health. Optional SSO via NHS CIS2 is included in the licence.',
-  'product-public-summary':
-    'Respira CBT is a clinician-supported digital cognitive behavioural therapy programme for adults with generalised anxiety disorder. It delivers 8 structured modules over 12 weeks with weekly asynchronous therapist review, freeing high-intensity therapist capacity for more complex cases.',
-  'clinical-evidence-baseline':
-    'Randomised controlled trial (n=412, UK, 2024): 61% reliable recovery vs 44% in the treatment-as-usual arm (Lancet Digital Health 2025;7:e112). Service evaluation across 3 NHS Talking Therapies services (n=1,870) reproduced the effect at 58% reliable recovery.',
-  'hospital-utilisation-bed-flow-impact':
-    'Reduced time-to-first-treatment from 9.4 to 2.1 weeks in pilot services, releasing an estimated 1,200 high-intensity therapy hours per 10,000 referrals per year. No direct inpatient bed impact is claimed; the benefit is outpatient capacity and waiting-list reduction.',
-  'expected-patient-outcomes':
-    'Quantitative: mean GAD-7 reduction of 6.8 points at 12 weeks; 61% reliable recovery. Qualitative: improved sleep and daily functioning, reduced avoidance, high satisfaction (mean 4.5/5), and better access for patients who cannot attend daytime appointments.',
-  'human-wrapper-requirements':
-    'One Band 5 psychological wellbeing practitioner per 120 active patients (approximately 30 minutes of asynchronous review per patient per week), plus a named service lead for onboarding. Aurora Health provides 2 half-day training sessions and a 6-week implementation support programme.',
-  'nhs-deployment-locations':
-    'Live: Greater Manchester ICB (3 Talking Therapies services), Norfolk and Waveney ICB, Leeds Community Healthcare NHS Trust. In mobilisation: Sussex Partnership NHS Foundation Trust.',
-  'active-deployment-verification-contact':
-    // "xo" suffix keeps the sample address obviously fictional (not a real mailbox).
-    'Dr Priya Nair, Clinical Lead for Talking Therapies, Greater Manchester ICB — priya.nairxo@nhs.net',
-  'approved-procurement-frameworks':
-    'G-Cloud 14 (Lot 2, service ID 7231 4489 2210 566); NHS Shared Business Services Digital Health Advisory Services framework; Spark DPS (Dynamic Purchasing System).',
-  'pricing-structure-transparency':
-    'Per-completed-patient licence of £145 (12-week programme), or an annual block contract from £48,000 for up to 400 patients. One-off implementation and integration set-up fee of £6,500 (waived for ICB-wide contracts). No charge for training, support or upgrades.',
+  // Product details
+  'a2-product-name': 'Respira CBT',
+  'a3-product-version': '3.2.0',
+  // Section B
+  'b2-description':
+    'Respira CBT is a clinician-supported digital cognitive behavioural therapy programme for adults with generalised anxiety disorder. It delivers 8 structured modules over 12 weeks with weekly asynchronous therapist review. Patients are referred by NHS Talking Therapies services and use the app on their own device between sessions.',
+  'b3-users-benefits':
+    'Intended users: adults (18+) referred to NHS Talking Therapies with mild to moderate anxiety, and the psychological wellbeing practitioners who supervise them. Benefits: 61% reliable recovery vs 44% treatment as usual in a UK randomised controlled trial (n=412, Lancet Digital Health 2025;7:e112), and time-to-first-treatment reduced from 9.4 to 2.1 weeks in pilot services. Benefits were validated through the RCT and a service evaluation across 3 NHS services (n=1,870).',
+  // C1
+  'c1-2-3-crm-system-details':
+    'Clinical risk management is run under our Clinical Risk Management System (CRMS-02, v4.1) which follows DCB 0129. Hazards are identified at design review, logged in the Hazard Log with initial and residual risk ratings, and reviewed monthly by the Clinical Safety Officer. Release gates require CSO sign-off of the Safety Case Report for each product version.',
+  'c1-2-5-cso':
+    'Dr Hannah Okafor, Clinical Psychologist, HCPC registration PYL04471. Trained in DCB 0129/0160 (NHS Digital Clinical Safety Officer course, 2023).',
+  // C2
+  'c2-2-6-outside-uk':
+    'Anonymised analytics events are processed in the Republic of Ireland (AWS eu-west-1) by our analytics sub-processor. No identifiable patient data leaves the UK. Transfers rely on the UK adequacy regulations for the EEA, with an International Data Transfer Addendum in place as a fallback.',
+  // C4
+  'c4-1-1-standards':
+    'Our APIs use HL7 FHIR R4 (UK Core profiles) for referrals and outcome measures, and OAuth 2.0 / OpenID Connect for authorisation. FHIR was chosen so that NHS Talking Therapies systems can consume outcome data (PHQ-9, GAD-7) as coded observations without bespoke mapping.',
+  'c4-1-3-documentation':
+    'API documentation is published as an OpenAPI 3.1 specification on our developer portal, available to integration partners on request. We plan to make it openly available once the authentication onboarding guide is complete (expected Q1 2027).',
+  'c4-2-3-identification':
+    'Referrals arrive with the NHS number from the referring system. Where PDS validation is not yet available, the NHS number is checked against the modulus 11 algorithm and matched to the referral record using name, date of birth and postcode. Unmatched records are held for manual review by the service.',
+  'c4-2-6-authentication':
+    'Patients authenticate with email and password plus a one-time code (SMS or authenticator app). Passwords are hashed with Argon2id, sessions expire after 30 minutes of inactivity, and all traffic is TLS 1.2+. Integration of NHS login is on the roadmap for 2027.',
+  // Section D
+  'd1-4-2-timescale': 'March 2027',
+  'd1-4-3-accessibility-statement': 'https://www.aurora-health.example/respira/accessibility',
+  'c2-2-3-privacy-notice-link': 'https://www.aurora-health.example/respira/privacy',
+  'd1-5-availability': '99.96%',
 }
 
 const UPLOADS: Record<string, { name: string; reference: string }> = {
-  'post-market-surveillance-report': {
-    name: 'Respira-CBT-PSUR-2026-v1.2.pdf',
-    reference: `${SUPPLIER} — PSUR Jan–Jun 2026 — ${SUBMISSION_DATE}`,
+  'b4-data-flow-upload': {
+    name: 'Aurora-Health-B4-Data-Flow-User-Journey.pdf',
+    reference: `${SUPPLIER} — B4 Data flow and user journey map — ${SUBMISSION_DATE}`,
   },
-  'vulnerability-remediation-plan': {
-    name: 'Respira-CBT-Pen-Test-Remediation-Plan-2026.pdf',
-    reference: `${SUPPLIER} — Pen test remediation roadmap — ${SUBMISSION_DATE}`,
+  'c1-1-1-paq-upload': {
+    name: 'Aurora-Health-C1.1.1-PAQ-Form.pdf',
+    reference: `${SUPPLIER} — C1.1.1 Pre-acquisition questionnaire — ${SUBMISSION_DATE}`,
   },
-  'buyer-pack-commercial-materials': {
-    name: 'Respira-CBT-NHS-Buyer-Pack-2026.pdf',
-    reference: `${SUPPLIER} — NHS Buyer Pack — ${SUBMISSION_DATE}`,
+  'c1-2-4-safety-case-report-upload': {
+    name: 'Aurora-Health-C1.2.4-Clinical-Safety-Case-Report.pdf',
+    reference: `${SUPPLIER} — C1.2.4 Clinical Safety Case Report — ${SUBMISSION_DATE}`,
   },
-  'deployment-implementation-manual': {
-    name: 'Respira-CBT-Implementation-and-Integration-Guide-v3.pdf',
-    reference: `${SUPPLIER} — Deployment manual — ${SUBMISSION_DATE}`,
+  'c1-2-4-hazard-log-upload': {
+    name: 'Aurora-Health-C1.2.4-Hazard-Log.xlsx',
+    reference: `${SUPPLIER} — C1.2.4 Hazard Log — ${SUBMISSION_DATE}`,
+  },
+  'c2-2-1-ico-upload': {
+    name: 'Aurora-Health-C2.2.1-ICO-Registration.pdf',
+    reference: `${SUPPLIER} — C2.2.1 ICO registration certificate — ${SUBMISSION_DATE}`,
+  },
+  'c2-2-2-dpia-upload': {
+    name: 'Aurora-Health-C2.2.2-DPIA.pdf',
+    reference: `${SUPPLIER} — C2.2.2 DPIA — ${SUBMISSION_DATE}`,
+  },
+  'c2-2-4-terms-upload': {
+    name: 'Aurora-Health-C2.2.4-Terms-and-EULA.pdf',
+    reference: `${SUPPLIER} — C2.2.4 Terms and conditions and EULA — ${SUBMISSION_DATE}`,
+  },
+  'c3-1-cyber-essentials-upload': {
+    name: 'Aurora-Health-C3.1-Cyber-Essentials-Plus.pdf',
+    reference: `${SUPPLIER} — C3.1 Cyber Essentials Plus certificate — ${SUBMISSION_DATE}`,
+  },
+  'c3-3-pen-test-upload': {
+    name: 'Aurora-Health-C3.3-Pen-Test-Summary.pdf',
+    reference: `${SUPPLIER} — C3.3 External penetration test summary — ${SUBMISSION_DATE}`,
+  },
+  'd1-1-pathways-upload': {
+    name: 'Aurora-Health-D1.1-Pathway-and-Instructions-for-Use.pdf',
+    reference: `${SUPPLIER} — D1.1 Care pathway and instructions for use — ${SUBMISSION_DATE}`,
   },
 }
 
-const DTAC_DOCUMENTS: Array<Pick<UploadedDocument, 'name' | 'reference' | 'size'>> = [
-  { name: 'Aurora-Health-A11-CQC-Report.pdf', reference: `${SUPPLIER} — A11 CQC Report — ${SUBMISSION_DATE}`, size: 1_284_000 },
-  { name: 'Aurora-Health-B4-User-Journeys-Data-Flows.pdf', reference: `${SUPPLIER} — B4 User journeys and data flows — ${SUBMISSION_DATE}`, size: 2_410_000 },
-  { name: 'Aurora-Health-C1.2.3-Clinical-Safety-Case-Report.pdf', reference: `${SUPPLIER} — C1.2.3 Clinical Safety Case Report — ${SUBMISSION_DATE}`, size: 940_000 },
-  { name: 'Aurora-Health-C1.3.4-Hazard-Log.xlsx', reference: `${SUPPLIER} — C1.3.4 Hazard Log — ${SUBMISSION_DATE}`, size: 312_000 },
-  { name: 'Aurora-Health-C2.2.2-DPIA.pdf', reference: `${SUPPLIER} — C2.2.2 DPIA — ${SUBMISSION_DATE}`, size: 1_105_000 },
-  { name: 'Aurora-Health-C3.1-Cyber-Essentials-Plus.pdf', reference: `${SUPPLIER} — C3.1 Cyber Essentials Plus certificate — ${SUBMISSION_DATE}`, size: 210_000 },
-  { name: 'Aurora-Health-C3.2-Pen-Test-Summary.pdf', reference: `${SUPPLIER} — C3.2 External penetration test summary — ${SUBMISSION_DATE}`, size: 680_000 },
+/** Fallback for any multi-upload question (none in the current questionnaire). */
+const GENERIC_DOCUMENTS: Array<Pick<UploadedDocument, 'name' | 'reference' | 'size'>> = [
+  { name: 'Aurora-Health-Supporting-Evidence.pdf', reference: `${SUPPLIER} — Supporting evidence — ${SUBMISSION_DATE}`, size: 1_284_000 },
 ]
 
 const CHOICES: Record<string, string> = {
-  'financial-stability': 'yes',
-  'supervision-care-model': 'clinically-supervised',
-  'medical-device-classification': 'class-i',
-  'clinical-system-integrations': ['emis-web', 'systmone'].join(CHECKBOX_SEPARATOR),
-  'accessibility-audit-date': '2026-05-14',
+  // Product details
+  'a4-product-type': 'standalone-application',
+  // Section B
+  'b1-intended-use': 'patient-care-support',
+  'b4-data-flow': 'provided',
+  // C1
+  'c1-1-1-samd': 'yes',
+  'c1-1-2-standalone': 'yes',
+  'c1-2-direct-care': 'yes',
+  'c1-2-2-crm-activities': 'yes',
+  'c1-2-3-crm-system': 'provided',
+  'c1-2-4-safety-case': 'provided',
+  // C2
+  'c2-1-dspt': 'confirmed',
+  'c2-2-personal-data': 'yes',
+  'c2-2-1-ico': 'provided',
+  'c2-2-2-dpia': 'provided',
+  'c2-2-3-privacy-notice': 'provided',
+  'c2-2-4-terms': 'provided',
+  'c2-2-5-data-location': 'outside-uk',
+  // C3
+  'c3-1-cyber-essentials': 'provided',
+  'c3-2-charter': 'no',
+  'c3-3-pen-test': 'provided',
+  'c3-4-code-of-practice': 'confirmed',
+  'c3-5-mfa-plan': 'yes',
+  'c3-5-1-privileged-mfa': 'yes',
+  'c3-6-logging': 'yes',
+  // C4
+  'c4-1-apis': 'yes',
+  'c4-1-2-open-api': 'cannot-confirm',
+  'c4-2-data-sharing': 'yes',
+  'c4-2-1-nhs-number': 'yes',
+  'c4-2-2-pds': 'no',
+  'c4-2-4-nhs-login': 'no',
+  'c4-2-5-dapb3051': 'not-applicable',
+  // Section D
+  'd1-1-pathways': 'provided',
+  'd1-2-user-testing': 'yes',
+  'd1-3-ais': 'confirm',
+  'd1-4-platforms': ['ios', 'android', 'web'].join(CHECKBOX_SEPARATOR),
+  'd1-4-1-wcag': 'no-plan-in-place',
 }
 
 /** Sample answer(s) for one question — the keys a question writes, filled. */
 export function sampleAnswerFor(question: OnboardingQuestion): TaskAnswers {
   switch (question.type) {
     case 'radios':
-      return { [question.id]: CHOICES[question.id] ?? question.options[0].value }
+      return { [question.id]: CHOICES[question.id] ?? question.options.find((o) => !o.hidden)?.value ?? '' }
     case 'checkboxes':
-      return { [question.id]: CHOICES[question.id] ?? question.options[0].value }
+      return { [question.id]: CHOICES[question.id] ?? question.options.find((o) => !o.hidden)?.value ?? '' }
     case 'date':
       return { [question.id]: CHOICES[question.id] ?? SUBMISSION_DATE }
     case 'textarea':
       return { [question.id]: TEXT[question.id] ?? `Sample response for "${question.label}" (prototype).` }
+    case 'text':
+      return {
+        [question.id]:
+          TEXT[question.id] ?? (question.inputType === 'url' ? 'https://www.aurora-health.example/respira' : 'Sample response (prototype)'),
+      }
+    case 'fields':
+      return Object.fromEntries(
+        question.fields.map((f) => [fieldKey(question.id, f), TEXT[fieldKey(question.id, f)] ?? `Sample ${f.label.toLowerCase()}`]),
+      )
     case 'upload': {
       const u = UPLOADS[question.id] ?? {
         name: `${question.id}.pdf`,
-        reference: `${SUPPLIER} — ${question.label} — ${SUBMISSION_DATE}`,
+        reference: `${SUPPLIER} — ${question.code ?? question.label} — ${SUBMISSION_DATE}`,
       }
+      if (question.noReference) return { [question.id]: u.name }
       return { [question.id]: u.name, [`${question.id}${UPLOAD_REFERENCE_SUFFIX}`]: u.reference }
     }
     case 'multi-upload': {
       const uploadedAt = new Date().toISOString()
-      const docs: UploadedDocument[] = DTAC_DOCUMENTS.map((d) => ({ ...d, uploadedAt }))
+      const docs: UploadedDocument[] = GENERIC_DOCUMENTS.map((d) => ({ ...d, uploadedAt }))
       return {
         [question.id]: serializeUploadedDocuments(docs),
         [`${question.id}${MULTI_UPLOAD_CONFIRMED_SUFFIX}`]: CONFIRMED_VALUE,
@@ -124,12 +198,15 @@ export function sampleAnswerFor(question: OnboardingQuestion): TaskAnswers {
 }
 
 /**
- * Answers for a task with every unanswered question filled from the samples.
+ * Answers for a task with every unanswered question on the route filled from
+ * the samples. Questions are filled in page order, so each follow-up is only
+ * filled when the answers so far (real or sample) put it on the route.
  * Questions the supplier has already answered are left exactly as they are.
  */
 export function fillTaskWithSamples(task: OnboardingTask, existing: TaskAnswers): TaskAnswers {
   let filled = { ...existing }
   for (const q of task.questions) {
+    if (!isQuestionVisible(q, task, filled)) continue
     if (!isQuestionAnswered(q, filled)) filled = { ...filled, ...sampleAnswerFor(q) }
   }
   return filled

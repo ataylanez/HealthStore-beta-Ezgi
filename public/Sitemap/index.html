@@ -1,0 +1,1207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Sitemap — NHS HealthStore</title>
+  <link rel="stylesheet" href="/DS/assets/ds.css">
+  <style>
+    /* Sitemap-only styles (namespaced sm-). Everything else comes from ds.css. */
+    .sm-tabs { display: flex; gap: 4px; margin: 16px 0 0; border-bottom: 2px solid var(--border); }
+    .sm-tab { border: 0; background: none; cursor: pointer; font: inherit; font-weight: 600; font-size: var(--text-label); color: var(--text-muted); padding: 10px 14px; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+    .sm-tab:hover { color: var(--text-primary); }
+    .sm-tab[aria-selected="true"] { color: var(--nhs-blue); border-bottom-color: var(--nhs-blue); }
+    .sm-tab:focus-visible { outline: 3px solid #FFD800; outline-offset: -2px; }
+
+    .sm-toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 24px 0 12px; }
+    .sm-toolbar .ds-input { max-width: 360px; }
+    .sm-toolbar .sm-spacer { flex: 1 1 auto; }
+    .sm-count { font-size: 0.85rem; color: var(--text-muted); }
+
+    .sm-layout { display: grid; grid-template-columns: minmax(300px, 1.05fr) minmax(320px, 1fr); gap: 24px; align-items: start; }
+    @media (max-width: 1100px) { .sm-layout { grid-template-columns: 1fr; } }
+
+    .sm-tree { border: 1px solid var(--border); border-radius: var(--radius-lg); background: #fff; padding: 12px 8px; }
+    .sm-tree ul { list-style: none; margin: 0; padding: 0 0 0 20px; max-width: none; position: relative; }
+    .sm-tree ul ul::before { content: ""; position: absolute; left: 10px; top: 0; bottom: 0; border-left: 1px solid var(--border); }
+    .sm-tree li { margin: 0; position: relative; }
+    .sm-tree li[hidden] { display: none; }
+    .sm-node { display: flex; align-items: center; gap: 6px; padding: 5px 8px 5px 2px; border-radius: 4px; min-height: 32px; }
+    .sm-node:hover { background: #f0f4f5; }
+    .sm-node--selected { background: #E6F0FB; }
+    .sm-node--selected:hover { background: #d7e6f8; }
+    .sm-toggle { flex: 0 0 22px; width: 22px; height: 22px; border: 0; background: none; cursor: pointer; color: var(--text-muted); padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; }
+    .sm-toggle:hover { background: #e3e9f0; color: var(--text-primary); }
+    .sm-toggle:focus-visible, .sm-label:focus-visible { outline: 3px solid #FFD800; outline-offset: 1px; }
+    .sm-toggle svg { width: 12px; height: 12px; transition: transform .12s ease; }
+    .sm-toggle[aria-expanded="true"] svg { transform: rotate(90deg); }
+    .sm-toggle--leaf { visibility: hidden; }
+    .sm-label { flex: 1 1 auto; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; text-align: left; color: var(--text-primary); display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; min-width: 0; }
+    .sm-label__title { font-weight: 600; font-size: var(--text-label); }
+    .sm-label__route { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.76rem; color: var(--text-muted); word-break: break-all; }
+    .sm-label mark { background: #fff3d9; color: inherit; padding: 0 1px; border-radius: 2px; }
+
+    .sm-detail { position: sticky; top: 16px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: #fff; padding: 22px 24px; }
+    .ds-content .sm-detail h2 { margin: 0 0 4px; font-size: var(--text-card-title); line-height: 1.2; }
+    .ds-content .sm-detail h3 { margin: 20px 0 6px; font-size: var(--text-caption); text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); font-weight: 600; }
+    .sm-detail__route { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.86rem; color: var(--text-secondary); word-break: break-all; margin: 0 0 12px; display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+    .sm-detail__route a { color: var(--nhs-blue); font-family: var(--font-body); font-size: 0.85rem; }
+    .sm-detail ol, .sm-detail ul { margin: 0; padding-left: 20px; max-width: none; }
+    .sm-detail li { margin-bottom: 5px; font-size: var(--text-label); line-height: 1.45; }
+    .sm-detail p { margin: 0; font-size: var(--text-label); line-height: 1.5; max-width: none; }
+    .sm-detail code { background: #eef2f7; padding: 1px 5px; border-radius: 4px; font-size: 0.85em; }
+    .sm-detail .ds-meta-grid { margin: 14px 0 0; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+    .sm-detail__empty { color: var(--text-muted); font-size: var(--text-label); }
+    .sm-children a { color: var(--nhs-blue); }
+
+    .sm-tech { margin-top: 20px; border: 1px dashed var(--border); border-radius: var(--radius-md); background: #fafbfc; }
+    .sm-tech summary { cursor: pointer; padding: 10px 14px; font-size: var(--text-caption); font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; list-style: none; display: flex; align-items: center; gap: 8px; }
+    .sm-tech summary::-webkit-details-marker { display: none; }
+    .sm-tech summary::before { content: ""; width: 0; height: 0; border-left: 5px solid var(--text-muted); border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: transform .12s ease; }
+    .sm-tech[open] > summary::before { transform: rotate(90deg); }
+    .sm-tech > div { padding: 0 14px 12px; }
+    .sm-tech dt { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); font-weight: 600; margin: 10px 0 2px; }
+    .sm-tech dd { margin: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; word-break: break-word; }
+
+    .sm-detail li > ul { margin-top: 6px; }
+    .sm-needs { margin: 6px 0 2px; }
+    .sm-needs summary { cursor: pointer; font-size: 0.78rem; font-weight: 600; color: var(--nhs-blue); list-style: none; display: inline-flex; align-items: center; gap: 6px; }
+    .sm-needs summary::-webkit-details-marker { display: none; }
+    .sm-needs summary::before { content: ""; width: 0; height: 0; border-left: 5px solid currentColor; border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: transform .12s ease; }
+    .sm-needs[open] > summary::before { transform: rotate(90deg); }
+    .sm-needs ul { margin: 6px 0 0; }
+    .sm-needs li { color: var(--text-secondary); }
+
+    .sm-global details { border: 1px solid var(--border); border-radius: var(--radius-md); background: #fff; padding: 0; margin: 10px 0; }
+    .sm-global summary { cursor: pointer; padding: 12px 16px; font-weight: 600; font-size: var(--text-label); list-style: none; display: flex; align-items: center; gap: 10px; }
+    .sm-global summary::-webkit-details-marker { display: none; }
+    .sm-global summary::before { content: ""; width: 0; height: 0; border-left: 6px solid var(--text-muted); border-top: 5px solid transparent; border-bottom: 5px solid transparent; transition: transform .12s ease; }
+    .sm-global details[open] > summary::before { transform: rotate(90deg); }
+    .sm-global details > div { padding: 0 16px 16px; }
+    .sm-global details ul { margin: 4px 0 0; }
+    .sm-global details li { font-size: var(--text-label); }
+    .sm-global .ds-table { margin: 8px 0 0; }
+    .sm-global .sm-tech { margin: 12px 0 0; }
+  </style>
+</head>
+<body>
+  <div id="ds-root" data-ds-page="sitemap" data-ds-nav="none">
+    <div class="ds-page-header">
+      <p class="ds-eyebrow">Overview</p>
+      <h1 class="ds-page-title">NHS HealthStore sitemap</h1>
+      <p class="ds-lede">
+        Pick a page in the tree to read about it.
+      </p>
+    </div>
+
+    <div class="sm-tabs" role="tablist" aria-label="Choose a site">
+      <button type="button" class="sm-tab" id="sm-tab-store" role="tab" aria-selected="true" data-tab="store">Commissioning Store</button>
+      <button type="button" class="sm-tab" id="sm-tab-portal" role="tab" aria-selected="false" data-tab="portal">Supplier portal</button>
+    </div>
+
+    <div class="sm-toolbar">
+      <input class="ds-input" id="sm-search" type="search" placeholder="Search for a page…" aria-label="Search the sitemap" autocomplete="off">
+      <span class="sm-spacer"></span>
+      <button type="button" class="ds-btn ds-btn--secondary ds-btn--sm" id="sm-expand">Expand all</button>
+      <button type="button" class="ds-btn ds-btn--secondary ds-btn--sm" id="sm-collapse">Collapse all</button>
+    </div>
+    <p class="sm-count" id="sm-count"></p>
+
+    <div class="sm-layout">
+      <nav class="sm-tree" id="sm-tree" aria-label="Site structure"></nav>
+      <aside class="sm-detail" id="sm-detail" aria-live="polite" aria-labelledby="sm-detail-title"></aside>
+    </div>
+
+    <h2>What every page shares</h2>
+    <div class="sm-global" id="sm-global-store">
+      <p>A few things appear on every page of the Commissioning Store, so they are described once here.</p>
+      <details open>
+        <summary>The header and footer</summary>
+        <div>
+          <ul>
+            <li><strong>The blue NHS header</strong> shows the service name “NHS Commissioning Store” — clicking it takes you back to the home page. Underneath sits a banner explaining this is a new service in development (“Alpha”).</li>
+            <li><strong>The menu</strong> has five sections: About, Product catalogue, Comparison tool (with a count of products you have picked to compare), Funding index, and Resource library. On smaller screens the items that do not fit move into a “More” menu.</li>
+            <li><strong>The footer</strong> links to the Cookies page and to the Supplier portal, and carries a short line explaining the site is a prototype.</li>
+            <li><strong>A cookie banner</strong> appears until you choose to accept or reject analytics; your choice is remembered on your device. A “Back to top” button appears once you scroll down the page.</li>
+          </ul>
+          <details class="sm-tech">
+            <summary>Technical details</summary>
+            <div>
+              <dl>
+                <dt>Components</dt>
+                <dd><code>components/Nav.tsx</code> (header and menu, with a ResizeObserver-driven overflow menu), <code>components/AppShell.tsx</code> (page shell, footer, providers), <code>components/PhaseBanner.tsx</code>, <code>components/CookieBanner.tsx</code>, <code>components/BackToTop.tsx</code>.</dd>
+                <dt>Client state</dt>
+                <dd>Compare basket in <code>localStorage</code> (<code>healthstore-compare-basket</code>, one condition at a time, up to four products); expressions of interest via <code>/api/express-interest</code>; cookie choice in <code>localStorage</code>; toast notifications.</dd>
+              </dl>
+            </div>
+          </details>
+        </div>
+      </details>
+      <details>
+        <summary>Who can see the site</summary>
+        <div>
+          <p>The whole site sits behind a single password. The first time you visit you are asked for it on the “private prototype” page; once entered, every page is open to you. The guidance articles in the Resource library are written for anyone, including clinicians.</p>
+          <details class="sm-tech">
+            <summary>Technical details</summary>
+            <div>
+              <dl>
+                <dt>How it works</dt>
+                <dd><code>middleware.ts</code> checks for the <code>hs-gate</code> cookie on every request and redirects to <code>/gate?next=…</code> until it is set. The password check happens at <code>POST /api/gate</code>, which sets the cookie for 30 days. API requests such as <code>/api/express-interest</code> return JSON rather than redirecting, and the static reference sites under <code>/DS</code> and <code>/templates</code> skip the check.</dd>
+              </dl>
+            </div>
+          </details>
+        </div>
+      </details>
+      <details>
+        <summary>Behind the scenes (technical)</summary>
+        <div>
+          <p>Two small services support the pages above.</p>
+          <table class="ds-table">
+            <thead><tr><th>Service</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td><code>POST /api/gate</code></td><td>Checks the site password and remembers it on your device for 30 days.</td></tr>
+              <tr><td><code>GET/POST/DELETE /api/express-interest</code></td><td>Saves, lists and clears expressions of interest submitted from product pages.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+
+    <div class="sm-global" id="sm-global-portal" hidden>
+      <p>A few things appear on every page of the Supplier portal, so they are described once here.</p>
+      <details open>
+        <summary>The header and footer</summary>
+        <div>
+          <ul>
+            <li><strong>The blue NHS header</strong> shows the service name “HealthStore Supplier portal” — clicking it takes you to the dashboard. On the right sit your name (which opens Account management) and a Sign out button.</li>
+            <li><strong>The menu</strong> has three sections: Dashboard, Product management, and Published pages. On focused journeys — signing in, or answering questions one at a time — the menu row is hidden so you can concentrate.</li>
+            <li><strong>The footer</strong> is the same as the Commissioning Store’s: links to the Cookies page and the Supplier portal, with a short line explaining the site is a prototype.</li>
+          </ul>
+          <details class="sm-tech">
+            <summary>Technical details</summary>
+            <div>
+              <dl>
+                <dt>Components</dt>
+                <dd><code>components/Nav.tsx</code> (portal menu entries and the account area), <code>components/supplier-portal/PortalGuard.tsx</code> (sign-in gate for every portal page), <code>components/AppShell.tsx</code> (page shell and footer, with a portal styling class).</dd>
+              </dl>
+            </div>
+          </details>
+        </div>
+      </details>
+      <details>
+        <summary>Who can see it</summary>
+        <div>
+          <p>The portal sits behind the same site password as the rest of the prototype, and then asks you to sign in. This prototype accepts any email address and password; you stay signed in on your device until you sign out.</p>
+          <details class="sm-tech">
+            <summary>Technical details</summary>
+            <div>
+              <dl>
+                <dt>How it works</dt>
+                <dd><code>PortalGuard</code> redirects any signed-out visit to <code>/supplier-portal/sign-in?next=…</code> and sends you back afterwards. The signed-in state lives in the browser (<code>localStorage</code> key <code>hs-supplier-portal:state</code>); nothing renders until that state has been read, to avoid a flash of signed-in content.</dd>
+              </dl>
+            </div>
+          </details>
+        </div>
+      </details>
+      <details>
+        <summary>Behind the scenes (technical)</summary>
+        <div>
+          <p>There is no server or back office: everything you do in the portal is saved in your browser, and review outcomes are simulated.</p>
+          <table class="ds-table">
+            <thead><tr><th>Where</th><th>What it holds</th></tr></thead>
+            <tbody>
+              <tr><td><code>localStorage hs-supplier-portal:state</code></td><td>Sign-in state, company information answers, product drafts and submissions, and the status of every store page.</td></tr>
+              <tr><td><code>localStorage hs-supplier-portal:onboarding:{formId}</code></td><td>Your answers to a product onboarding form, one entry per form.</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:8px">While a submission is “In review”, <strong>Simulate approval</strong> and <strong>Simulate rejection</strong> buttons stand in for the HealthStore team.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="ds-note ds-note--source">This map is maintained by hand: when a page is added, changed or taken away, update the <code>SITE</code> (Commissioning Store) or <code>SUPPLIER_SITE</code> (Supplier portal) data inside this file. Last reviewed 14 October 2026.</div>
+  </div>
+
+  <script>
+  /* ---------------------------------------------------------------------------
+     Sitemap data. One node per page. Fields:
+       route    web address ([slug] stands in for a product name)
+       title    page name
+       access   who can see it, in plain words
+       purpose  one plain-English sentence
+       on       what a visitor sees, in order. Items are plain strings, or objects
+                { heading, text, needs: [...], sub: [...] } — `needs` renders as a
+                collapsible “User needs, pain points, gaps addressed” list
+       actions  where the page takes you
+       note     a plain-English note worth surfacing (optional)
+       file     source file(s) — shown under Technical details
+       data     data sources and parameters — shown under Technical details
+       tech     implementation notes — shown under Technical details
+       example  a concrete URL to open when the route is dynamic
+       children nested pages
+  --------------------------------------------------------------------------- */
+  var ARTICLE_SHELL = 'A simple article layout: the page trail at the top, then the article heading and text in a single reading column.';
+
+  function article(slug, section, title, summary, on, links, note) {
+    return {
+      route: '/resources/' + section + '/' + slug,
+      title: title,
+      access: 'Anyone',
+      purpose: summary,
+      on: [ARTICLE_SHELL].concat(on),
+      actions: links && links.length ? links : ['The page trail links back to /resources and /resources/' + section],
+      note: note || '',
+      file: 'app/resources/' + section + '/' + slug + '/page.tsx',
+      data: 'Static content written in the page file',
+      tech: 'Shared layout component: components/resources/GuidanceArticle.tsx'
+    };
+  }
+
+  var EOI_STEPS = [
+    {
+      route: '/apps/[slug]/express-interest', title: 'Express interest — start',
+      access: 'Anyone with the site password',
+      purpose: 'The first step when you ask for commissioning support with a product. It explains what you will be asked and makes clear this is not a purchase.',
+      on: ['A link back to the product page', 'The heading “Express interest in {product}”', 'A highlighted note explaining this is not a purchase or commitment', 'A short list of what you will be asked: your details, the support you need, and timing (about 2 minutes)', 'A Continue button'],
+      actions: ['Back → /apps/[slug]', 'Continue → /apps/[slug]/express-interest/details'],
+      file: 'app/apps/[slug]/express-interest/page.tsx → components/eoi/journey/steps/StartStep.tsx',
+      data: 'Your answers are kept in the browser (sessionStorage key hs-eoi-journey:{slug}) until you submit',
+      tech: 'No form fields on this step.',
+      example: '/apps/mycopd/express-interest'
+    },
+    {
+      route: '/apps/[slug]/express-interest/details', title: 'Your details',
+      access: 'Anyone with the site password',
+      purpose: 'Asks for your contact details, role and organisation so the team can follow up.',
+      on: ['A back link', 'An error message box if something needs fixing', 'The heading “Your details”', 'Fields: full name, NHS work email address, role, and organisation (all required), plus an optional phone number', 'A Continue button'],
+      actions: ['Continue → /apps/[slug]/express-interest/verify', 'Back → the start step', 'If you came from Check your answers, both take you back there instead'],
+      file: 'app/apps/[slug]/express-interest/details/page.tsx → DetailsStep.tsx',
+      data: 'Answers kept in the browser; a ?from=check parameter remembers that you arrived from the review step',
+      example: '/apps/mycopd/express-interest/details'
+    },
+    {
+      route: '/apps/[slug]/express-interest/verify', title: 'Verify your email',
+      access: 'Anyone with the site password',
+      purpose: 'Asks you to confirm your email address with a code before continuing. Because this is a prototype, the code is shown on screen rather than emailed.',
+      on: ['A back link', 'An error message box if the code is wrong', 'The heading “Verify your email”', 'A highlighted note showing the code to use', 'A field for the code', 'A Continue button', 'An “I did not receive an email” section with a resend option'],
+      actions: ['Continue → /apps/[slug]/express-interest/support', 'Back → your details'],
+      file: 'app/apps/[slug]/express-interest/verify/page.tsx → VerifyStep.tsx',
+      data: 'A verified flag kept in the browser; no email is actually sent',
+      tech: 'The code is hard-coded to 123456. Resend has a 30-second cooldown. The page sends you back to the details step if those answers are missing.',
+      example: '/apps/mycopd/express-interest/verify'
+    },
+    {
+      route: '/apps/[slug]/express-interest/support', title: 'What support do you need?',
+      access: 'Anyone with the site password',
+      purpose: 'Lets you tick the kinds of commissioning support you want.',
+      on: ['A back link', 'An error message box if nothing is selected', 'The question “What support do you need?” with the hint “Select all that apply”', 'Tick boxes: assess pathway fit; build or review a business case; clarify assurance and local work; commercial route and buyer pack; implementation planning; other (with a box to give more detail)', 'A Continue button'],
+      actions: ['Continue → /apps/[slug]/express-interest/timing', 'Back → verify your email'],
+      file: 'app/apps/[slug]/express-interest/support/page.tsx → SupportStep.tsx',
+      data: 'Answers kept in the browser',
+      tech: 'Guarded step: you need completed details and a verified email to reach it.',
+      example: '/apps/mycopd/express-interest/support'
+    },
+    {
+      route: '/apps/[slug]/express-interest/timing', title: 'Timing and context',
+      access: 'Anyone with the site password',
+      purpose: 'Optional questions about when you want to move and how many patients are involved.',
+      on: ['A back link', 'The heading “Timing and context”', 'An optional timeline choice: within 3 months; 3 to 6 months; 6 to 12 months; exploratory only', 'An optional estimated patient population', 'An optional free-text box for extra context (with a reminder not to include patient-identifiable information)', 'A Continue button'],
+      actions: ['Continue → /apps/[slug]/express-interest/check-answers', 'Back → support'],
+      file: 'app/apps/[slug]/express-interest/timing/page.tsx → TimingStep.tsx',
+      data: 'Answers kept in the browser',
+      example: '/apps/mycopd/express-interest/timing'
+    },
+    {
+      route: '/apps/[slug]/express-interest/check-answers', title: 'Check your answers',
+      access: 'Anyone with the site password',
+      purpose: 'Shows everything you entered so you can correct it before submitting.',
+      on: ['A back link', 'An error message box if submission fails', 'The heading “Check your answers”', 'A summary of every answer — product, name, email, role, organisation, phone, support requested, timeline, patient population and extra context — each with a Change link', 'A short consent line', 'A Submit button'],
+      actions: ['Change → back to the matching step', 'Submit → saves your expression of interest and shows the confirmation page', 'Back → timing'],
+      file: 'app/apps/[slug]/express-interest/check-answers/page.tsx → CheckAnswersStep.tsx',
+      data: 'Submits via POST /api/express-interest; a reference such as HSC6589L is generated',
+      tech: 'Your in-progress answers are cleared after submitting; only the reference is kept.',
+      example: '/apps/mycopd/express-interest/check-answers'
+    },
+    {
+      route: '/apps/[slug]/express-interest/confirmation', title: 'Expression of interest submitted',
+      access: 'Anyone with the site password',
+      purpose: 'Confirms your request went through and tells you what happens next.',
+      on: ['A green confirmation panel with your reference number', 'A note that a confirmation email has been sent', '“What happens next”: the team will be in touch within 5 working days', 'Links to the Resource library and back to the product'],
+      actions: ['→ /resources', '→ /apps/[slug]'],
+      file: 'app/apps/[slug]/express-interest/confirmation/page.tsx → ConfirmationStep.tsx',
+      data: 'The reference number is read from the browser session',
+      tech: 'Sends you back to the start of the journey if there is no reference to show.',
+      example: '/apps/mycopd/express-interest/confirmation'
+    }
+  ];
+
+  var SITE = [
+    {
+      route: '/', title: 'Home',
+      access: 'Anyone with the site password',
+      purpose: 'The front door. It explains what the Commissioning Store does, how it works, and which health conditions it currently covers.',
+      on: [
+        'A blue banner: “Enabling the self-management of long-term health conditions”, with a short explanation and an illustration',
+        '“What the NHS HealthStore addresses”: six cards covering assurance support, opportunity identification, procurement and commercial support, deployment, performance tracking, and ongoing support',
+        '“How it works”: four illustrated steps — discover, explore and compare, get support, track outcomes',
+        '“Conditions and pathways we currently support”: buttons for each condition (COPD and cardiac rehabilitation today)',
+        'A blue “Case studies” band with one featured story and up to three smaller ones'
+      ],
+      actions: [
+        'Find out more → /about',
+        'COPD → /catalogue/digital-therapeutics?condition=copd',
+        'Cardiac rehabilitation → /catalogue/digital-therapeutics?condition=cardiac_rehab',
+        'See all case studies → /resources'
+      ],
+      file: 'app/page.tsx',
+      data: 'Banner copy from content/dashboard/dashboard.json; case studies drawn from the product content in content/apps/*.json',
+      children: [
+        {
+          route: '/about', title: 'How the NHS HealthStore helps',
+          access: 'Anyone with the site password',
+          purpose: 'Explains what the HealthStore does for you and what stays in local hands.',
+          on: ['The page trail (“How it works”)', 'A heading and introduction', 'Sections on assurance support, local accountability, impact modelling, and the commercial route', 'A bullet list of what the store brokers on your behalf'],
+          actions: ['Reading only — this page has no buttons or forms'],
+          file: 'app/about/page.tsx',
+          data: 'Shares one standard sentence about local assurance with the product pages (lib/content/productNarratives.ts)'
+        },
+        {
+          route: '/catalogue', title: 'Product catalogue',
+          access: 'Anyone with the site password',
+          purpose: 'The starting point for browsing products, organised by health condition.',
+          on: ['The page trail', 'A heading and a short introduction', '“Care pathways”: a link card for each condition that has products', 'A “See all products in the catalogue” link showing the total count', '“Pathways and conditions coming soon”: greyed cards for conditions on the roadmap'],
+          actions: ['A pathway card → /catalogue/digital-therapeutics filtered to that condition', 'See all products → /catalogue/digital-therapeutics'],
+          file: 'app/catalogue/page.tsx → AppsDiscoveryClient.tsx',
+          data: 'Conditions and products from the content files (content/apps/*.json); three products are currently shown in the catalogue',
+          tech: 'Arriving with ?condition= or ?q= forwards you straight to /catalogue/digital-therapeutics with the same parameters. COPD and pulmonary rehabilitation are presented as one pathway.',
+          children: [
+            {
+              route: '/catalogue/digital-therapeutics', title: 'Digital therapeutics',
+              access: 'Anyone with the site password',
+              purpose: 'The full product list, with filters to narrow it down.',
+              on: ['The page trail', 'The heading “Digital therapeutics”', 'A filter panel: choose a condition, tick the kinds of care model you are interested in, then apply or clear', 'Pills showing which filters are active', 'A card for each product: logo, name, supplier, a one-line description, condition and maturity badges, and buttons to view or compare it', 'A friendly message when no products match your filters'],
+              actions: ['View product details → /apps/[slug]', 'Compare → adds the product to your comparison list', 'Apply filters → updates the list and the web address'],
+              file: 'app/catalogue/digital-therapeutics/page.tsx → CatalogueClient.tsx',
+              data: 'Products from content/apps/*.json (three visible); the chosen condition is carried in the ?condition= parameter',
+              tech: 'The COPD filter also includes products tagged pulmonary_rehab. A skeleton grid shows while the list loads.',
+              children: [
+                {
+                  route: '/apps/[slug]', title: 'Product page',
+                  access: 'Anyone with the site password',
+                  purpose: 'The main page for a product: what it does, the evidence behind it, what it takes to run locally, and how to get support with commissioning it.',
+                  on: [
+                    'The page trail back to the catalogue',
+                    'A header with the product’s logo, name, supplier, condition tags, maturity badges and a one-line description',
+                    'Two buttons: “Get in touch” and a compare toggle',
+                    'Warnings where relevant, for example if clinical safety information has not been confirmed',
+                    'A snapshot strip: what platforms it runs on, how it connects to NHS systems, and where it is already live',
+                    'An “On this page” side menu for jumping between sections',
+                    {
+                      text: 'The story of the product.',
+                      sub: [
+                        {
+                          heading: 'The problem it addresses',
+                          text: 'A few sentences explaining the gap in care this product is trying to fix. For example: too many patients ending up in hospital, or long waits for a service. It also says why this matters to a buyer right now. Its job is to set the scene.',
+                          needs: [
+                            'Curated, neutral, evidence-based content that limits supplier bias',
+                            'Not all commissioners are DTx experts',
+                            'Ensuring licensing of the DTxs works for their population'
+                          ]
+                        },
+                        {
+                          heading: 'How it changes a treatment pathway',
+                          text: 'First, a simple bullet list of what the product does. Then a side-by-side picture: example steps a patient goes through today, next to example steps they could go through with this product in place. New or changed steps are highlighted so you can see exactly what’s different. For accessibility there is a text-only pathway description that describes both journeys in plain text.',
+                          needs: [
+                            'Not all commissioners are DTx experts',
+                            'Ensuring licensing of the DTxs works for their population',
+                            'I need to know who else in the patient’s care pathway can help them get started'
+                          ]
+                        },
+                        {
+                          heading: 'What using the product could mean for patients',
+                          text: 'What it could be worth (calculations in these sections and their origin are a work in progress: NICE, national data). The human and resource impact: an estimate of what the product could save in your area, roughly how many hospital admissions and A&E visits might be avoided, shown as a cautious-to-optimistic range. The monetary impact: a worked example of costs versus savings. The figures use information about an average population (local population is a future iteration). All information here is clearly labelled as illustrative only.',
+                          needs: [
+                            'Product facts don’t answer “will it pay for itself”',
+                            'Payment can penalise the right clinical choice',
+                            'Ensuring licensing of the DTxs works for their population',
+                            'Business case tools'
+                          ]
+                        },
+                        {
+                          heading: 'Funding levers and tariff alignments',
+                          text: 'Where the money could come from. It covers how the product fits with existing NHS payment and incentive schemes, and lists any funding under the funding index that may be applicable to this product.',
+                          needs: [
+                            'Product facts don’t answer “will it pay for itself”',
+                            'Payment can penalise the right clinical choice',
+                            'Funding is a major barrier',
+                            'Finding funding is a challenge',
+                            '“No point in me writing a business case unless there’s money available.”',
+                            '“I need to know about all the sources of funding … that mean(s) I’m not just spending my own money”',
+                            'Securing funding for licenses and deployment of a DTx'
+                          ]
+                        },
+                        {
+                          heading: 'Assurance and evidence',
+                          text: 'One part shows the official checks: NICE recommendation, medical device class, and DTAC status, which is listed as complete, pending, or incomplete (status requirements to be scoped). This is also where the safety and data-protection paperwork the supplier has provided is surfaced, under the assurance pack. The other part lists the published research and studies behind the product.',
+                          needs: [
+                            'I need access to risk mitigations and NICE-backed evidence to assess clinical model safety and assure frontline referrers that the therapeutic is safe to deploy',
+                            'I need condition-specific real-world deployment evidence to evaluate digital therapeutic options',
+                            '“I want to know that the evidence is trustworthy …”',
+                            'Getting independent, objective, verifiable information on the market'
+                          ]
+                        },
+                        {
+                          heading: 'Making it work at your site',
+                          text: 'An honest look at the effort involved to deploy: what clinical staff need to do, what your local team needs to set up, and how long it takes to get up and running. There’s a checklist of things you need in place first, and a note on what the supplier handles for you (training, set-up help, ongoing support).',
+                          needs: [
+                            'Hidden costs',
+                            'Unfunded mobilisation roles',
+                            '“We got a deal on a few hundred licenses, but the patients didn’t engage … but because they were lifetime licenses, we couldn’t transfer to other patients who might use them”'
+                          ]
+                        },
+                        {
+                          heading: 'NHS experience',
+                          text: 'A table of NHS sites where the product is already deployed and in what care setting. There are also short case studies: where it was used, how many patients, what happened, and any caveats.',
+                          needs: [
+                            'Peer to peer evidence',
+                            'Patient voice'
+                          ]
+                        },
+                        {
+                          heading: 'How to commission and procure it',
+                          text: 'Information on how to actually buy it: what the buying route is and how to find out more or get support (express interest). It explains what the HealthStore does for you in the purchasing process. Pricing is by contact and in the buyer pack, which is stated here and available via the express interest journey.'
+                        },
+                        {
+                          heading: 'Resources',
+                          text: 'Additional features that are helpful for the buyer, such as product videos and a way to try a demo.'
+                        }
+                      ]
+                    }
+                  ],
+                  actions: ['Get in touch → the express interest journey', 'Compare → adds the product to your comparison list, then /compare', 'Snapshot tiles jump to the matching section further down the page'],
+                  note: 'Product pages only show the sections they have content for. A product with less information available simply has a shorter story with fewer sections.',
+                  file: 'app/apps/[slug]/page.tsx, components/Pdp*.tsx',
+                  data: 'Product content from content/apps/{slug}.json; the narrative sections from lib/content/productNarratives.ts; funding and deployment information from the content files',
+                  tech: 'Example slugs: luscii, mycopd, myheart, joint-academy.',
+                  example: '/apps/mycopd',
+                  children: [
+                    {
+                      route: 'Express interest journey', title: 'Express interest journey (7 steps)',
+                      access: 'Anyone with the site password',
+                      purpose: 'A short, one-question-at-a-time journey that takes you from a product page to a submitted request for commissioning support.',
+                      on: ['Seven steps in order: start → your details → verify your email → what support do you need? → timing and context → check your answers → confirmation', 'Every step has a back link, clear error messages, and a Continue button', 'Your answers are saved in your browser as you go, so nothing is lost between steps'],
+                      actions: ['You enter by pressing “Get in touch” on a product page', 'You finish on a confirmation page that links to the Resource library and back to the product'],
+                      file: 'app/apps/[slug]/express-interest/**, components/eoi/journey/**',
+                      data: 'Answers kept in sessionStorage (hs-eoi-journey:{slug}) until submission via POST /api/express-interest',
+                      tech: 'Later steps check that earlier ones are complete and send you back if not.',
+                      example: '/apps/mycopd/express-interest',
+                      children: EOI_STEPS
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          route: '/compare', title: 'Comparison tool',
+          access: 'Anyone with the site password',
+          purpose: 'Puts up to four products for the same condition side by side so you can weigh them up.',
+          on: ['The page trail', 'The heading “Comparison tool” and a short how-to', 'A toolbar showing which condition you are comparing, with a “Clear all” button', 'If you have not picked anything yet, a friendly prompt to go to the catalogue', 'Comparison tables covering: product details; what each product is and who it is for; evidence and expected impact; assurance; what it takes to run locally; NHS experience; and cost and commercial route'],
+          actions: ['Clear all or Remove → updates your comparison list', 'Go to product catalogue → /catalogue', 'Product page → /apps/[slug]'],
+          file: 'app/compare/page.tsx → CompareClient.tsx, components/compare/CompareNarrativeTables.tsx',
+          data: 'Your picks live in the browser (localStorage healthstore-compare-basket) and in the ?ids= parameter; comparison text from lib/compareNarrativeContent.ts',
+          tech: 'The basket only accepts products for one condition at a time, with a limit of four.'
+        },
+        {
+          route: '/funding', title: 'Funding index',
+          access: 'Anyone with the site password',
+          purpose: 'A directory of funding and adoption schemes that could help pay for digital therapeutics.',
+          on: ['The page trail', 'The heading “Funding index” and an introduction, with a reminder to confirm each scheme is still available before building a business case', 'A card for each open, upcoming or recurring scheme: its name, total value where known, a description, who runs it, when it closes, which conditions it covers, and a link to the official page'],
+          actions: ['More information → the scheme’s official website (NHS England, NIHR, Innovate UK and others)'],
+          file: 'app/funding/page.tsx → components/FundingDirectoryCard.tsx',
+          data: 'Schemes from content/funding/funding.json (six today); condition tags filtered by lib/visibleConditions.ts',
+          tech: 'A “Closed (confirm current status)” section appears only when closed schemes exist — none today.'
+        },
+        {
+          route: '/resources', title: 'Resource library',
+          access: 'Anyone',
+          purpose: 'Training and practical guidance for recommending digital therapeutics and supporting patients to use them.',
+          on: ['The page trail', 'The heading “Resource library” and an introduction', 'A grid of link cards, one for each section below'],
+          actions: ['Training and guidance → /resources/guidance', 'Preparing to recommend a DTx → /resources/preparing-to-recommend', 'Prior to patient appointment → /resources/prior-to-appointment', 'During patient appointment → /resources/during-appointment', 'After a patient appointment → /resources/after-appointment'],
+          file: 'app/resources/page.tsx',
+          data: 'Static content written in the page file',
+          children: [
+            {
+              route: '/resources/guidance', title: 'Training and guidance',
+              access: 'Anyone',
+              purpose: 'National policy, evidence and digital inclusion guidance.',
+              on: ['The page trail', 'A heading and introduction', 'A list of article links'],
+              actions: ['Five articles, listed below'],
+              file: 'app/resources/guidance/page.tsx',
+              data: 'Static content written in the page file',
+              children: [
+                article('nhs-10-year-health-plan', 'guidance', 'Alignment with The NHS 10-Year Health Plan', 'How the HealthStore and digital therapeutics fit the plan’s three big shifts and the drive for productivity.', ['An introduction and a list of the three shifts (prevention, digital, community)', 'A short paragraph on each shift', 'A closing paragraph on productivity and the workforce']),
+                article('dtx-evidence', 'guidance', 'Evidence of digital therapeutics (DTx) success', 'UK trial results and real-world outcomes for digital therapeutics.', ['An introduction', 'A table of UK trial evidence (weight management, Airedale COPD, Grampian COPD)', 'A paragraph on NICE-recommended products', 'A table of headline outcomes from live programmes (cardiac rehabilitation, COPD pulmonary rehabilitation)']),
+                article('understanding-digital-capabilities', 'guidance', 'Find ways of understanding patients’ digital capabilities', 'A GP practice case study on assessing how comfortable patients are with technology, and recording it in their notes.', ['The story', 'A “do” list', 'A “do not” list']),
+                article('targeted-human-support', 'guidance', 'Using targeted human support to enable digital inclusion', 'How one practice pairs technology with human helpers in community venues.', ['The story', 'A “do” list', 'A “don’t” list']),
+                article('local-partners-digital-inclusion', 'guidance', 'Utilising local partners and third-sector organisations to help deliver digital inclusion work', 'How Cornwall and the Isles of Scilly ran a joint COPD campaign, with pointers to national digital inclusion charities.', ['The story', 'A list of charity links'], ['Good Things Foundation (external website)', 'Digital Poverty Alliance (external website)'])
+              ]
+            },
+            {
+              route: '/resources/preparing-to-recommend', title: 'Preparing to recommend a DTx',
+              access: 'Anyone',
+              purpose: 'What to understand before recommending a digital therapeutic to a patient.',
+              on: ['The page trail', 'A heading and introduction', 'A list of article links'],
+              actions: ['Seven articles, listed below'],
+              file: 'app/resources/preparing-to-recommend/page.tsx',
+              data: 'Static content; section details in section.ts',
+              children: [
+                article('what-the-nhs-healthstore-is', 'preparing-to-recommend', 'What The NHS HealthStore is', 'Explains the HealthStore from four points of view: commissioners, clinicians, patients and suppliers.', ['An introduction', 'What it means for commissioners', 'What it means for clinicians', 'What it means for patients', 'What it means for suppliers']),
+                article('using-nhs-healthstore', 'preparing-to-recommend', 'Using NHS HealthStore', 'How clinicians start using the HealthStore once a product is commissioned, with example workflows and governance expectations.', ['Getting started', 'A simplified workflow with a diagram', 'An example: the COPD annual review', 'An example: referral by patient group', 'Clinical and information governance'], null, 'Two of the example workflows are described in words only; one diagram is shown.'),
+                article('clinician-onboarding-guidance', 'preparing-to-recommend', 'Clinician onboarding guidance', 'A short introduction to supporting clinicians as they set up the HealthStore.', ['A single introductory paragraph'], null, 'A short page — more content is planned.'),
+                article('case-studies-and-best-practice', 'preparing-to-recommend', 'Case studies and best practice', 'A short page naming the practices and areas whose stories will appear here.', ['Two paragraphs'], null, 'A short page — more content is planned.'),
+                article('embedding-dtx-into-a-pathway', 'preparing-to-recommend', 'Embedding digital therapeutics (DTx) into a service or pathway', 'Why digital therapeutics work best as part of a care pathway with ongoing support.', ['The argument, in a few paragraphs', 'A pointer to a King’s Fund report', 'Do and do-not lists'], ['King’s Fund: digital exclusion and inclusion in health care (external website)']),
+                article('identifying-suitable-patients', 'preparing-to-recommend', 'Identifying suitable patients for digital therapeutics (DTx) inclusion', 'Who digital therapeutics suit and who they do not, with a focus on COPD and asthma.', ['A “patients must be” list', 'A “not suitable if” list', 'A closing note on local eligibility rules']),
+                article('introducing-dtx-to-patients', 'preparing-to-recommend', 'How to introduce digital therapeutics (DTx) to your patients', 'A simple Ask–Advise–Act approach and suggested wording for the conversation.', ['The Ask / Advise / Act approach', 'Language to use', 'A table of suggested wording (“say this” / “avoid this”)', 'A follow-up prompt', 'Treating digital therapeutics as part of normal care'])
+              ]
+            },
+            {
+              route: '/resources/prior-to-appointment', title: 'Prior to patient appointment',
+              access: 'Anyone',
+              purpose: 'How to prepare before a consultation: record templates, models of remote care, and the barriers patients may face.',
+              on: ['The page trail', 'A heading and introduction', 'A list of article links'],
+              actions: ['Three articles, listed below'],
+              file: 'app/resources/prior-to-appointment/page.tsx',
+              data: 'Static content written in the page file',
+              children: [
+                article('ardens-templates', 'prior-to-appointment', 'Ensuring Ardens templates are updated to include digital therapeutics (DTx)', 'Which fields to add to GP record templates so digital therapeutic use is captured.', ['The fields to capture: recommended DTx, its name, and whether the patient is actively using it', 'The COPD-linked templates to update']),
+                article('self-management-and-remote-care', 'prior-to-appointment', 'What we mean by Self-management, Remote Management and Remote Monitoring', 'Plain definitions of the three models of care used with digital therapeutics.', ['Self-management', 'Remote management', 'Remote monitoring (the virtual ward)']),
+                article('patient-challenges', 'prior-to-appointment', 'Recognition of the challenges patients might have', 'The access and confidence barriers patients face with technology, and how clinicians and NHS England resources can help.', ['An introduction', 'How a clinician can support patients', 'How NHS England’s digital content helps'])
+              ]
+            },
+            {
+              route: '/resources/during-appointment', title: 'During the appointment',
+              access: 'Anyone',
+              purpose: 'What to cover in the consultation itself: the case for digital therapeutics, what to expect of patients, and how it fits clinical systems.',
+              on: ['The page trail', 'A heading and introduction', 'A list of article links'],
+              actions: ['Five articles, listed below'],
+              file: 'app/resources/during-appointment/page.tsx',
+              data: 'Static content written in the page file',
+              tech: 'The hub card on /resources says “During patient appointment”; this page’s own heading is “During the appointment”.',
+              children: [
+                article('how-dtx-improve-outcomes', 'during-appointment', 'How digital therapeutics (DTx) improve patient outcomes', 'The four main ways digital therapeutics help patients.', ['An introduction', 'Supporting behaviour change over time', 'Building confidence to self-manage', 'Extending the reach of a clinical programme', 'Reducing pressure on services']),
+                article('why-nhs-england-advocates-dtx', 'during-appointment', 'Why NHS England is an advocate of digital therapeutics (DTx)', 'NHS England’s reasons: better access, shorter waits, remote monitoring, fairness, and careful data handling.', ['An introduction and the benefits', 'A closing paragraph on data governance']),
+                article('what-is-expected-of-patients', 'during-appointment', 'Make it clear what is expected of patients and keep it simple', 'A real example of remote monitoring for COPD patients in Airedale.', ['A one-line summary', 'The story of the case']),
+                article('clinical-software-integration', 'during-appointment', 'Integration with clinical software', 'How recommending a digital therapeutic in the clinical system triggers messages and set-up through the NHS App.', ['Recommending through the prescribing system', 'What the patient receives through the NHS App, including reminders']),
+                article('overcoming-barriers', 'during-appointment', 'Overcoming barriers to using digital therapeutics (DTx)', 'Practical ways to help patients who find technology hard: assess their comfort, offer in-person help, and work with local partners.', ['An introduction', 'Assessing a patient’s digital capabilities, with further reading', 'Using in-person help to support adoption, with further reading', 'Working with local partners and community organisations'], ['→ /resources/preparing-to-recommend/case-studies-and-best-practice', '→ /resources/guidance/understanding-digital-capabilities', '→ /resources/guidance/targeted-human-support', 'King’s Fund long read (external website)'])
+              ]
+            },
+            {
+              route: '/resources/after-appointment', title: 'After a patient appointment',
+              access: 'Anyone',
+              purpose: 'What patients are entitled to after the consultation, and who stays clinically responsible.',
+              on: ['The page trail', 'A heading and introduction', 'A list of article links'],
+              actions: ['Two articles, listed below'],
+              file: 'app/resources/after-appointment/page.tsx',
+              data: 'Static content written in the page file',
+              children: [
+                article('continued-access-to-alternative-care', 'after-appointment', 'Continued access to alternative care', 'Saying no to a digital therapeutic, or stopping one, never affects a patient’s normal NHS care.', ['A single paragraph'], null, 'A short page.'),
+                article('clinical-responsibility', 'after-appointment', 'Clinical responsibility', 'The patient’s named clinician keeps the duty of care; hospital teams take over during inpatient stays.', ['Four paragraphs'])
+              ]
+            }
+          ]
+        },
+        {
+          route: '/gate', title: 'This is a private prototype',
+          access: 'Everyone — it is the first page any visitor sees',
+          purpose: 'Asks for the site password before letting you in.',
+          on: ['A simple NHS header with no menu', 'A card with a heading, a short explanation, and an error message if the password is wrong', 'A password field and a Continue button', 'A short disclaimer explaining this is a prototype'],
+          actions: ['Continue → checks the password, then takes you to the page you were trying to reach, or the home page'],
+          file: 'app/gate/page.tsx',
+          data: 'The password check happens at POST /api/gate; a ?next= parameter remembers where you were heading',
+          tech: 'Once unlocked (hs-gate cookie), visiting /gate sends you straight to the home page.'
+        },
+        {
+          route: '/cookies', title: 'Cookies',
+          access: 'Anyone',
+          purpose: 'Explains what the site remembers on your device and how to change your mind about analytics.',
+          on: ['The page trail', 'A heading and introduction', 'How your cookie choice is stored', 'What accepting or rejecting analytics means', 'A control to bring the cookie banner back'],
+          actions: ['Show cookie banner again → clears your saved choice and reloads the page'],
+          file: 'app/cookies/page.tsx',
+          data: 'Your choice is stored in the browser (localStorage, via lib/cookieConsentStorage.ts)',
+          tech: 'Linked from the footer and from the cookie banner itself. Analytics is Hotjar, loaded only after consent.'
+        }
+      ]
+    }
+  ];
+
+  var SUPPLIER_SITE = [
+    {
+      route: '/supplier-portal', title: 'Dashboard',
+      access: 'Suppliers, after signing in',
+      purpose: 'The home page after signing in. It shows what needs doing and opens every area of the portal.',
+      on: [
+        'Your company name above the heading “Dashboard”',
+        '“Needs your attention”: a work list showing company information that has never been submitted, an onboarding form that is incomplete or needs action, product documents that need action, and any store page that is unpublished or needs action',
+        'Five cards: Company information, Product management, Published pages, Contact, and Account management'
+      ],
+      actions: [
+        'An item in “Needs your attention” → the page where you can deal with it',
+        'Company information → /supplier-portal/company',
+        'Product management → /supplier-portal/products',
+        'Published pages → /supplier-portal/published',
+        'Contact → /supplier-portal/contact',
+        'Account management → /supplier-portal/account'
+      ],
+      note: 'Draft changes, unpublished changes and items already in review stay off the “Needs your attention” list.',
+      file: 'app/supplier-portal/page.tsx → DashboardAttentionList.tsx, PortalCardGrid.tsx',
+      data: 'The sample supplier (my mhealth Limited) and its products come from lib/supplierPortal.ts; everything you do is saved in the browser',
+      children: [
+        {
+          route: '/supplier-portal/sign-in', title: 'Sign in',
+          access: 'Anyone with the site password — it is where signed-out visitors land',
+          purpose: 'Asks for an email address and password before you can use the portal.',
+          on: ['The heading “Sign in to the Supplier portal”', 'A note that this prototype accepts any email address and password', 'Email address and password fields, with clear error messages if either is empty', 'A Sign in button'],
+          actions: ['Sign in → the dashboard, or the page you were trying to open'],
+          file: 'app/supplier-portal/sign-in/page.tsx → SupplierSignInForm.tsx',
+          data: 'Signed-in state kept in the browser; a ?next= parameter remembers where you were heading',
+          tech: 'Opening any portal address while signed out redirects here (PortalGuard). Visiting while already signed in sends you to the dashboard.'
+        },
+        {
+          route: '/supplier-portal/company', title: 'Company information',
+          access: 'Suppliers, after signing in',
+          purpose: 'The questionnaire about your company, split into three chapters you submit one at a time.',
+          on: [
+            'The heading and, once every chapter is submitted, a status and the date it was last updated',
+            'Three chapters: Company details (name, trading name, type of organisation, registration, address and website); Relationship manager (name, job title, email and phone); and Care Quality Commission (whether you must register, the date of the last assessment, and the latest report)',
+            'A chapter you have not submitted yet shows as a task-list row marked Incomplete',
+            'A submitted chapter shows as a read-only summary with a single Change button'
+          ],
+          actions: ['Open or Change a chapter → its questions, one per page', 'The last question → Check your answers for that chapter', 'Confirm and submit → a confirmation page, then back here'],
+          note: 'Submitting a chapter applies its answers straight away — there is no HealthStore review for company information. Save and exit part-way keeps a draft; nothing changes until you confirm and submit.',
+          file: 'app/supplier-portal/company/page.tsx → components/supplier-portal/CompanyInformationPage.tsx',
+          data: 'Questions defined in lib/supplierCompany.ts (the Section A supplier questionnaire); answers saved in the browser',
+          children: [
+            {
+              route: '/supplier-portal/company/questions/[step]', title: 'Company question',
+              access: 'Suppliers, after signing in',
+              purpose: 'One question at a time, with a Save and continue button.',
+              on: ['A back link', 'The question, any hint text, and its fields (text boxes, choices, an address, or a file upload)', 'Save and continue, or Save and exit to keep a draft and come back later'],
+              actions: ['Save and continue → the next question in the chapter', 'The last question → the chapter’s Check your answers', 'Save and exit → back to Company information'],
+              file: 'app/supplier-portal/company/questions/[step]/page.tsx → CompanyQuestionPage.tsx',
+              data: 'Answers saved in the browser as a draft',
+              tech: 'Arriving from Check your answers (?return=check-answers) swaps the buttons to Save and exit / Cancel and exit so one answer can be corrected on its own.'
+            },
+            {
+              route: '/supplier-portal/company/check-answers', title: 'Check your answers (chapter)',
+              access: 'Suppliers, after signing in',
+              purpose: 'Shows every answer in the chapter so you can correct it before submitting.',
+              on: ['A summary of the chapter’s answers, each with a Change link', 'A Confirm and submit button'],
+              actions: ['Change → the matching question', 'Confirm and submit → the confirmation page'],
+              file: 'app/supplier-portal/company/check-answers/page.tsx → CompanyCheckAnswers.tsx',
+              data: 'Reads the draft from the browser'
+            },
+            {
+              route: '/supplier-portal/company/confirmation', title: 'Chapter submitted',
+              access: 'Suppliers, after signing in',
+              purpose: 'Confirms the chapter went through and lists any chapters still to complete.',
+              on: ['A green confirmation panel', 'A list of chapters still to complete, if any', 'A link back to Company information'],
+              actions: ['→ /supplier-portal/company'],
+              file: 'app/supplier-portal/company/confirmation/page.tsx → CompanyConfirmation.tsx'
+            }
+          ]
+        },
+        {
+          route: '/supplier-portal/products', title: 'Product management',
+          access: 'Suppliers, after signing in',
+          purpose: 'The front door to everything product-related: onboarding new products and updating existing ones.',
+          on: ['The page trail', 'A heading and a short introduction', 'Two cards: Manage products and Product onboarding'],
+          actions: ['Manage products → /supplier-portal/products/manage', 'Product onboarding → /supplier-portal/products/onboard'],
+          file: 'app/supplier-portal/products/page.tsx',
+          children: [
+            {
+              route: '/supplier-portal/products/onboard', title: 'Product onboarding',
+              access: 'Suppliers, after signing in',
+              purpose: 'Lists each new product that has its own onboarding form, with its status.',
+              on: ['The page trail', 'An introduction explaining that answers save as a draft until you submit the form for review', 'A table of onboarding forms: product name, the date it was started, and its status (myCOPD in this prototype)'],
+              actions: ['Open a form → /supplier-portal/products/onboard/[formId]'],
+              file: 'app/supplier-portal/products/onboard/page.tsx → OnboardingFormsTable.tsx',
+              data: 'Forms listed in lib/supplierPortal.ts (one today: myCOPD)',
+              children: [
+                {
+                  route: '/supplier-portal/products/onboard/[formId]', title: 'Onboarding form (task list)',
+                  access: 'Suppliers, after signing in',
+                  purpose: 'The onboarding form for one product: four sections and seven tasks, each a run of one-question-per-page screens.',
+                  on: [
+                    'The product name and the form status',
+                    'A task list across four sections: Product details; Value proposition; Technical questions (clinical safety, data protection, technical security, interoperability); and Key principles for success (usability and accessibility)',
+                    'Each task marked Completed or Incomplete',
+                    'A Submit button that stays unavailable until every task is completed'
+                  ],
+                  actions: ['Open a task → its first question', 'Submit → Check your answers, then Confirm and submit, then a confirmation with a reference number'],
+                  note: 'Some questions only appear depending on earlier answers in the same task; questions you are routed past are left out of the Completed check and of Check your answers. After submitting, the HealthStore team reviews the evidence before the product can be listed, and will be in touch within 10 working days if they need more information.',
+                  file: 'app/supplier-portal/products/onboard/[formId]/page.tsx → components/supplier-onboard/**',
+                  data: 'Questions and routing in lib/supplierOnboarding.ts; answers in the browser (localStorage hs-supplier-portal:onboarding:{formId})',
+                  tech: 'The question routes (Sections B, C1–C4 and D) are drawn in docs/SUPPLIER_PORTAL_FLOWS.md. “Provided / Not provided” questions are followed by a separate upload or text page when the answer is Provided.',
+                  example: '/supplier-portal/products/onboard/mycopd',
+                  children: [
+                    {
+                      route: '/supplier-portal/products/onboard/[formId]/[task]/[step]', title: 'Onboarding question',
+                      access: 'Suppliers, after signing in',
+                      purpose: 'One question at a time, with Save and next.',
+                      on: ['A back link', 'Which section and task you are in', 'The question, any hint text, and its fields (text boxes, choices, or a file upload)', 'Save and next — or Save and exit on the last question of the task'],
+                      actions: ['Save and next → the next question on your route', 'Save and exit → back to the task list, marking the task completed when the required answers are in', 'Cancel → back to the task list without saving that page'],
+                      file: 'app/supplier-portal/products/onboard/[formId]/[task]/[step]/page.tsx',
+                      data: 'Answers saved in the browser as you go',
+                      tech: 'Opening a task (…/[task]) takes you to its first question. Changing an earlier answer can bring a skipped question back; its previous answer, if any, is kept.'
+                    },
+                    {
+                      route: '/supplier-portal/products/onboard/[formId]/check-answers', title: 'Check your answers (form)',
+                      access: 'Suppliers, after signing in',
+                      purpose: 'Shows every answer on your route through the whole form before you submit it for review.',
+                      on: ['Answers grouped by section and task, each with a Change link', 'A Confirm and submit button'],
+                      actions: ['Change → the matching question', 'Confirm and submit → the confirmation page'],
+                      file: 'app/supplier-portal/products/onboard/[formId]/check-answers/page.tsx'
+                    },
+                    {
+                      route: '/supplier-portal/products/onboard/[formId]/confirmation', title: 'Form submitted',
+                      access: 'Suppliers, after signing in',
+                      purpose: 'Confirms the form went through, with a reference number and what happens next.',
+                      on: ['A green confirmation panel with a reference number', '“What happens next”: the team reviews the evidence; the product is not listed until that review is finished'],
+                      actions: ['→ back to the portal'],
+                      file: 'app/supplier-portal/products/onboard/[formId]/confirmation/page.tsx'
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              route: '/supplier-portal/products/manage', title: 'Manage products',
+              access: 'Suppliers, after signing in',
+              purpose: 'Lists your products that are already on the HealthStore, with their update status.',
+              on: ['The page trail', 'A heading and a short introduction', 'A table of products with their status (myHeart in this prototype, which starts as Up to date)'],
+              actions: ['Open a product → /supplier-portal/products/manage/[productId]'],
+              file: 'app/supplier-portal/products/manage/page.tsx → ManagedProductsTable.tsx',
+              data: 'Products listed in lib/supplierPortal.ts',
+              children: [
+                {
+                  route: '/supplier-portal/products/manage/[productId]', title: 'Product content and documents',
+                  access: 'Suppliers, after signing in',
+                  purpose: 'Where you update a product after onboarding: its summary, who it is for, the support email, and the assurance documents.',
+                  on: [
+                    'The product name and its status',
+                    'Content rows — product summary, who the product is for, and the support contact email — each with a Change link',
+                    'Assurance documents in DTAC order (PAQ form, clinical safety case report and hazard log, ICO registration, Cyber Essentials, penetration test summary, WCAG 2.2 AA audit, completed DTAC form), each with a Change link',
+                    'A Submit for review button, shown once there are draft changes or a review came back asking for changes',
+                    'While a submission is in review: Simulate approval and Simulate rejection buttons stand in for the HealthStore team'
+                  ],
+                  actions: ['Change → /supplier-portal/products/manage/[productId]/[field]', 'Submit for review → Check your answers, then Confirm and submit, then a confirmation'],
+                  note: 'Draft changes are not seen by the HealthStore team until you submit them. A rejection puts the submitted values back into your draft so they can be edited and sent again, and the product appears under “Needs your attention” on the dashboard.',
+                  file: 'app/supplier-portal/products/manage/[productId]/page.tsx → ProductDocumentsView.tsx',
+                  data: 'Your edits saved in the browser, over the sample defaults in lib/supplierPortal.ts',
+                  example: '/supplier-portal/products/manage/myheart',
+                  children: [
+                    {
+                      route: '/supplier-portal/products/manage/[productId]/[field]', title: 'Change one field',
+                      access: 'Suppliers, after signing in',
+                      purpose: 'Edit a single piece of content or replace a single document.',
+                      on: ['A back link', 'The field with its hint text, or a file upload', 'Save and exit, or Cancel'],
+                      actions: ['Save and exit → back to the product, with the status becoming Draft changes', 'Cancel → back without saving'],
+                      file: 'app/supplier-portal/products/manage/[productId]/[field]/page.tsx → ProductFieldEditor.tsx',
+                      tech: 'Arriving from Check your answers (?return=check-answers) returns you there after saving.'
+                    },
+                    {
+                      route: '/supplier-portal/products/manage/[productId]/check-answers', title: 'Check your answers (product)',
+                      access: 'Suppliers, after signing in',
+                      purpose: 'Shows the changes you are about to submit for review.',
+                      on: ['The changed fields, each with a Change link', 'A Confirm and submit button'],
+                      actions: ['Change → edit that field', 'Confirm and submit → the confirmation page, and the status becomes In review'],
+                      file: 'app/supplier-portal/products/manage/[productId]/check-answers/page.tsx → ProductCheckAnswers.tsx'
+                    },
+                    {
+                      route: '/supplier-portal/products/manage/[productId]/confirmation', title: 'Changes submitted',
+                      access: 'Suppliers, after signing in',
+                      purpose: 'Confirms your changes have gone to the HealthStore team for review.',
+                      on: ['A green confirmation panel', 'What happens next'],
+                      actions: ['→ back to the product or the dashboard'],
+                      file: 'app/supplier-portal/products/manage/[productId]/confirmation/page.tsx → ProductSubmissionConfirmation.tsx'
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          route: '/supplier-portal/published', title: 'Published pages',
+          access: 'Suppliers, after signing in',
+          purpose: 'The pages commissioners see on the Commissioning Store: one for each product, plus your supplier page.',
+          on: ['The page trail', 'An introduction noting that some content comes from product onboarding and cannot be changed here', 'A table of pages: each product page and the supplier page, with a status'],
+          actions: ['Open a product page → /supplier-portal/published/products/[productId]', 'Open the supplier page → /supplier-portal/published/supplier'],
+          note: 'A page that has never been published starts as Unpublished, so commissioners cannot see it. After the first approval it is Published; later saves become Unpublished changes, and the live page stays as it was until the new version is approved.',
+          file: 'app/supplier-portal/published/page.tsx → PublishedPagesTable.tsx',
+          data: 'Page fields and statuses in lib/supplierPortal.ts; your edits saved in the browser',
+          children: [
+            {
+              route: '/supplier-portal/published/products/[productId]', title: 'Product page (store content)',
+              access: 'Suppliers, after signing in',
+              purpose: 'Edit the public wording of a product’s Commissioning Store page.',
+              on: ['The page status and when it was last updated', 'The fields you can edit — such as the overview and why it matters locally — each with a Change link', '“Information from product onboarding”: read-only rows that can only be changed through Manage products', 'A Submit for review button once there are changes', 'Simulate approval and Simulate rejection while in review'],
+              actions: ['Change a field → edit it on its own page', 'Submit for review → Check your answers, then Confirm and submit, then a confirmation'],
+              note: 'A rejected page becomes Action needed and returns to “Needs your attention”, together with any page that is still unpublished.',
+              file: 'app/supplier-portal/published/products/[productId]/page.tsx → PublishedPageEditor.tsx',
+              example: '/supplier-portal/published/products/myheart',
+              children: [
+                {
+                  route: '/supplier-portal/published/products/[productId]/check-answers', title: 'Check your answers (product page)',
+                  access: 'Suppliers, after signing in',
+                  purpose: 'Shows the page changes you are about to submit for review.',
+                  on: ['The changed fields, each with a Change link', 'A Confirm and submit button'],
+                  actions: ['Confirm and submit → the confirmation page, and the status becomes In review'],
+                  file: 'app/supplier-portal/published/products/[productId]/check-answers/page.tsx → PublishedPageCheckAnswers.tsx'
+                },
+                {
+                  route: '/supplier-portal/published/products/[productId]/confirmation', title: 'Page submitted',
+                  access: 'Suppliers, after signing in',
+                  purpose: 'Confirms the page has gone to the HealthStore team for review.',
+                  on: ['A green confirmation panel', 'What happens next'],
+                  actions: ['→ back to Published pages'],
+                  file: 'app/supplier-portal/published/products/[productId]/confirmation/page.tsx → PublishedPageConfirmation.tsx'
+                }
+              ]
+            },
+            {
+              route: '/supplier-portal/published/supplier', title: 'Supplier page (store content)',
+              access: 'Suppliers, after signing in',
+              purpose: 'Edit the public page about your company on the Commissioning Store.',
+              on: ['The page status and when it was last updated', 'The fields you can edit: about the company, website, and enquiries email', 'Read-only company information from supplier onboarding: registered address, company number and ICO registration', 'A Submit for review button once there are changes', 'Simulate approval and Simulate rejection while in review'],
+              actions: ['Change a field → edit it on its own page', 'Submit for review → Check your answers, then Confirm and submit, then a confirmation'],
+              file: 'app/supplier-portal/published/supplier/page.tsx → PublishedPageEditor.tsx',
+              children: [
+                {
+                  route: '/supplier-portal/published/supplier/check-answers', title: 'Check your answers (supplier page)',
+                  access: 'Suppliers, after signing in',
+                  purpose: 'Shows the supplier-page changes you are about to submit for review.',
+                  on: ['The changed fields, each with a Change link', 'A Confirm and submit button'],
+                  actions: ['Confirm and submit → the confirmation page, and the status becomes In review'],
+                  file: 'app/supplier-portal/published/supplier/check-answers/page.tsx → PublishedPageCheckAnswers.tsx'
+                },
+                {
+                  route: '/supplier-portal/published/supplier/confirmation', title: 'Supplier page submitted',
+                  access: 'Suppliers, after signing in',
+                  purpose: 'Confirms the supplier page has gone to the HealthStore team for review.',
+                  on: ['A green confirmation panel', 'What happens next'],
+                  actions: ['→ back to Published pages'],
+                  file: 'app/supplier-portal/published/supplier/confirmation/page.tsx → PublishedPageConfirmation.tsx'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          route: '/supplier-portal/contact', title: 'Contact',
+          access: 'Suppliers, after signing in',
+          purpose: 'Where you will be able to contact the HealthStore team.',
+          on: ['The page trail', 'A heading and a one-line description'],
+          actions: ['Reading only — this page has no journey yet'],
+          note: 'A short page — the full journey is still to come.',
+          file: 'app/supplier-portal/contact/page.tsx → PortalSkeletonPage.tsx'
+        },
+        {
+          route: '/supplier-portal/account', title: 'Account management',
+          access: 'Suppliers, after signing in',
+          purpose: 'Where you will be able to manage access and your password.',
+          on: ['The page trail', 'A heading and a one-line description'],
+          actions: ['Reading only — this page has no journey yet'],
+          note: 'A short page — the full journey is still to come.',
+          file: 'app/supplier-portal/account/page.tsx → PortalSkeletonPage.tsx'
+        },
+        {
+          route: '/supplier-portal/statuses', title: 'Statuses (reference)',
+          access: 'Suppliers, after signing in',
+          purpose: 'A reference list of every status tag used in the portal and the colour it appears in.',
+          on: ['Tables of statuses grouped by where they appear: onboarding forms, managed products, and published pages'],
+          actions: ['Reading only'],
+          note: 'Not linked from the dashboard — you have to type the address.',
+          file: 'app/supplier-portal/statuses/page.tsx → PortalStatusTag.tsx'
+        }
+      ]
+    }
+  ];
+
+  /* ------------------------------------------------------------------------ */
+
+  (function () {
+    var treeEl = document.getElementById('sm-tree');
+    var detailEl = document.getElementById('sm-detail');
+    var searchEl = document.getElementById('sm-search');
+    var countEl = document.getElementById('sm-count');
+
+    /* Two maps, one per tab. */
+    var TABS = {
+      store: { site: SITE, globalId: 'sm-global-store', buttonId: 'sm-tab-store' },
+      portal: { site: SUPPLIER_SITE, globalId: 'sm-global-portal', buttonId: 'sm-tab-portal' }
+    };
+    var activeTab = 'store';
+    var flat = [];
+    var byId = {};
+    function activeSite() { return TABS[activeTab].site; }
+    function tabForRoute(route) { return route.indexOf('/supplier-portal') === 0 ? 'portal' : 'store'; }
+    function walk(nodes, parent, depth) {
+      nodes.forEach(function (n) {
+        n.id = 'n' + flat.length;
+        n.parent = parent;
+        n.depth = depth;
+        flat.push(n);
+        byId[n.id] = n;
+        if (n.children) walk(n.children, n, depth + 1);
+      });
+    }
+    function buildTab(tab) {
+      activeTab = tab;
+      flat = [];
+      byId = {};
+      selectedId = null;
+      walk(activeSite(), null, 0);
+      Object.keys(TABS).forEach(function (t) {
+        document.getElementById(TABS[t].buttonId).setAttribute('aria-selected', t === tab ? 'true' : 'false');
+        document.getElementById(TABS[t].globalId).hidden = t !== tab;
+      });
+      renderTree();
+      applyFilter();
+    }
+
+    function isRoute(s) { return /^\//.test(s); }
+
+    function esc(s) {
+      return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
+    }
+    function hl(s, q) {
+      var e = esc(s);
+      if (!q) return e;
+      var re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+      return e.replace(re, '<mark>$1</mark>');
+    }
+    /* Wrap route-like tokens in <code>. */
+    function fmt(s) {
+      return esc(s).replace(/(^|[\s(→,;])(\/[A-Za-z0-9\-\[\]\/\?=&{}_.…]*|#)(?=$|[\s),;.])/g, '$1<code>$2</code>').replace(/(POST|GET|PUT|DELETE|GET\/POST\/DELETE)(?=\s<code>)/g, '<strong>$1</strong>');
+    }
+
+    /* Items in `on` can be plain strings or objects { heading, text, needs, sub }. */
+    function itemText(i) {
+      if (typeof i === 'string') return i;
+      var parts = [i.heading || '', i.text || ''];
+      if (i.needs) parts = parts.concat(i.needs);
+      if (i.sub) parts = parts.concat(i.sub.map(itemText));
+      return parts.join(' ');
+    }
+    function haystack(n) {
+      return [n.route, n.title, n.purpose, n.access, n.file, n.note, n.tech, n.data]
+        .concat((n.on || []).map(itemText), (n.actions || []).map(itemText)).join(' ').toLowerCase();
+    }
+
+    /* ---- Tree ---- */
+    function renderTree() {
+      treeEl.innerHTML = '';
+      treeEl.appendChild(renderList(activeSite()));
+    }
+    function renderList(nodes) {
+      var ul = document.createElement('ul');
+      ul.setAttribute('role', 'list');
+      nodes.forEach(function (n) {
+        var li = document.createElement('li');
+        li.dataset.id = n.id;
+        var row = document.createElement('div');
+        row.className = 'sm-node';
+        row.id = 'row-' + n.id;
+
+        var toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'sm-toggle' + (n.children ? '' : ' sm-toggle--leaf');
+        toggle.innerHTML = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 1.5 8 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+        if (n.children) {
+          toggle.setAttribute('aria-expanded', n.depth < 1 ? 'true' : 'false');
+          toggle.setAttribute('aria-label', 'Toggle ' + n.title);
+          toggle.addEventListener('click', function () { setExpanded(li, toggle.getAttribute('aria-expanded') !== 'true'); });
+        } else {
+          toggle.tabIndex = -1;
+          toggle.setAttribute('aria-hidden', 'true');
+        }
+
+        var label = document.createElement('button');
+        label.type = 'button';
+        label.className = 'sm-label';
+        label.dataset.id = n.id;
+        label.addEventListener('click', function () { select(n.id, true); });
+
+        row.appendChild(toggle);
+        row.appendChild(label);
+        li.appendChild(row);
+        if (n.children) {
+          var sub = renderList(n.children);
+          sub.hidden = n.depth >= 1;
+          li.appendChild(sub);
+        }
+        ul.appendChild(li);
+      });
+      return ul;
+    }
+    function setExpanded(li, open) {
+      var toggle = li.querySelector(':scope > .sm-node > .sm-toggle');
+      var sub = li.querySelector(':scope > ul');
+      if (!sub) return;
+      sub.hidden = !open;
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    function expandAll(open) {
+      treeEl.querySelectorAll('li').forEach(function (li) { setExpanded(li, open); });
+    }
+
+    /* Paint labels (with highlight) and apply the search filter. */
+    function applyFilter() {
+      var q = searchEl.value.trim().toLowerCase();
+      var visible = 0;
+      var matched = {};
+      flat.forEach(function (n) {
+        matched[n.id] = !q || haystack(n).indexOf(q) !== -1;
+      });
+      /* A node stays visible if it or any descendant matches. */
+      function anyBelow(n) {
+        if (matched[n.id]) return true;
+        return (n.children || []).some(anyBelow);
+      }
+      flat.forEach(function (n) {
+        var li = treeEl.querySelector('li[data-id="' + n.id + '"]');
+        var show = anyBelow(n);
+        li.hidden = !show;
+        if (show && isRoute(n.route) && matched[n.id]) visible++;
+        var label = li.querySelector(':scope > .sm-node > .sm-label');
+        label.innerHTML = '<span class="sm-label__title">' + hl(n.title, q) + '</span>' +
+          (isRoute(n.route) ? '<span class="sm-label__route">' + hl(n.route, q) + '</span>' : '');
+        if (q && show && n.children) setExpanded(li, true);
+      });
+      countEl.textContent = q
+        ? visible + ' page' + (visible === 1 ? '' : 's') + ' match “' + searchEl.value.trim() + '”'
+        : flat.filter(function (n) { return isRoute(n.route); }).length + ' pages';
+    }
+
+    /* ---- Detail ---- */
+    function liveHref(n) {
+      if (n.example) return n.example;
+      if (!isRoute(n.route) || /[\[{…]/.test(n.route)) return null;
+      return n.route;
+    }
+    function listItem(i) {
+      if (typeof i === 'string') return '<li>' + fmt(i) + '</li>';
+      var h = '';
+      if (i.heading) h += '<strong>' + esc(i.heading) + '</strong>' + (i.text ? ' ' : '');
+      if (i.text) h += fmt(i.text);
+      if (i.needs && i.needs.length) {
+        h += '<details class="sm-needs"><summary>User needs, pain points, gaps addressed</summary><ul>' +
+          i.needs.map(function (x) { return '<li>' + fmt(x) + '</li>'; }).join('') + '</ul></details>';
+      }
+      if (i.sub && i.sub.length) h += '<ul>' + i.sub.map(listItem).join('') + '</ul>';
+      return '<li>' + h + '</li>';
+    }
+    function list(items, ordered) {
+      if (!items || !items.length) return '<p class="sm-detail__empty">None</p>';
+      var tag = ordered ? 'ol' : 'ul';
+      return '<' + tag + '>' + items.map(listItem).join('') + '</' + tag + '>';
+    }
+    function crumbs(n) {
+      var parts = [];
+      var p = n.parent;
+      while (p) { parts.unshift(p); p = p.parent; }
+      if (!parts.length) return '';
+      return '<p class="ds-u-muted" style="font-size:.8rem;margin:0 0 6px">' + parts.map(function (p) {
+        return '<a href="#' + encodeURIComponent(p.route) + '" data-id="' + p.id + '" class="sm-crumb">' + esc(p.title) + '</a>';
+      }).join(' › ') + '</p>';
+    }
+    function techBlock(n) {
+      var rows = [];
+      if (n.file) rows.push('<dt>Source file</dt><dd><code>' + esc(n.file) + '</code></dd>');
+      if (n.data) rows.push('<dt>Data and parameters</dt><dd>' + fmt(n.data) + '</dd>');
+      if (n.tech) rows.push('<dt>Notes</dt><dd>' + fmt(n.tech) + '</dd>');
+      if (!rows.length) return '';
+      return '<details class="sm-tech"><summary>Technical details</summary><div><dl>' + rows.join('') + '</dl></div></details>';
+    }
+    function renderDetail(n) {
+      var href = liveHref(n);
+      var html = crumbs(n) +
+        '<h2 id="sm-detail-title">' + esc(n.title) + '</h2>' +
+        '<p class="sm-detail__route">' + (isRoute(n.route) ? esc(n.route) : '<span class="ds-u-muted">A group of pages</span>') +
+        (href ? ' <a href="' + esc(href) + '" target="_blank" rel="noopener">Open page ↗</a>' : '') + '</p>' +
+        '<p>' + esc(n.purpose || '') + '</p>' +
+        '<div class="ds-meta-grid">' +
+          '<div class="ds-meta"><div class="ds-meta__k">Who can see it</div><div class="ds-meta__v">' + esc(n.access || '—') + '</div></div>' +
+        '</div>' +
+        '<h3>What’s on this page</h3>' + list(n.on, true) +
+        '<h3>Where it takes you</h3>' + list(n.actions, false) +
+        (n.note ? '<h3>Worth knowing</h3><p>' + fmt(n.note) + '</p>' : '');
+      if (n.children && n.children.length) {
+        html += '<h3>Pages inside this one</h3><ul class="sm-children">' + n.children.map(function (c) {
+          return '<li><a href="#' + encodeURIComponent(c.route) + '" data-id="' + c.id + '" class="sm-crumb">' + esc(c.title) + '</a>' +
+            (isRoute(c.route) ? ' <span class="sm-label__route">' + esc(c.route) + '</span>' : '') + '</li>';
+        }).join('') + '</ul>';
+      }
+      html += techBlock(n);
+      detailEl.innerHTML = html;
+      detailEl.querySelectorAll('.sm-crumb').forEach(function (a) {
+        a.addEventListener('click', function (e) { e.preventDefault(); select(a.dataset.id, true); });
+      });
+    }
+
+    var selectedId = null;
+    function select(id, scroll) {
+      var n = byId[id];
+      if (!n) return;
+      if (selectedId) {
+        var prev = document.getElementById('row-' + selectedId);
+        if (prev) prev.classList.remove('sm-node--selected');
+      }
+      selectedId = id;
+      /* Expand ancestors so the selected row is visible. */
+      var p = n.parent;
+      while (p) { setExpanded(treeEl.querySelector('li[data-id="' + p.id + '"]'), true); p = p.parent; }
+      var row = document.getElementById('row-' + id);
+      row.classList.add('sm-node--selected');
+      renderDetail(n);
+      if (history.replaceState) history.replaceState(null, '', '#' + encodeURIComponent(n.route));
+      if (scroll && window.matchMedia && window.matchMedia('(max-width: 1100px)').matches) {
+        detailEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function selectFromHash() {
+      var h = decodeURIComponent((location.hash || '').slice(1));
+      var want = h ? tabForRoute(h) : activeTab;
+      if (want !== activeTab) buildTab(want);
+      var n = h && flat.filter(function (x) { return x.route === h; })[0];
+      select(n ? n.id : flat[0].id, false);
+    }
+
+    buildTab('store');
+    selectFromHash();
+
+    Object.keys(TABS).forEach(function (t) {
+      document.getElementById(TABS[t].buttonId).addEventListener('click', function () {
+        if (t === activeTab) return;
+        buildTab(t);
+        select(flat[0].id, false);
+      });
+    });
+
+    searchEl.addEventListener('input', applyFilter);
+    document.getElementById('sm-expand').addEventListener('click', function () { expandAll(true); });
+    document.getElementById('sm-collapse').addEventListener('click', function () {
+      expandAll(false);
+      setExpanded(treeEl.querySelector('li'), true);
+    });
+    window.addEventListener('hashchange', selectFromHash);
+  })();
+  </script>
+  <script src="/DS/assets/ds.js" defer></script>
+</body>
+</html>

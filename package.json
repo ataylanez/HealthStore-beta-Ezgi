@@ -7,7 +7,6 @@
     "db:migrate": "npx tsx scripts/run-migration.ts",
     "db:seed": "npx tsx scripts/seed-db.ts",
     "db:setup": "npm run db:migrate && npm run db:seed",
-    "db:migrate-bookmarks": "npx tsx scripts/migrate-bookmarks.ts",
     "build:ds-css": "sass --no-source-map --no-charset --style=compressed --load-path=node_modules/nhsuk-frontend/packages app/styles/_src/nhsuk-theme.scss app/styles/nhsuk-theme.generated.css && sass --no-source-map --no-charset --style=compressed --quiet --load-path=node_modules/nhsuk-frontend-v10/dist app/styles/_src/nhsuk-v10-gaps.scss app/styles/nhsuk-v10-gaps.generated.css && sass --no-source-map --no-charset --style=compressed --quiet --load-path=node_modules/govuk-frontend/dist app/styles/_src/govuk-gaps.scss app/styles/govuk-gaps.generated.css",
     "dev": "next dev --webpack",
     "dev:turbo": "next dev --turbopack",

@@ -2,17 +2,14 @@
 
 import { useEffect, useId, useRef, useState } from 'react'
 import { X, Trash2, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
-import { useBookmarks } from '@/components/BookmarkProvider'
 import { useEoi } from '@/components/EoiProvider'
 import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 
-type Dataset = 'bookmarks' | 'eoi' | 'all'
+type Dataset = 'eoi'
 
 const DATASET_LABELS: Record<Dataset, string> = {
-  bookmarks: 'Saved apps',
   eoi: 'EOI record',
-  all: 'All data',
 }
 
 type Stage = 'idle' | 'confirming' | 'loading' | 'success' | 'error'
@@ -23,7 +20,6 @@ interface Props {
 }
 
 export default function ClearDataModal({ open, onClose }: Props) {
-  const { refresh: refreshBookmarks } = useBookmarks()
   const { refresh: refreshEoi } = useEoi()
 
   const [stage, setStage] = useState<Stage>('idle')
@@ -52,21 +48,12 @@ export default function ClearDataModal({ open, onClose }: Props) {
     setStage('loading')
     setErrorMsg(null)
     try {
-      const requests: Promise<Response>[] = []
-      if (chosen === 'bookmarks' || chosen === 'all') {
-        requests.push(fetch('/api/bookmarks', { method: 'DELETE' }))
-      }
-      if (chosen === 'eoi' || chosen === 'all') {
-        requests.push(fetch('/api/express-interest', { method: 'DELETE' }))
-      }
-      const responses = await Promise.all(requests)
-      const failed = responses.find(r => !r.ok)
-      if (failed) {
-        const data = (await failed.json().catch(() => ({}))) as { error?: string }
+      const res = await fetch('/api/express-interest', { method: 'DELETE' })
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string }
         throw new Error(data.error || 'The server returned an error. Please try again.')
       }
-      if (chosen === 'bookmarks' || chosen === 'all') await refreshBookmarks()
-      if (chosen === 'eoi' || chosen === 'all') await refreshEoi()
+      await refreshEoi()
       setStage('success')
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
@@ -109,15 +96,15 @@ export default function ClearDataModal({ open, onClose }: Props) {
             Select which data to clear for your organisation. This will permanently delete the records for all users in your organisation.
           </p>
           <div className="flex flex-col gap-4">
-            {(['bookmarks', 'eoi', 'all'] as Dataset[]).map(d => (
+            {(['eoi'] as Dataset[]).map(d => (
               <button
                 key={d}
                 type="button"
                 onClick={() => pickDataset(d)}
                 className="flex items-center gap-4 w-full rounded-xl border px-4 py-4 hs-text-label hs-font-bold text-left transition-colors hover:bg-[#F0F4F5]"
-                style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                style={{ borderColor: 'var(--border)', color: 'var(--nhs-blue)' }}
               >
-                <Trash2 className="w-4 h-4 shrink-0" style={{ color: d === 'all' ? 'var(--nhs-red, #d5281b)' : 'var(--nhs-blue)' }} aria-hidden />
+                <Trash2 className="w-4 h-4 shrink-0" style={{ color: 'var(--nhs-blue)' }} aria-hidden />
                 Clear {DATASET_LABELS[d]}
               </button>
             ))}
@@ -136,9 +123,7 @@ export default function ClearDataModal({ open, onClose }: Props) {
           </h2>
           <p className="mb-6" style={{ fontSize: 'var(--text-body)', color: 'var(--text-secondary)' }}>
             This will permanently delete{' '}
-            <strong>
-              {chosen === 'all' ? 'all saved apps and expressions of interest' : DATASET_LABELS[chosen].toLowerCase()}
-            </strong>{' '}
+            <strong>{DATASET_LABELS[chosen].toLowerCase()}</strong>{' '}
             for your entire organisation. This action cannot be undone.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">

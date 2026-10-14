@@ -3,7 +3,7 @@
 // The app compiles nhsuk-frontend v9 (see nhsuk-theme.scss). Some components
 // only exist in v10 — currently File upload
 // (https://service-manual.nhs.uk/design-system/components/file-upload, requires
-// 10.6.1). Rather than a whole-site major upgrade, v10 is installed under the
+// 10.6.1) and the Header account section. Rather than a whole-site major upgrade, v10 is installed under the
 // `nhsuk-frontend-v10` alias and only the missing components are compiled here.
 //
 // Provenance: NHS (official v10 SCSS, unmodified).
@@ -31,3 +31,7 @@
 );
 
 @use "nhsuk/components/file-upload";
+
+// Header account section (supplier portal). See the partial for why only the
+// account rules are compiled.
+@use "nhsuk-v10-header-account";

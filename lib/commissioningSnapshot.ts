@@ -31,7 +31,7 @@ export type CommissioningSnapshotCard =
   | {
       kind: 'cost'
       label: string
-      href: string
+      href?: string
       /** Shown in small type when pricing is indicative. */
       indicativeNote?: string
       modelPills: string[]
@@ -48,7 +48,7 @@ export type CommissioningSnapshotCard =
   | {
       kind: 'interop'
       label: string
-      href: string
+      href?: string
       items: InteropSnapshotItem[]
     }
   | {
@@ -127,7 +127,7 @@ function costCard(app: any, opts?: { commercialHref?: string }): CommissioningSn
   return {
     kind: 'cost',
     label: 'Indicative cost',
-    href: opts?.commercialHref ?? '#commercial-model',
+    ...(opts?.commercialHref ? { href: opts.commercialHref } : {}),
     indicativeNote,
     modelPills,
   }
@@ -158,22 +158,25 @@ function fundingCard(
     kind: 'funding',
     label: 'Funding opportunities',
     pills,
-    opportunitiesLink: {
-      href: opts?.opportunitiesHref ?? '#related-funding',
-      label: opts?.opportunitiesLabel ?? 'Related funding opportunities',
-    },
+    ...(opts?.opportunitiesHref
+      ? {
+          opportunitiesLink: {
+            href: opts.opportunitiesHref,
+            label: opts?.opportunitiesLabel ?? 'Related funding opportunities',
+          },
+        }
+      : {}),
   }
 }
 
 function platformCard(app: any, opts?: { demoHref?: string }): CommissioningSnapshotCard {
   const platforms: string[] = app.platform_tags ?? app.platforms ?? []
-  const demoHref = opts?.demoHref ?? '#demo-access'
   return {
     kind: 'platform',
     label: 'Platform',
     values: platforms.length > 0 ? platforms : ['iOS', 'Android', 'Web'],
-    ...(catalogueDemoAvailable(app)
-      ? { demoLink: { href: demoHref, label: 'Demo available' } }
+    ...(catalogueDemoAvailable(app) && opts?.demoHref
+      ? { demoLink: { href: opts.demoHref, label: 'Demo available' } }
       : {}),
   }
 }
@@ -201,7 +204,7 @@ function interopCard(app: any, opts?: { interopHref?: string }): CommissioningSn
   return {
     kind: 'interop',
     label: 'Technical integration',
-    href: opts?.interopHref ?? '#nhs-integrations',
+    ...(opts?.interopHref ? { href: opts.interopHref } : {}),
     items,
   }
 }

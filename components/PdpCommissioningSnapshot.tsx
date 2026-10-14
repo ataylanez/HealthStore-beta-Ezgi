@@ -228,7 +228,7 @@ export function PdpCommissioningSnapshot({
   cards: CommissioningSnapshotCard[]
   fundingCard?: FundingSnapshotCard | null
   whereLiveApp: WhereLiveApp
-  /** Deep-link target for the "Live deployments" tile (defaults to #scale-and-maturity). */
+  /** Deep-link target for the "Live deployments" tile; renders as a plain card when omitted. */
   whereLiveHref?: string
 }) {
   return (

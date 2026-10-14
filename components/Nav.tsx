@@ -19,8 +19,14 @@ import {
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useCompareBasket } from '@/components/CompareBasketProvider'
-import { AUTH_DISABLED } from '@/lib/authMode'
-import { isSupplierOnboardPath } from '@/lib/supplierOnboarding'
+import {
+  PORTAL_PATHS,
+  PORTAL_SERVICE_NAME,
+  SAMPLE_SUPPLIER,
+  isPortalFocusedPath,
+  isSupplierPortalPath,
+} from '@/lib/supplierPortal'
+import { useSupplierPortal } from '@/components/supplier-portal/useSupplierPortal'
 import PhaseBanner from '@/components/PhaseBanner'
 
 const NHS_LOGO = (
@@ -53,6 +59,21 @@ const CHEVRON_DOWN = (
     focusable="false"
   >
     <path d="M15.5 12a1 1 0 0 1-.29.71l-5 5a1 1 0 0 1-1.42-1.42l4.3-4.29-4.3-4.29a1 1 0 0 1 1.42-1.42l5 5a1 1 0 0 1 .29.71z" />
+  </svg>
+)
+
+const USER_ICON = (
+  <svg
+    className="nhsuk-icon nhsuk-icon--user"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width={16}
+    height={16}
+    fill="currentColor"
+    focusable="false"
+    aria-hidden="true"
+  >
+    <path d="M12 1a11 11 0 1 1 0 22 11 11 0 0 1 0-22Zm0 2a9 9 0 0 0-5 16.5V18a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1.5A9 9 0 0 0 12 3Zm0 3a3.5 3.5 0 1 1-3.5 3.5A3.4 3.4 0 0 1 12 6Z" />
   </svg>
 )
 
@@ -123,6 +144,8 @@ export default function Nav({
   const path = usePathname() ?? ''
   const router = useRouter()
   const { ids, count } = useCompareBasket()
+  const { signedIn: portalAccount, signOut: portalSignOut } = useSupplierPortal()
+  const isPortal = isSupplierPortalPath(path)
   const menuId = useId()
 
   const navRef = useRef<HTMLElement>(null)
@@ -136,13 +159,7 @@ export default function Nav({
   const compareHref =
     ids.length > 0 ? `/compare?ids=${ids.map(id => encodeURIComponent(id)).join(',')}` : '/compare'
 
-  async function handleLogout() {
-    await fetch('/api/auth/logout', { method: 'POST' })
-    router.push('/')
-    router.refresh()
-  }
-
-  const primaryEntries: NavEntry[] = [
+  const commissionerEntries: NavEntry[] = [
     {
       id: 'about',
       href: '/about',
@@ -153,7 +170,7 @@ export default function Nav({
       id: 'catalogue',
       href: '/catalogue',
       label: 'Product catalogue',
-      active: path === '/catalogue' || path.startsWith('/catalogue/') || path.startsWith('/product-catalogue') || path === '/apps' || path.startsWith('/apps/'),
+      active: path === '/catalogue' || path.startsWith('/catalogue/') || path.startsWith('/apps/'),
     },
     {
       id: 'compare',
@@ -175,7 +192,7 @@ export default function Nav({
       id: 'funding',
       href: '/funding',
       label: 'Funding index',
-      active: path === '/funding' || path.startsWith('/funding-index'),
+      active: path === '/funding',
     },
     {
       id: 'resources',
@@ -186,31 +203,36 @@ export default function Nav({
   ]
 
   if (isLoggedIn && onOpenAiPanel) {
-    primaryEntries.push({
+    commissionerEntries.push({
       id: 'ai',
       label: 'AI Advisor',
       onClick: onOpenAiPanel,
     })
   }
 
-  if (!AUTH_DISABLED) {
-    if (isLoggedIn) {
-      primaryEntries.push({
-        id: 'signout',
-        label: 'Sign out',
-        onClick: () => {
-          void handleLogout()
-        },
-      })
-    } else {
-      primaryEntries.push({
-        id: 'signin',
-        href: '/login',
-        label: 'Sign in',
-        active: path === '/login',
-      })
-    }
-  }
+  // Supplier portal: same NHS header navigation, portal sections instead.
+  const portalEntries: NavEntry[] = [
+    {
+      id: 'portal-dashboard',
+      href: PORTAL_PATHS.dashboard,
+      label: 'Dashboard',
+      active: path === PORTAL_PATHS.dashboard,
+    },
+    {
+      id: 'portal-products',
+      href: PORTAL_PATHS.products,
+      label: 'Product management',
+      active: path === PORTAL_PATHS.products || path.startsWith(`${PORTAL_PATHS.products}/`),
+    },
+    {
+      id: 'portal-published',
+      href: PORTAL_PATHS.published,
+      label: 'Published pages',
+      active: path === PORTAL_PATHS.published || path.startsWith(`${PORTAL_PATHS.published}/`),
+    },
+  ]
+
+  const primaryEntries = isPortal ? portalEntries : commissionerEntries
 
   const primaryIds = primaryEntries.map(e => e.id).join('|')
 
@@ -314,9 +336,10 @@ export default function Nav({
   const overflowEntries = primaryEntries.filter(e => overflowSet.has(e.id))
   const moreHasCurrent = overflowEntries.some(e => e.active)
 
-  // Supplier onboarding is a focused journey: NHS header without the navigation row
-  // (the official header supports this "no navigation" variant).
-  const hideNavigation = isSupplierOnboardPath(path)
+  // Supplier sign-in and onboarding form pages are focused journeys: NHS header
+  // without the navigation row (the official header supports this variant).
+  const hideNavigation = isPortalFocusedPath(path)
+  const serviceName = isPortal ? PORTAL_SERVICE_NAME : 'NHS Commissioning Store'
 
   return (
     <header className="nhsuk-header" role="banner">
@@ -324,14 +347,39 @@ export default function Nav({
         <div className="nhsuk-header__logo">
           <Link
             className="nhsuk-header__link nhsuk-header__link--service"
-            href="/"
-            aria-label="NHS Commissioning Store homepage"
+            href={isPortal ? PORTAL_PATHS.dashboard : '/'}
+            aria-label={`${serviceName} homepage`}
             onClick={e => flashFocusThenBlur(e.currentTarget, e.detail === 0)}
           >
             {NHS_LOGO}
-            <span className="nhsuk-header__service-name">NHS Commissioning Store</span>
+            <span className="nhsuk-header__service-name">{serviceName}</span>
           </Link>
         </div>
+
+        {isPortal && portalAccount && (
+          <nav className="nhsuk-header__account" aria-label="Account">
+            <ul className="nhsuk-header__account-list">
+              <li className="nhsuk-header__account-item">
+                <Link className="nhsuk-header__account-link" href={PORTAL_PATHS.account}>
+                  {USER_ICON}
+                  {SAMPLE_SUPPLIER.contactName}
+                </Link>
+              </li>
+              <li className="nhsuk-header__account-item">
+                <button
+                  type="button"
+                  className="nhsuk-header__account-button"
+                  onClick={() => {
+                    portalSignOut()
+                    router.push(PORTAL_PATHS.signIn)
+                  }}
+                >
+                  Sign out
+                </button>
+              </li>
+            </ul>
+          </nav>
+        )}
       </div>
 
       {!hideNavigation && (

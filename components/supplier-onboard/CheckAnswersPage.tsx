@@ -8,16 +8,18 @@ import { Button } from '@/components/ui/Button'
 import {
   CHECKBOX_SEPARATOR,
   CONFIRMED_VALUE,
-  CONFIRMATION_PATH,
   MULTI_UPLOAD_CONFIRMED_SUFFIX,
   SECTIONS,
   SUBMISSION_DECLARATION,
-  SUPPLIER_ONBOARD_BASE_PATH,
   UPLOAD_REFERENCE_SUFFIX,
+  confirmationPath,
+  fieldKey,
+  formBasePath,
   isQuestionAnswered,
   isValidIsoDate,
   parseUploadedDocuments,
   taskStepHref,
+  visibleQuestions,
   type OnboardingQuestion,
   type TaskAnswers,
 } from '@/lib/supplierOnboarding'
@@ -30,22 +32,24 @@ const NOT_PROVIDED = 'Not provided'
  *
  * Replays every answer from every section as NHS Summary lists (one per task,
  * grouped under the numbered section headings from the task list), each row
- * with a Change link back to its question page. The declaration sits above the
+ * with a Change link back to its question page. Only questions on the
+ * supplier's route (see `visibleQuestions`) are shown. The declaration sits above the
  * NHS green "Confirm and submit" action; confirming records a reference and
  * moves to the confirmation page.
  *
  * Guard: reachable only once every task is Completed (the Submit button that
  * leads here is disabled otherwise); direct visits are sent back to the list.
  */
-export default function CheckAnswersPage() {
+export default function CheckAnswersPage({ formId }: { formId: string }) {
   const router = useRouter()
-  const { hydrated, allComplete, getAnswers, completeSubmission } = useOnboardingProgress()
+  const { hydrated, allComplete, getAnswers, completeSubmission } = useOnboardingProgress(formId)
+  const taskListHref = formBasePath(formId)
   const [submitting, setSubmitting] = useState(false)
   const headingRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
-    if (hydrated && !allComplete && !submitting) router.replace(SUPPLIER_ONBOARD_BASE_PATH)
-  }, [hydrated, allComplete, submitting, router])
+    if (hydrated && !allComplete && !submitting) router.replace(taskListHref)
+  }, [hydrated, allComplete, submitting, router, taskListHref])
 
   useEffect(() => {
     if (hydrated && allComplete) headingRef.current?.focus()
@@ -57,13 +61,13 @@ export default function CheckAnswersPage() {
     if (submitting) return
     setSubmitting(true)
     completeSubmission()
-    router.push(CONFIRMATION_PATH)
+    router.push(confirmationPath(formId))
   }
 
   return (
     <div className="hs-page">
       <div className="max-w-3xl">
-        <BackLink href={SUPPLIER_ONBOARD_BASE_PATH} />
+        <BackLink href={taskListHref} />
         <h1 ref={headingRef} tabIndex={-1} className="page-title-h1 outline-none">
           Check your answers before submitting
         </h1>
@@ -75,20 +79,28 @@ export default function CheckAnswersPage() {
             </h2>
             {section.tasks.map((task) => {
               const answers = getAnswers(task.id)
+              const visible = visibleQuestions(task, answers)
               return (
                 <div key={task.id} className="nhsuk-u-margin-bottom-5">
                   {/* Task title shown only when it is not simply repeated by its single question. */}
-                  {(task.questions.length !== 1 || task.questions[0].label !== task.title) && (
+                  {(visible.length !== 1 || visible[0].question.label !== task.title) && (
                     <h3 className="nhsuk-heading-s nhsuk-u-margin-bottom-2">{task.title}</h3>
                   )}
                   <dl className="nhsuk-summary-list">
-                    {task.questions.map((question, index) => (
+                    {visible.map(({ question, step }) => (
                       <div key={question.id} className="nhsuk-summary-list__row">
-                        <dt className="nhsuk-summary-list__key">{question.label}</dt>
+                        <dt className="nhsuk-summary-list__key">
+                          {question.code && (
+                            <span className="nhsuk-u-secondary-text-color nhsuk-body-s nhsuk-u-margin-bottom-0" style={{ display: 'block' }}>
+                              {question.code}
+                            </span>
+                          )}
+                          {question.label}
+                        </dt>
                         <dd className="nhsuk-summary-list__value">{formatAnswer(question, answers)}</dd>
                         <dd className="nhsuk-summary-list__actions">
-                          <Link className="hs-link-button" href={taskStepHref(task, index + 1)}>
-                            Change<span className="nhsuk-u-visually-hidden"> {question.label}</span>
+                          <Link className="hs-link-button" href={taskStepHref(formId, task, step)}>
+                            Change<span className="nhsuk-u-visually-hidden"> {question.code ? `${question.code} ` : ''}{question.label}</span>
                           </Link>
                         </dd>
                       </div>
@@ -110,8 +122,8 @@ export default function CheckAnswersPage() {
   )
 }
 
-/** Human-readable replay of one answer, per question type. */
-function formatAnswer(question: OnboardingQuestion, answers: TaskAnswers): ReactNode {
+/** Human-readable replay of one answer, per question type. Shared with Company information. */
+export function formatAnswer(question: OnboardingQuestion, answers: TaskAnswers): ReactNode {
   const raw = answers[question.id] ?? ''
   const empty = <span className="nhsuk-u-secondary-text-color">{NOT_PROVIDED}</span>
 
@@ -128,6 +140,42 @@ function formatAnswer(question: OnboardingQuestion, answers: TaskAnswers): React
     case 'textarea':
       return raw.trim() ? <span style={{ whiteSpace: 'pre-wrap' }}>{raw.trim()}</span> : empty
 
+    case 'text': {
+      const value = raw.trim()
+      if (!value) return empty
+      if (question.inputType === 'url' && /^https?:\/\//i.test(value)) {
+        return (
+          <a className="nhsuk-link" href={value} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all' }}>
+            {value}
+            <span className="nhsuk-u-visually-hidden"> (opens in new tab)</span>
+          </a>
+        )
+      }
+      return value
+    }
+
+    case 'fields': {
+      // One line per field; `inline` fields join the previous line (e.g. "First Last").
+      const lines: string[] = []
+      for (const field of question.fields) {
+        const value = (answers[fieldKey(question.id, field)] ?? '').trim()
+        if (!value) continue
+        if (field.inline && lines.length > 0) lines[lines.length - 1] += ` ${value}`
+        else lines.push(value)
+      }
+      if (lines.length === 0) return empty
+      return (
+        <>
+          {lines.map((line, i) => (
+            <span key={i}>
+              {i > 0 && <br />}
+              {line}
+            </span>
+          ))}
+        </>
+      )
+    }
+
     case 'date': {
       if (!isValidIsoDate(raw)) return empty
       const [y, m, d] = raw.split('-').map(Number)
@@ -136,6 +184,7 @@ function formatAnswer(question: OnboardingQuestion, answers: TaskAnswers): React
 
     case 'upload': {
       if (!isQuestionAnswered(question, answers)) return empty
+      if (question.noReference) return raw
       return (
         <>
           {answers[`${question.id}${UPLOAD_REFERENCE_SUFFIX}`]}

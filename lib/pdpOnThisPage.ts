@@ -10,8 +10,7 @@ import type { PdpSectionId } from '@/lib/pdpSections'
 export type PdpOnThisPageLink = { id: string; label: string }
 
 /**
- * Builds anchor links for the PDP "On this page" nav — narrative spine sections first,
- * then reference tab sections with stable ids (deep-linkable via PdpTabs hash handling).
+ * Builds anchor links for the PDP "On this page" nav from the narrative spine sections.
  */
 export function buildPdpOnThisPageLinks(input: {
   app: App
@@ -86,20 +85,6 @@ export function buildPdpOnThisPageLinks(input: {
       push('how-to-buy')
     }
     push('resources')
-  }
-
-  if (!showNarrativeSpine) {
-    links.push({ id: 'clinical-evidence', label: 'Clinical evidence' })
-    links.push({ id: 'scale-and-maturity', label: 'Scale and maturity' })
-  }
-  if (!showNarrativeSpine) {
-    links.push({ id: 'commercial-model', label: 'Commercial model and cost' })
-  }
-  if (!showNarrativeSpine && hasLinkedFunding) {
-    links.push({ id: 'related-funding', label: 'Related funding' })
-  }
-  if (!showNarrativeSpine) {
-    links.push({ id: 'nhs-integrations', label: 'NHS integrations' })
   }
 
   return links
