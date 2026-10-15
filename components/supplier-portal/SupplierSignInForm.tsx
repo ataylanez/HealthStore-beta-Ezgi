@@ -9,18 +9,23 @@ import { FormField, TextInput } from '@/components/ui/FormField'
 import { PORTAL_BASE_PATH, PORTAL_PATHS } from '@/lib/supplierPortal'
 import { useSupplierPortal } from './useSupplierPortal'
 
+/** Demo credentials for Brandson Sanderson (sample supplier contact). Any values still work. */
+const DEMO_EMAIL = 'brandson.sanderson@mymhealth.example'
+const DEMO_PASSWORD = 'Password1!'
+
 /**
  * Supplier sign in. [Provenance: NHS]
  *
  * Prototype: any email address and password are accepted. Validation only
  * checks the fields are filled in (NHS error summary plus inline errors).
+ * Fields are prefilled with the sample supplier contact for demos.
  */
 export default function SupplierSignInForm() {
   const router = useRouter()
   const params = useSearchParams()
   const { hydrated, signedIn, signIn } = useSupplierPortal()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState(DEMO_EMAIL)
+  const [password, setPassword] = useState(DEMO_PASSWORD)
   const [errors, setErrors] = useState<FieldError[]>([])
 
   const nextParam = params.get('next') ?? ''
