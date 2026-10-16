@@ -97,35 +97,37 @@ function SectionCheckAnswers({ section }: { section: CompanySection }) {
   const rows = companySectionQuestions(section.id, merged)
 
   return (
-    <div className="hs-page">
-      <div className="max-w-3xl">
-        <BackLink href={COMPANY_PATHS.page} />
-        <span className="nhsuk-caption-l">
-          {COMPANY_TITLE} — {section.title}
-        </span>
-        <h1 ref={headingRef} tabIndex={-1} className="page-title-h1 outline-none">
-          {firstTime ? 'Check your answers before submitting' : 'Check your changes before submitting'}
-        </h1>
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <BackLink href={COMPANY_PATHS.page} />
+          <span className="nhsuk-caption-l">
+            {COMPANY_TITLE} — {section.title}
+          </span>
+          <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
+            {firstTime ? 'Check your answers before submitting' : 'Check your changes before submitting'}
+          </h1>
 
-        <dl className="nhsuk-summary-list nhsuk-u-margin-bottom-7">
-          {rows.map(({ question, step }) => (
-            <div key={question.id} className="nhsuk-summary-list__row">
-              <dt className="nhsuk-summary-list__key">{question.label}</dt>
-              <dd className="nhsuk-summary-list__value">{formatAnswer(question, merged)}</dd>
-              <dd className="nhsuk-summary-list__actions">
-                <Link className="hs-link-button" href={companyQuestionHref(step, { returnTo: 'check-answers' })}>
-                  Change<span className="nhsuk-u-visually-hidden"> {question.label.toLowerCase()}</span>
-                </Link>
-              </dd>
-            </div>
-          ))}
-        </dl>
+          <dl className="nhsuk-summary-list nhsuk-u-margin-bottom-7">
+            {rows.map(({ question, step }) => (
+              <div key={question.id} className="nhsuk-summary-list__row">
+                <dt className="nhsuk-summary-list__key">{question.label}</dt>
+                <dd className="nhsuk-summary-list__value">{formatAnswer(question, merged)}</dd>
+                <dd className="nhsuk-summary-list__actions">
+                  <Link className="hs-link-button" href={companyQuestionHref(step, { returnTo: 'check-answers' })}>
+                    Change<span className="nhsuk-u-visually-hidden"> {question.label.toLowerCase()}</span>
+                  </Link>
+                </dd>
+              </div>
+            ))}
+          </dl>
 
-        <h2 className="nhsuk-heading-m">{firstTime ? 'Submit this section' : 'Submit your changes'}</h2>
-        <p className="nhsuk-body-m">{DECLARATION}</p>
-        <Button variant="confirm" onClick={confirmAndSubmit} loading={submitting}>
-          {submitting ? 'Submitting…' : 'Confirm and submit'}
-        </Button>
+          <h2 className="nhsuk-heading-m">{firstTime ? 'Submit this section' : 'Submit your changes'}</h2>
+          <p className="nhsuk-body-m">{DECLARATION}</p>
+          <Button variant="confirm" onClick={confirmAndSubmit} loading={submitting}>
+            {submitting ? 'Submitting…' : 'Confirm and submit'}
+          </Button>
+        </div>
       </div>
     </div>
   )

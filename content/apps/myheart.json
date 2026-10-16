@@ -26,6 +26,10 @@
     "clinician_referral"
   ],
   "one_line_value_proposition": "A home-based cardiac rehabilitation app — patients complete Phase III and IV rehab from home with exercise prescription, and the clinical team monitors progress remotely.",
+  "overview": [
+    "myHeart is a home-based cardiac rehabilitation app for adults recovering from a heart attack or heart surgery, or living with heart failure. Patients follow a personalised exercise programme, watch educational videos and record their symptoms, weight and blood pressure. The cardiac rehabilitation team reviews this through a clinician app and can message patients. It's used alongside or instead of class-based rehabilitation.",
+    "To use it, your cardiac rehabilitation team will need training and to offer it as an option in your existing pathway. Patients need a smartphone, tablet or smart TV. It is not a 24-hour monitored service. NICE conditionally recommends myHeart while more evidence is collected. The evidence comes from NHS service evaluations rather than randomised trials. It's live in several NHS trusts, including Dorset and Derby. Pricing is by licence from the supplier, and its DTAC assessment needs refreshing."
+  ],
   "why_it_matters_locally": "myHeart has the largest documented NHS deployment among HTG761-recommended platforms, with over 20,800 UK users since 2018. The Dorset County Hospital case study demonstrated 70% CR uptake, surpassing the 2028 NHS Long-Term Plan target. Built on the my mhealth platform (which also powers myCOPD), it benefits from an established NHS relationship and DTAC completion.",
   "target_problem_statement": "Low national CR uptake rates, limited capacity for home-based CR delivery, and the 2028 NHS Long-Term Plan target to increase CR uptake to 85%.",
   "nice_guidance_refs": [

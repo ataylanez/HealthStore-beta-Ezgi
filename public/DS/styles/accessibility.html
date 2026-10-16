@@ -34,15 +34,15 @@
 
     <h2>Skip link</h2>
     <p>A visually hidden skip link reveals on focus and jumps to <code>#main-content</code> (here, <code>#ds-main</code>). Press <kbd>Tab</kbd> from the top of the page.</p>
-<pre class="ds-code"><code>&lt;a class="skip-link" href="#main-content"&gt;Skip to main content&lt;/a&gt;</code></pre>
+<pre class="ds-code"><code>&lt;a class="nhsuk-skip-link" href="#main-content"&gt;Skip to main content&lt;/a&gt;</code></pre>
 
     <h2>Visually hidden content (<code>.sr-only</code>)</h2>
-    <p>Use <code>.sr-only</code> for labels that should be announced but not shown (e.g. count context on icon buttons).</p>
+    <p>Use <code>nhsuk-u-visually-hidden</code> for labels that should be announced but not shown (e.g. the count on the Comparison tool header link). The Tailwind <code>sr-only</code> utility is equivalent but prefer the NHS class in new code.</p>
     <div class="ds-example">
       <button class="ds-btn ds-btn--secondary" type="button">
-        Saved apps <span class="sr-only">(3 items)</span>
+        Comparison tool <span class="ds-u-sr">(2 selected)</span>
       </button>
-      <p class="ds-u-muted" style="font-size:.85rem;margin-top:8px">The "(3 items)" text is present for screen readers only.</p>
+      <p class="ds-u-muted" style="font-size:.85rem;margin-top:8px">The "(2 selected)" text is present for screen readers only.</p>
     </div>
 
     <h2>Reduced motion</h2>
@@ -65,7 +65,7 @@
       </tbody>
     </table>
 
-    <div class="ds-note ds-note--source">Source: <code>app/globals.css</code> (focus, <code>.skip-link</code>, <code>.sr-only</code>, reduced-motion, print); <code>components/AppShell.tsx</code>.</div>
+    <div class="ds-note ds-note--source">Source: <code>app/globals.css</code> (focus, reduced-motion, print); <code>nhsuk-skip-link</code> and <code>nhsuk-u-visually-hidden</code> from nhsuk-frontend; <code>components/AppShell.tsx</code>.</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

@@ -47,92 +47,94 @@ export default function SupportStep() {
   }
 
   return (
-    <div className="hs-page">
-      <div className="max-w-2xl">
-        <BackLink href={returnToCheck ? `${basePath}/check-answers` : `${basePath}/verify`} />
-        <ErrorSummary errors={errors} />
-        <form
-          noValidate
-          onSubmit={(e) => {
-            e.preventDefault()
-            handleSubmit()
-          }}
-        >
-          <div
-            className={`nhsuk-form-group${errorFor(`eoi-help-${HELP_OPTIONS[0].id}`) ? ' nhsuk-form-group--error' : ''}`}
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <BackLink href={returnToCheck ? `${basePath}/check-answers` : `${basePath}/verify`} />
+          <ErrorSummary errors={errors} />
+          <form
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleSubmit()
+            }}
           >
-            <fieldset className="nhsuk-fieldset" aria-describedby="eoi-help-hint">
-              <legend className="nhsuk-fieldset__legend">
-                <h1
-                  ref={headingRef}
-                  tabIndex={-1}
-                  className="page-title-h1 outline-none nhsuk-fieldset__heading"
-                >
-                  What support do you need?
-                </h1>
-              </legend>
-              <div id="eoi-help-hint" className="nhsuk-hint">
-                Select all that apply.
-              </div>
-              {errorFor(`eoi-help-${HELP_OPTIONS[0].id}`) ? (
-                <span className="nhsuk-error-message" role="alert">
-                  <span className="nhsuk-u-visually-hidden">Error:</span> Select what help you need
-                </span>
-              ) : null}
-              <div className="nhsuk-checkboxes nhsuk-checkboxes--conditional">
-                {HELP_OPTIONS.map((o) => {
-                  const isOther = o.id === 'other'
-                  return (
-                    <Fragment key={o.id}>
-                      <div className="nhsuk-checkboxes__item">
-                        <input
-                          className="nhsuk-checkboxes__input"
-                          id={`eoi-help-${o.id}`}
-                          type="checkbox"
-                          checked={data.help.includes(o.id)}
-                          aria-controls={isOther ? 'conditional-eoi-help-other' : undefined}
-                          aria-expanded={isOther ? data.help.includes('other') : undefined}
-                          onChange={(e) =>
-                            update({
-                              help: e.target.checked
-                                ? [...data.help, o.id]
-                                : data.help.filter((x) => x !== o.id),
-                            })
-                          }
-                        />
-                        <label
-                          className="nhsuk-checkboxes__label nhsuk-label"
-                          htmlFor={`eoi-help-${o.id}`}
-                        >
-                          {o.label}
-                        </label>
-                      </div>
-                      {isOther && data.help.includes('other') ? (
-                        <div className="nhsuk-checkboxes__conditional" id="conditional-eoi-help-other">
-                          <FormField
-                            id="eoi-help-other-details"
-                            label="Give more details"
-                            required
-                            error={errorFor('eoi-help-other-details')}
+            <div
+              className={`nhsuk-form-group${errorFor(`eoi-help-${HELP_OPTIONS[0].id}`) ? ' nhsuk-form-group--error' : ''}`}
+            >
+              <fieldset className="nhsuk-fieldset" aria-describedby="eoi-help-hint">
+                <legend className="nhsuk-fieldset__legend">
+                  <h1
+                    ref={headingRef}
+                    tabIndex={-1}
+                    className="nhsuk-heading-xl outline-none nhsuk-fieldset__heading"
+                  >
+                    What support do you need?
+                  </h1>
+                </legend>
+                <div id="eoi-help-hint" className="nhsuk-hint">
+                  Select all that apply.
+                </div>
+                {errorFor(`eoi-help-${HELP_OPTIONS[0].id}`) ? (
+                  <span className="nhsuk-error-message" role="alert">
+                    <span className="nhsuk-u-visually-hidden">Error:</span> Select what help you need
+                  </span>
+                ) : null}
+                <div className="nhsuk-checkboxes nhsuk-checkboxes--conditional">
+                  {HELP_OPTIONS.map((o) => {
+                    const isOther = o.id === 'other'
+                    return (
+                      <Fragment key={o.id}>
+                        <div className="nhsuk-checkboxes__item">
+                          <input
+                            className="nhsuk-checkboxes__input"
+                            id={`eoi-help-${o.id}`}
+                            type="checkbox"
+                            checked={data.help.includes(o.id)}
+                            aria-controls={isOther ? 'conditional-eoi-help-other' : undefined}
+                            aria-expanded={isOther ? data.help.includes('other') : undefined}
+                            onChange={(e) =>
+                              update({
+                                help: e.target.checked
+                                  ? [...data.help, o.id]
+                                  : data.help.filter((x) => x !== o.id),
+                              })
+                            }
+                          />
+                          <label
+                            className="nhsuk-checkboxes__label nhsuk-label"
+                            htmlFor={`eoi-help-${o.id}`}
                           >
-                            {(field) => (
-                              <TextInput
-                                {...field}
-                                value={data.helpOtherDetails}
-                                onChange={(e) => update({ helpOtherDetails: e.target.value })}
-                              />
-                            )}
-                          </FormField>
+                            {o.label}
+                          </label>
                         </div>
-                      ) : null}
-                    </Fragment>
-                  )
-                })}
-              </div>
-            </fieldset>
-          </div>
-          <Button type="submit">Continue</Button>
-        </form>
+                        {isOther && data.help.includes('other') ? (
+                          <div className="nhsuk-checkboxes__conditional" id="conditional-eoi-help-other">
+                            <FormField
+                              id="eoi-help-other-details"
+                              label="Give more details"
+                              required
+                              error={errorFor('eoi-help-other-details')}
+                            >
+                              {(field) => (
+                                <TextInput
+                                  {...field}
+                                  value={data.helpOtherDetails}
+                                  onChange={(e) => update({ helpOtherDetails: e.target.value })}
+                                />
+                              )}
+                            </FormField>
+                          </div>
+                        ) : null}
+                      </Fragment>
+                    )
+                  })}
+                </div>
+              </fieldset>
+            </div>
+            <Button type="submit">Continue</Button>
+          </form>
+        </div>
       </div>
     </div>
   )

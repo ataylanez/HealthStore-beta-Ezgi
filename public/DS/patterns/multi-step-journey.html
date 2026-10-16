@@ -10,18 +10,18 @@
 <body>
   <div id="ds-root" data-ds-page="multi-step-journey" data-ds-provenance="NHS">
     <div class="ds-page-header">
-      <p class="ds-eyebrow">Patterns <span class="ds-status ds-status--pending">Pending review</span></p>
+      <p class="ds-eyebrow">Patterns</p>
       <h1 class="ds-page-title">Multi-step journey</h1>
       <p class="ds-lede">
         The GOV.UK "question pages" pattern built from NHS components: one question per page, a
         working back link on every step, error summary on validation failure, a Check your answers
-        page, and a green confirmation panel. First used by the Express interest journey on PDPs.
+        page, and a green confirmation panel. Used by the Express interest journey on PDPs and, as a second instance, by supplier onboarding and the supplier portal editors. Every step renders in a <code>nhsuk-grid-column-two-thirds</code> column.
       </p>
     </div>
 
     <div class="ds-meta-grid">
       <div class="ds-meta"><div class="ds-meta__k">Reference</div><div class="ds-meta__v"><code>components/eoi/journey/</code></div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Route</div><div class="ds-meta__v"><code>/apps/[slug]/express-interest</code></div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Routes</div><div class="ds-meta__v"><code>/apps/[slug]/express-interest/{details,verify,support,timing,check-answers,confirmation}</code> &middot; <code>/supplier-portal/products/onboard/[formId]/[task]/[step]</code></div></div>
       <div class="ds-meta"><div class="ds-meta__k">Provenance</div><div class="ds-meta__v">GOV.UK pattern, NHS components</div></div>
     </div>
 
@@ -44,7 +44,8 @@
       <li>Changing an answer from Check your answers returns the user to Check your answers afterwards, not the next step.</li>
       <li>On step change, scroll to top and focus the heading so screen readers announce the new question.</li>
       <li>Optional answers play back as "Not provided" on Check your answers.</li>
-      <li>Buttons use the NHS button (<code>components/ui/Button.tsx</code>); the whole journey is state-driven on one route.</li>
+      <li>Each step is its own route so the browser back button and refresh behave; answers persist in session state between routes.</li>
+      <li>Buttons use the NHS button (<code>components/ui/Button.tsx</code>); button groups are spaced with <code>nhsuk-u-margin-*</code>.</li>
     </ul>
 
     <h2>Components used</h2>
@@ -57,7 +58,7 @@
       <li><a href="/DS/components/buttons.html">Buttons</a></li>
     </ul>
 
-    <div class="ds-note ds-note--source">Source: GOV.UK service manual question pages + NHS design system form components. Reference implementation: Express interest journey (<code>/apps/[slug]/express-interest</code>).</div>
+    <div class="ds-note ds-note--source">Source: GOV.UK service manual question pages + NHS design system form components. Reference implementations: Express interest journey (<code>components/eoi/journey/steps/*</code>) and supplier onboarding (<code>components/supplier-onboard/*</code>, see <a href="/DS/patterns/supplier-portal.html">Supplier portal</a>).</div>
   </div>
   <script src="/DS/assets/ds.js"></script>
 </body>

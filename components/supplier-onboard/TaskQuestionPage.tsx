@@ -140,44 +140,46 @@ export default function TaskQuestionPage({
   if (offRoute) return null
 
   return (
-    <div className="hs-page">
-      <div className="max-w-2xl">
-        <BackLink href={backHref} />
-        {/* Caption gives task context (and the questionnaire reference, e.g. C1.1.1). */}
-        {(multiPage || question.code || question.label !== task.title) && (
-          <span className="nhsuk-caption-l">
-            {task.title}
-            {question.code ? ` — ${question.code}` : ''}
-            {multiPage && position > 0 ? ` — question ${position} of ${total}` : ''}
-          </span>
-        )}
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <BackLink href={backHref} />
+          {/* Caption gives task context (and the questionnaire reference, e.g. C1.1.1). */}
+          {(multiPage || question.code || question.label !== task.title) && (
+            <span className="nhsuk-caption-l">
+              {task.title}
+              {question.code ? ` — ${question.code}` : ''}
+              {multiPage && position > 0 ? ` — question ${position} of ${total}` : ''}
+            </span>
+          )}
 
-        <form
-          noValidate
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (isLast) saveAndExit()
-            else saveAndNext()
-          }}
-        >
-          <QuestionField question={question} draft={draft} patch={patch} commit={commit} />
+          <form
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (isLast) saveAndExit()
+              else saveAndNext()
+            }}
+          >
+            <QuestionField question={question} draft={draft} patch={patch} commit={commit} />
 
-          {/* 96px above the actions (collapses with the field's form-group margin) — matches
-              the gap above "Mark as complete" on the DTAC page. */}
-          <div className="mt-24 flex flex-wrap items-center gap-4">
-            {!isLast && <Button type="submit">Save and Next</Button>}
-            <Button
-              type={isLast ? 'submit' : 'button'}
-              variant={isLast ? 'primary' : 'secondary'}
-              onClick={isLast ? undefined : saveAndExit}
-            >
-              Save and Exit
-            </Button>
-            <Button type="button" variant="secondary" onClick={cancel}>
-              Cancel
-            </Button>
-          </div>
-        </form>
+            {/* 96px above the actions (collapses with the field's form-group margin) — matches
+                the gap above "Mark as complete" on the DTAC page. */}
+            <div className="nhsuk-u-margin-top-6 flex flex-wrap items-center gap-4">
+              {!isLast && <Button type="submit">Save and Next</Button>}
+              <Button
+                type={isLast ? 'submit' : 'button'}
+                variant={isLast ? 'primary' : 'secondary'}
+                onClick={isLast ? undefined : saveAndExit}
+              >
+                Save and Exit
+              </Button>
+              <Button type="button" variant="secondary" onClick={cancel}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   )
@@ -656,7 +658,7 @@ function MultiUploadField({ question, draft, patch, commit, hintId, optionalSuff
       </Button>
 
       {/* Deliberately wide gap (96px) to separate the completion gate from the upload controls. */}
-      <div className="nhsuk-form-group mt-24">
+      <div className="nhsuk-form-group nhsuk-u-margin-top-6">
         <div className="nhsuk-checkboxes">
           <div className="nhsuk-checkboxes__item">
             <input

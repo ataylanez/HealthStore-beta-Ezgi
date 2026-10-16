@@ -8,7 +8,9 @@ import { PdpSection } from '@/components/PdpSection'
 import { IndicativeFinancialContextSection } from '@/components/AppDetailSections'
 import MycopdImpactCharts from '@/components/product/MycopdImpactCharts'
 import LusciiImpactCharts from '@/components/product/LusciiImpactCharts'
+import PdpWorthTiles, { PdpTileRow, Tile } from '@/components/product/PdpWorthTiles'
 import { InsightCallout } from '@/components/charts'
+import { computeIllustrativeWorth, formatGbp, PRICE_HIGH, PRICE_LOW } from '@/lib/pdpWorth'
 
 /**
  * Round 2 content migration (quantified value) — Luscii pilot.
@@ -28,37 +30,7 @@ import { InsightCallout } from '@/components/charts'
 const MONITORED_SHARE = 0.5 // of the high-risk cohort
 const HIGH_RISK_EVENT_RATE = 0.4 // emergency events per high-risk patient / year (illustrative)
 
-// R2-3 ROI runs on a fixed illustrative cohort this round
-const ROI_COHORT = 500
-const ROI_ADM_RATE = 0.2
-const ROI_AE_RATE = 0.25
-const ROI_ADM_EFFECT = 0.4 // central
-const ROI_AE_EFFECT = 0.25 // central
-const ADMISSION_COST = 2655
-const AE_COST = 273
-const CAPACITY_TO_CASH = 0.4
-
-// R2-4 price band (per patient / year) — spans the two unreconciled Round 1 figures
-const PRICE_LOW = 110
-const PRICE_HIGH = 360
-
-function formatGbp(n: number): string {
-  const abs = Math.abs(n)
-  const sign = n < 0 ? '-' : ''
-  if (abs >= 1_000_000) return `${sign}£${(abs / 1_000_000).toFixed(1)}m`
-  if (abs >= 1_000) return `${sign}£${Math.round(abs / 1_000)}k`
-  return `${sign}£${abs.toLocaleString()}`
-}
-
-function Tile({ value, label, sub, accent }: { value: string; label: string; sub?: string; accent?: string }) {
-  return (
-    <div className="hs-surface-card-sm bg-white rounded-lg border p-4" style={{ borderColor: 'var(--border)' }}>
-      <div className="hs-font-bold" style={{ fontSize: 'var(--text-card-title)', color: accent ?? 'var(--text-primary)' }}>{value}</div>
-      <div className="hs-text-caption hs-font-bold uppercase tracking-wide mt-1" style={{ color: 'var(--text-muted)' }}>{label}</div>
-      {sub && <div className="hs-text-caption mt-1" style={{ color: 'var(--text-secondary)' }}>{sub}</div>}
-    </div>
-  )
-}
+// R2-3 / R2-4 ROI model and price band live in lib/pdpWorth.ts (shared with the overview teaser).
 
 export default function PdpLocalValue({
   app,
@@ -91,15 +63,7 @@ export default function PdpLocalValue({
   const mycopdImpact = isMycopd ? computeMycopdImpactMetrics(ref, narrative) : null
 
   // R2-3 / R2-4: illustrative 500-patient ROI, net expressed across a price band.
-  const admAvoided = Math.round(ROI_COHORT * ROI_ADM_RATE * ROI_ADM_EFFECT)
-  const aeAvoided = Math.round(ROI_COHORT * ROI_AE_RATE * ROI_AE_EFFECT)
-  const capacity = admAvoided * ADMISSION_COST + aeAvoided * AE_COST
-  const cash = Math.round(capacity * CAPACITY_TO_CASH)
-  const costLow = ROI_COHORT * PRICE_LOW
-  const costHigh = ROI_COHORT * PRICE_HIGH
-  const netLow = capacity - costHigh
-  const netHigh = capacity - costLow
-  const breakEvenPrice = Math.round(capacity / ROI_COHORT)
+  const { breakEvenPrice } = computeIllustrativeWorth()
 
   return (
     <div className="hs-pdp-spine-group mb-6 space-y-4">
@@ -128,7 +92,7 @@ export default function PdpLocalValue({
               gp={mycopdImpact.gp}
               readmit={mycopdImpact.readmit}
             />
-            <div className="grid gap-4 sm:grid-cols-3 mt-4">
+            <PdpTileRow>
               <Tile
                 value={mycopdImpact.atUptake.toLocaleString()}
                 label="At 75% uptake"
@@ -144,7 +108,7 @@ export default function PdpLocalValue({
                 label="Readmissions avoided / yr"
                 sub={`${mycopdImpact.readmit.effectPct}% effect on ${mycopdImpact.atUptake.toLocaleString()} enrolled (RESCUE RCT)`}
               />
-            </div>
+            </PdpTileRow>
             <div className="mt-4">
               <p className="nhsuk-body" style={{ margin: 0, color: 'var(--text-secondary)' }}>
                 <strong className="nhsuk-u-font-weight-bold" style={{ display: 'block', marginBottom: 6, color: 'var(--text-primary)' }}>
@@ -168,11 +132,11 @@ export default function PdpLocalValue({
               admToday={ref.annual_admissions}
               aeToday={ref.annual_ae_attendances}
             />
-            <div className="grid gap-4 sm:grid-cols-3 mt-4">
+            <PdpTileRow>
               <Tile value={monitored.toLocaleString()} label="Monitored cohort" sub={`~50% of ${highRisk.toLocaleString()} high-risk`} />
               <Tile value={`${admLow.toLocaleString()}–${admHigh.toLocaleString()}`} label="Admissions avoided / yr" sub={`vs ${(ref.annual_admissions ?? 0).toLocaleString()} today`} />
               <Tile value={`${aeLow.toLocaleString()}–${aeHigh.toLocaleString()}`} label="A&E avoided / yr" />
-            </div>
+            </PdpTileRow>
             <div className="mt-4">
               <p className="nhsuk-body" style={{ margin: 0, color: 'var(--text-secondary)' }}>
                 <strong className="nhsuk-u-font-weight-bold" style={{ display: 'block', marginBottom: 6, color: 'var(--text-primary)' }}>
@@ -194,16 +158,7 @@ export default function PdpLocalValue({
         title={pdpSectionTitle('local-value-worth', { appName: app.app_name })}
         description="Illustrative economics for a 500-patient cohort. Cash and capacity are reported separately."
       >
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Tile value={formatGbp(capacity)} label="Capacity released / yr" sub="Freed acute beds & clinician time" />
-          <Tile value={formatGbp(cash)} label="Cash-releasing / yr" sub="~40% of capacity converted to elective" />
-          <Tile
-            value={`${formatGbp(netLow)} to ${formatGbp(netHigh)}`}
-            label="Net position / yr*"
-            sub="*across the indicative price band"
-            accent={netLow >= 0 ? '#007f3b' : 'var(--text-primary)'}
-          />
-        </div>
+        <PdpWorthTiles />
         <div className="mt-4">
           <InsightCallout title="Cash vs capacity">
             Avoided admissions free beds and clinician time first — that is capacity, not cash until you convert it (about 40%

@@ -109,7 +109,7 @@ export default function ProductDocumentsView({
       )}
 
       <span className="nhsuk-caption-l">Documents and content</span>
-      <h1 ref={headingRef} tabIndex={-1} className="page-title-h1 outline-none">
+      <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
         {product.name}
       </h1>
 

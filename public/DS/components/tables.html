@@ -13,67 +13,76 @@
       <p class="ds-eyebrow">Components</p>
       <h1 class="ds-page-title">Tables</h1>
       <p class="ds-lede">
-        Tabular data appears in two main forms: the PDP "Where it's live" deployment register, and the comparison
-        workspace. Both use bordered, scannable rows with status badges and scroll horizontally where the columns exceed the viewport.
+        All tables use the NHS <code>nhsuk-table</code> component. Two variants are in use: the plain table (deployment register,
+        supplier portal status list) and the responsive table (<code>nhsuk-table-responsive</code>) for the comparison tool, which stacks cells under their column heading on small screens.
       </p>
     </div>
 
-    <h2>Deployment register (PDP)</h2>
-    <p>Status-filterable rows: each row carries ICB, place, care setting, status and confidence. Rows expand for detail.</p>
-    <div class="ds-example ds-example--surface">
-      <div class="hs-surface-card-sm" style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden">
-        <table class="ds-table" style="margin:0">
-          <thead>
-            <tr><th>Site</th><th>ICB</th><th>Care setting</th><th>Status</th><th>Confidence</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Example NHS FT &mdash; respiratory service</td><td>NHS Example ICB</td><td>Secondary care</td><td><span class="badge badge-green">Live</span></td><td><span class="badge badge-blue">High</span></td></tr>
-            <tr><td>Sample Community Trust</td><td>NHS Sample ICB</td><td>Community</td><td><span class="badge badge-amber">Pilot</span></td><td><span class="badge badge-grey">Medium</span></td></tr>
-            <tr><td>Historic deployment</td><td>NHS Legacy ICB</td><td>Primary care</td><td><span class="badge badge-grey">Historic</span></td><td><span class="badge badge-grey">Low</span></td></tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="ds-meta-grid">
+      <div class="ds-meta"><div class="ds-meta__k">CSS</div><div class="ds-meta__v"><code>nhsuk-table</code>, <code>nhsuk-table-responsive</code>, <code>nhsuk-table__caption</code>, <code>nhsuk-table__head</code>, <code>nhsuk-table__row</code>, <code>nhsuk-table__header</code>, <code>nhsuk-table__cell</code></div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Used in</div><div class="ds-meta__v">Comparison tool (6 tables), deployment register on the PDP, supplier portal statuses, funding tables</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Not used</div><div class="ds-meta__v">Horizontal-scroll grids, sticky headers, expandable rows (retired with the compare workspace)</div></div>
     </div>
-    <div class="ds-note">The product distinguishes "currently live" from "ever procured" and lets users filter by status group (live / pilot &amp; research / historic).</div>
 
-    <h2>Comparison workspace</h2>
-    <p>DTx apps as columns, attributes as rows, grouped into collapsible sections. Critical rows get a blue left marker. The summary + group grids scroll horizontally (keeping columns readable) instead of overflowing the page with 3&ndash;4 apps.</p>
+    <h2>Deployment register (PDP &mdash; NHS experience)</h2>
+    <p><code>DeploymentRegisterTable</code>: a short stats row (live sites, ICBs, pilots) above a plain <code>nhsuk-table</code>. The caption is visually hidden because the section heading already names the table. Status is carried by an <code>nhsuk-tag</code>, never colour alone.</p>
     <div class="ds-example ds-example--surface">
-      <div class="hs-surface-card" style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:auto">
-        <table class="ds-table" style="margin:0;min-width:520px">
-          <thead>
-            <tr><th style="width:160px">Attribute</th><th>Clinitouch</th><th>COPD Hub</th></tr>
-          </thead>
-          <tbody>
-            <tr style="border-left:3px solid var(--nhs-blue)"><th scope="row" style="background:#fff;font-weight:600"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--nhs-blue)"></span>Evidence strength</span></th><td><span class="badge badge-green">Strong</span></td><td><span class="badge badge-blue">Moderate</span></td></tr>
-            <tr><th scope="row" style="background:#fff;font-weight:600">DTAC</th><td><span class="badge badge-green">Passed</span></td><td><span class="badge badge-amber">Refresh required</span></td></tr>
-            <tr><th scope="row" style="background:#fff;font-weight:600">Local effort</th><td><span class="badge effort-medium">Medium</span></td><td><span class="badge effort-low">Low</span></td></tr>
-          </tbody>
-        </table>
-      </div>
+      <table class="ds-table" style="margin:0">
+        <thead><tr><th>Site / service</th><th>ICB</th><th>Care setting</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Example NHS FT &mdash; respiratory service</td><td>NHS Example ICB</td><td>Secondary care</td><td><span class="badge badge-green">Live</span></td></tr>
+          <tr><td>Sample Community Trust</td><td>NHS Sample ICB</td><td>Community</td><td><span class="badge badge-amber">Pilot</span></td></tr>
+          <tr><td>Historic deployment</td><td>NHS Legacy ICB</td><td>Primary care</td><td><span class="badge badge-grey">Historic</span></td></tr>
+        </tbody>
+      </table>
     </div>
+<pre class="ds-code"><code>&lt;table class="nhsuk-table"&gt;
+  &lt;caption class="nhsuk-table__caption nhsuk-u-visually-hidden"&gt;Where Luscii is live&lt;/caption&gt;
+  &lt;thead class="nhsuk-table__head"&gt;
+    &lt;tr class="nhsuk-table__row"&gt;
+      &lt;th scope="col" class="nhsuk-table__header"&gt;Site / service&lt;/th&gt;
+      …
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody class="nhsuk-table__body"&gt;…&lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+
+    <h2>Responsive comparison table</h2>
+    <p><code>CompareNarrativeTables</code>: products as columns, dimensions as row headers. Each data cell carries a hidden <code>nhsuk-table-responsive__heading</code> so that, below 769px, every cell is labelled when the table stacks. The first column is fixed at 18% so dimension labels align across the six tables.</p>
+<pre class="ds-code"><code>&lt;table class="nhsuk-table-responsive" role="table"&gt;
+  &lt;caption class="nhsuk-table__caption nhsuk-table__caption--m"&gt;Evidence and expected impact&lt;/caption&gt;
+  &lt;thead class="nhsuk-table__head" role="rowgroup"&gt;
+    &lt;tr class="nhsuk-table__row" role="row"&gt;
+      &lt;th scope="col" class="nhsuk-table__header" role="columnheader"&gt;
+        &lt;span class="nhsuk-u-visually-hidden"&gt;Comparison dimension&lt;/span&gt;
+      &lt;/th&gt;
+      &lt;th scope="col" class="nhsuk-table__header" role="columnheader"&gt;Luscii&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody class="nhsuk-table__body"&gt;
+    &lt;tr class="nhsuk-table__row" role="row"&gt;
+      &lt;th scope="row" class="nhsuk-table__header" role="rowheader"&gt;Evidence strength&lt;/th&gt;
+      &lt;td class="nhsuk-table__cell" role="cell"&gt;
+        &lt;span class="nhsuk-table-responsive__heading" aria-hidden="true"&gt;Luscii &lt;/span&gt;
+        Strong
+      &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
 
     <h2>Conventions</h2>
     <table class="ds-table">
       <thead><tr><th>Aspect</th><th>Convention</th></tr></thead>
       <tbody>
-        <tr><td>Row separation</td><td>1px <code>var(--border)</code> bottom border</td></tr>
-        <tr><td>Header</td><td>Tinted <code>#f4f7fa</code>, weight 600, left-aligned</td></tr>
+        <tr><td>Caption</td><td>Always present; <code>nhsuk-table__caption--m</code> when visible, <code>nhsuk-u-visually-hidden</code> when the section heading already names the table</td></tr>
         <tr><td>Row headers</td><td><code>&lt;th scope="row"&gt;</code> for the first column</td></tr>
-        <tr><td>Critical rows</td><td>3px blue left border + marker dot</td></tr>
-        <tr><td>Overflow</td><td>Horizontal scroll container with sticky header</td></tr>
+        <tr><td>Missing values</td><td>&ldquo;Check with supplier&rdquo; in <code>nhsuk-u-secondary-text-colour</code>; never an empty cell or a dash</td></tr>
+        <tr><td>Status</td><td><code>nhsuk-tag</code> with text, not colour alone</td></tr>
+        <tr><td>Overflow</td><td>Use <code>nhsuk-table-responsive</code> to stack; do not scroll horizontally</td></tr>
       </tbody>
     </table>
 
-    <h2>Accessibility</h2>
-    <ul>
-      <li>Use real <code>&lt;table&gt;</code> markup with <code>&lt;th&gt;</code> and <code>scope</code> attributes.</li>
-      <li>Status is always carried by a text badge, not colour alone.</li>
-      <li>Expandable rows use buttons with <code>aria-expanded</code>.</li>
-      <li>Comparison view announces row counts via an <code>aria-live</code> region.</li>
-    </ul>
-
-    <div class="ds-note ds-note--source">Source: <code>components/DeploymentRegisterTable.tsx</code>, <code>components/compare/CompareWorkspaceView.tsx</code>.</div>
+    <div class="ds-note ds-note--source">Source: <code>components/DeploymentRegisterTable.tsx</code>, <code>components/compare/CompareNarrativeTables.tsx</code>, <code>app/supplier-portal/statuses/page.tsx</code>.</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

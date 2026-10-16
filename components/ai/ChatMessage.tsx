@@ -121,7 +121,7 @@ export default function ChatMessage({
     return (
       <div className="flex justify-end">
         <div
-          className="max-w-[80%] rounded-2xl rounded-br-md px-4 py-4 hs-text-label leading-relaxed"
+          className="max-w-[80%] rounded-2xl rounded-br-md px-4 py-4 leading-relaxed"
           style={{
             background: 'var(--nhs-blue)',
             color: '#fff',
@@ -140,7 +140,7 @@ export default function ChatMessage({
     <div className="flex justify-start">
       <div className="max-w-[90%]">
         <div
-          className="rounded-2xl rounded-bl-md border px-4 py-4 hs-text-label leading-relaxed"
+          className="rounded-2xl rounded-bl-md border px-4 py-4 leading-relaxed"
           style={{
             background: 'var(--card)',
             borderColor: 'var(--border)',

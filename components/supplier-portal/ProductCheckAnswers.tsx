@@ -76,89 +76,91 @@ export default function ProductCheckAnswers({
   }
 
   return (
-    <div className="hs-page">
-      <div className="max-w-3xl">
-        <BackLink href={productHref} />
-        <span className="nhsuk-caption-l">{product.name}</span>
-        <h1 ref={headingRef} tabIndex={-1} className="page-title-h1 outline-none">
-          Check your answers before submitting
-        </h1>
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <BackLink href={productHref} />
+          <span className="nhsuk-caption-l">{product.name}</span>
+          <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
+            Check your answers before submitting
+          </h1>
 
-        {changedContent.length > 0 && (
-          <>
-            <h2 className="nhsuk-heading-m nhsuk-u-margin-top-7">Product information</h2>
-            <dl className="nhsuk-summary-list">
-              {changedContent.map((field) => {
-                const v = value(field.id)
-                return (
-                  <div key={field.id} className="nhsuk-summary-list__row">
-                    <dt className="nhsuk-summary-list__key">{field.label}</dt>
-                    <dd className="nhsuk-summary-list__value">
-                      {v.trim() ? (
-                        <span style={{ whiteSpace: 'pre-wrap' }}>{v}</span>
-                      ) : (
-                        <span className="nhsuk-u-secondary-text-color">{NOT_PROVIDED}</span>
-                      )}
-                    </dd>
-                    <dd className="nhsuk-summary-list__actions">
-                      <Link
-                        className="hs-link-button"
-                        href={managedProductFieldHref(productId, field.id, { returnTo: 'check-answers' })}
-                      >
-                        Change<span className="nhsuk-u-visually-hidden"> {field.label.toLowerCase()}</span>
-                      </Link>
-                    </dd>
-                  </div>
-                )
-              })}
-            </dl>
-          </>
-        )}
+          {changedContent.length > 0 && (
+            <>
+              <h2 className="nhsuk-heading-m nhsuk-u-margin-top-7">Product information</h2>
+              <dl className="nhsuk-summary-list">
+                {changedContent.map((field) => {
+                  const v = value(field.id)
+                  return (
+                    <div key={field.id} className="nhsuk-summary-list__row">
+                      <dt className="nhsuk-summary-list__key">{field.label}</dt>
+                      <dd className="nhsuk-summary-list__value">
+                        {v.trim() ? (
+                          <span style={{ whiteSpace: 'pre-wrap' }}>{v}</span>
+                        ) : (
+                          <span className="nhsuk-u-secondary-text-color">{NOT_PROVIDED}</span>
+                        )}
+                      </dd>
+                      <dd className="nhsuk-summary-list__actions">
+                        <Link
+                          className="hs-link-button"
+                          href={managedProductFieldHref(productId, field.id, { returnTo: 'check-answers' })}
+                        >
+                          Change<span className="nhsuk-u-visually-hidden"> {field.label.toLowerCase()}</span>
+                        </Link>
+                      </dd>
+                    </div>
+                  )
+                })}
+              </dl>
+            </>
+          )}
 
-        {changedDocuments.length > 0 && (
-          <>
-            <h2 className="nhsuk-heading-m nhsuk-u-margin-top-7">Documents</h2>
-            <dl className="nhsuk-summary-list">
-              {changedDocuments.map((field) => {
-                const fileName = value(field.id)
-                const uploadedOn = value(`${field.id}${UPLOADED_ON_SUFFIX}`)
-                return (
-                  <div key={field.id} className="nhsuk-summary-list__row">
-                    <dt className="nhsuk-summary-list__key">{field.label}</dt>
-                    <dd className="nhsuk-summary-list__value">
-                      {fileName ? (
-                        <>
-                          {fileName}
-                          <br />
-                          <span className="nhsuk-u-secondary-text-color nhsuk-body-s">
-                            Uploaded {formatPortalDate(uploadedOn)}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="nhsuk-u-secondary-text-color">{NOT_PROVIDED}</span>
-                      )}
-                    </dd>
-                    <dd className="nhsuk-summary-list__actions">
-                      <Link
-                        className="hs-link-button"
-                        href={managedProductFieldHref(productId, field.id, { returnTo: 'check-answers' })}
-                      >
-                        {fileName ? 'Replace' : 'Upload'}
-                        <span className="nhsuk-u-visually-hidden"> {field.label}</span>
-                      </Link>
-                    </dd>
-                  </div>
-                )
-              })}
-            </dl>
-          </>
-        )}
+          {changedDocuments.length > 0 && (
+            <>
+              <h2 className="nhsuk-heading-m nhsuk-u-margin-top-7">Documents</h2>
+              <dl className="nhsuk-summary-list">
+                {changedDocuments.map((field) => {
+                  const fileName = value(field.id)
+                  const uploadedOn = value(`${field.id}${UPLOADED_ON_SUFFIX}`)
+                  return (
+                    <div key={field.id} className="nhsuk-summary-list__row">
+                      <dt className="nhsuk-summary-list__key">{field.label}</dt>
+                      <dd className="nhsuk-summary-list__value">
+                        {fileName ? (
+                          <>
+                            {fileName}
+                            <br />
+                            <span className="nhsuk-u-secondary-text-color nhsuk-body-s">
+                              Uploaded {formatPortalDate(uploadedOn)}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="nhsuk-u-secondary-text-color">{NOT_PROVIDED}</span>
+                        )}
+                      </dd>
+                      <dd className="nhsuk-summary-list__actions">
+                        <Link
+                          className="hs-link-button"
+                          href={managedProductFieldHref(productId, field.id, { returnTo: 'check-answers' })}
+                        >
+                          {fileName ? 'Replace' : 'Upload'}
+                          <span className="nhsuk-u-visually-hidden"> {field.label}</span>
+                        </Link>
+                      </dd>
+                    </div>
+                  )
+                })}
+              </dl>
+            </>
+          )}
 
-        <h2 className="nhsuk-heading-m nhsuk-u-margin-top-7">Submit your changes</h2>
-        <p className="nhsuk-body-m">{DECLARATION}</p>
-        <Button variant="confirm" onClick={confirmAndSubmit} loading={submitting}>
-          {submitting ? 'Submitting…' : 'Confirm and submit'}
-        </Button>
+          <h2 className="nhsuk-heading-m nhsuk-u-margin-top-7">Submit your changes</h2>
+          <p className="nhsuk-body-m">{DECLARATION}</p>
+          <Button variant="confirm" onClick={confirmAndSubmit} loading={submitting}>
+            {submitting ? 'Submitting…' : 'Confirm and submit'}
+          </Button>
+        </div>
       </div>
     </div>
   )

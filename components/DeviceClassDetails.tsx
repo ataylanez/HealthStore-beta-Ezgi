@@ -7,7 +7,7 @@ export function DeviceClassDetails({ deviceClass }: { deviceClass: string }) {
   return (
     <details className="mt-2">
       <summary
-        className="cursor-pointer hs-text-label hs-font-normal underline-offset-2 hover:underline outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-[var(--nhs-blue)] focus-visible:ring-offset-2"
+        className="cursor-pointer hs-text-label hs-font-normal underline-offset-2 underline hover:no-underline outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-[var(--nhs-blue)] focus-visible:ring-offset-2"
         style={{ color: 'var(--nhs-blue)' }}
       >
         {explainer.summary}

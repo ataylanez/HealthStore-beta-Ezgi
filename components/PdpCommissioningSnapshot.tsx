@@ -31,7 +31,7 @@ function SnapshotText({ muted, children }: { muted?: boolean; children: ReactNod
 function SnapshotTextList({ items }: { items: string[] }) {
   if (items.length === 0) return null
   return (
-    <p className="m-0 hs-text-label leading-snug" style={{ color: 'var(--text-secondary)' }}>
+    <p className="nhsuk-body-s nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-secondary)' }}>
       {items.join(' · ')}
     </p>
   )
@@ -172,7 +172,7 @@ function PlatformSegment({
 }) {
   return (
     <SegmentShell label={card.label} href={card.demoLink?.href} linkHeading={false}>
-      <p className="m-0 hs-text-label leading-snug" style={{ color: 'var(--text-primary)' }}>
+      <p className="nhsuk-body-s nhsuk-u-margin-bottom-0">
         {card.values.join(', ')}
       </p>
       {card.demoLink ? (

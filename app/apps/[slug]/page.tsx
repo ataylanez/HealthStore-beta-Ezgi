@@ -1,32 +1,17 @@
-import { getAllAppsUnfiltered, getAppBySlug } from '@/lib/data'
-import { getCommissioningSnapshot } from '@/lib/commissioningSnapshot'
-import { getDeploymentRegister } from '@/lib/deploymentRegister'
-import { resolveProductNarrative, getProductNarrative } from '@/lib/content/productNarratives'
-import PdpNarrativeSpine from '@/components/product/PdpNarrativeSpine'
-import PdpLocalValue from '@/components/product/PdpLocalValue'
-import PdpAssurancePassport from '@/components/product/PdpAssurancePassport'
-import PdpImplementation from '@/components/product/PdpImplementation'
-import PdpNhsExperience from '@/components/product/PdpNhsExperience'
-import PdpResources from '@/components/product/PdpResources'
-import PdpExpressInterestCallout from '@/components/product/PdpExpressInterestCallout'
-import PdpFundingLevers from '@/components/product/PdpFundingLevers'
-import { getServerContext } from '@/lib/context/serverContext'
-import { PdpCommissioningSnapshot } from '@/components/PdpCommissioningSnapshot'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import {
-  DtacBadge, MaturityBadge, EffortBadge,
-  SupervisionBadge, ConditionTag, AlertBox
-} from '@/components/Badges'
+import { getAllAppsUnfiltered, getAppBySlug } from '@/lib/data'
+import { getPdpPageModel, pdpSectionPath, type PdpSearchParams } from '@/lib/pdpPageModel'
+import PdpFrame from '@/components/product/PdpFrame'
+import PdpExpressInterestCallout from '@/components/product/PdpExpressInterestCallout'
+import PdpOverviewSummary from '@/components/product/PdpOverviewSummary'
+import { PdpCommissioningSnapshot } from '@/components/PdpCommissioningSnapshot'
+import { overviewParagraphs, usesSummaryOverview } from '@/lib/pdpSummary'
+import { MaturityBadge, SupervisionBadge, ConditionTag, AlertBox } from '@/components/Badges'
 import { CompareToggleButton } from '@/components/CompareToggleButton'
 import { STORE_ACCENT } from '@/lib/storeAccent'
-import { PdpSharePrintProvider, PdpShareRegion } from '@/components/PdpSharePrintContext'
-import { DeviceClassDetails } from '@/components/DeviceClassDetails'
-import { PageBreadcrumb } from '@/components/PageBreadcrumb'
-import PdpSupplierContactCard from '@/components/PdpSupplierContactCard'
-import PdpOnThisPage from '@/components/PdpOnThisPage'
-import { buildPdpOnThisPageLinks } from '@/lib/pdpOnThisPage'
+import { PdpShareRegion } from '@/components/PdpSharePrintContext'
 
 export async function generateStaticParams() {
   return getAllAppsUnfiltered().map(a => ({ slug: a.slug }))
@@ -38,277 +23,147 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: app ? `${app.app_name} — NHS HealthStore` : 'Not found' }
 }
 
+/**
+ * Product overview — hero, alerts and commissioning snapshot. The narrative
+ * sections each live on their own page under /apps/[slug]/[section] and are
+ * reached from the side nav (see app/apps/[slug]/[section]/page.tsx).
+ */
 export default async function AppPage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>
-  searchParams: Promise<Record<string, string | string[] | undefined>>
+  searchParams: Promise<PdpSearchParams>
 }) {
   const { slug } = await params
-  const app = getAppBySlug(slug)
-  if (!app) notFound()
+  const model = await getPdpPageModel(slug, await searchParams)
+  if (!model) notFound()
 
-  // Round 2 content migration: commissioner context drives the personalised
-  // local-value block. Prefer the guided-start cookie; only honour URL params
-  // when an explicit geography override is present so unrelated query strings
-  // (share tokens etc.) don't reset personalisation to the national baseline.
-  const sp = await searchParams
-  const commissionerContext = await getServerContext(
-    typeof sp?.geo === 'string' ? sp : undefined
-  )
-
+  const { app, narrative, commissioningCards, hasNhsExperience, hasPdpAlerts, heroProposition, showNarrativeSpine, sections } = model
   const accent = STORE_ACCENT
-  const showPdpFactsGrid = false
-
-  // Content migration (hybrid page): fold the curated narrative spine onto the canonical PDP.
-  // Round 3 (R3-4 D) replaces the Luscii-only gate with data-driven gating: any product with a
-  // curated narrative gets the spine + assurance passport; the local-value block self-gates to
-  // COPD, and other products keep the reference-only layout.
-  const narrative = resolveProductNarrative(slug, app)
-  const showNarrativeSpine = getProductNarrative(slug) != null
-  const heroProposition =
-    (showNarrativeSpine && narrative.decision_summary?.one_line_proposition) || app.one_line_value_proposition
-
-  const linkedFundingIds = app.linked_funding_ids ?? app.funding_ids ?? []
-  const commissioningCards = getCommissioningSnapshot(
-    app,
-    showNarrativeSpine
-      ? { commercialHref: '#how-to-buy', interopHref: '#resources', demoHref: '#resources' }
-      : undefined,
-  )
-  const showLocalValue = showNarrativeSpine && (app.condition_tags?.includes('copd') ?? false)
-  const hasNhsExperience =
-    showNarrativeSpine &&
-    (getDeploymentRegister(app).length > 0 || (app.case_studies?.length ?? 0) > 0)
-
-  const onThisPageLinks = buildPdpOnThisPageLinks({
-    app,
-    narrative: showNarrativeSpine ? narrative : null,
-    showNarrativeSpine,
-    showLocalValue,
-    hasLinkedFunding: linkedFundingIds.length > 0,
-    context: commissionerContext,
-  })
-
-  const hasPdpAlerts =
-    !!app.clinical_safety_alert ||
-    app.dtac_status === 'required_not_confirmed'
+  // Summary-style overview (Luscii only for now): no action buttons or snapshot;
+  // one short block per section page instead of the plain-English overview.
+  const summaryOverview = usesSummaryOverview(app.slug) && showNarrativeSpine
+  // Plain-English overview paragraphs from content/apps/{slug}.json (optional).
+  const overview = summaryOverview ? [] : overviewParagraphs(app)
 
   return (
-      <div className="hs-pdp">
-        <PdpSharePrintProvider>
-        <div className="hs-pdp-top">
-        <div className="hs-page">
-        <PdpShareRegion shareKey="breadcrumb" label="Browse trail" excludeFromShareUi className="mb-4">
-          <PageBreadcrumb
-            items={[
-              { label: 'Product catalogue', href: '/catalogue' },
-              { label: 'Digital therapeutics', href: '/catalogue/digital-therapeutics' },
-              { label: app.app_name },
-            ]}
-          />
-        </PdpShareRegion>
-
-        <PdpShareRegion
-          shareKey="hero"
-          label="DTx app summary"
-          description="Supplier, proposition, and actions."
-          className="mb-4"
-        >
+    <PdpFrame
+      model={model}
+      breadcrumb={[
+        { label: 'Product catalogue', href: '/catalogue' },
+        { label: 'Digital therapeutics', href: '/catalogue/digital-therapeutics' },
+        { label: app.app_name },
+      ]}
+    >
+      <PdpShareRegion
+        shareKey="hero"
+        label="DTx app summary"
+        description="Supplier, proposition, and actions."
+        className="mb-4"
+      >
+        {/* NHS page heading pattern: supplier as a caption above the H1 (heading-xl),
+            then tags and the lede proposition in body text. */}
         <div className="overflow-visible">
-            <div className="w-full min-w-0">
-              <div className="flex items-start gap-4 mb-2">
-                {app.logo_path && (
-                  <Image src={app.logo_path} alt={`${app.app_name} logo`} width={48} height={48}
-                    className="rounded-lg flex-shrink-0" />
-                )}
-                <div>
-                  <h1 className="page-title-h1 mb-1">{app.app_name}</h1>
-                  <p style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}>{app.supplier_name}</p>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {(app.condition_tags ?? []).map((t: string) => (
-                  <ConditionTag key={t} tag={t} />
-                ))}
-                {app.supervision_model ? <SupervisionBadge model={app.supervision_model} /> : null}
-                <MaturityBadge level={app.maturity_level} hideEstablished />
-                {app.content_confidence && app.content_confidence !== 'Confirmed' && (
-                  <span className={`badge ${app.content_confidence === 'Supplier-reported' ? 'badge-blue' : 'badge-amber'}`}>
-                    {app.content_confidence}
-                  </span>
-                )}
-              </div>
-              <p
-                className="min-w-0 max-w-[640px] mb-4"
-                style={{ fontSize: 'var(--text-body)', lineHeight: 1.7, color: 'var(--text-secondary)' }}
-              >
-                {heroProposition}
-              </p>
+          <div className="w-full min-w-0">
+            <div className="flex items-start gap-4">
+              {app.logo_path && (
+                <Image src={app.logo_path} alt={`${app.app_name} logo`} width={48} height={48}
+                  className="rounded-lg flex-shrink-0" />
+              )}
+              <h1 className="nhsuk-heading-xl nhsuk-u-margin-bottom-4">
+                <span className="nhsuk-caption-xl">{app.supplier_name}</span>
+                {app.app_name}
+              </h1>
             </div>
-            <div className="mt-8 mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+            <div className="flex flex-wrap gap-2 nhsuk-u-margin-bottom-4">
+              {(app.condition_tags ?? []).map((t: string) => (
+                <ConditionTag key={t} tag={t} />
+              ))}
+              {app.supervision_model ? <SupervisionBadge model={app.supervision_model} /> : null}
+              <MaturityBadge level={app.maturity_level} hideEstablished />
+              {app.content_confidence && app.content_confidence !== 'Confirmed' && (
+                <span className={`badge ${app.content_confidence === 'Supplier-reported' ? 'badge-blue' : 'badge-amber'}`}>
+                  {app.content_confidence}
+                </span>
+              )}
+            </div>
+            <p className="nhsuk-body-m" style={{ color: 'var(--text-secondary)' }}>
+              {heroProposition}
+            </p>
+          </div>
+          {!summaryOverview && (
+            <div className="nhsuk-u-margin-top-5 nhsuk-u-margin-bottom-4 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
               <Link
                 href={`/apps/${app.slug}/express-interest`}
-                className="nhsuk-button mb-0 inline-flex items-center justify-center gap-2 align-top max-sm:mb-2 max-sm:w-full px-6 py-4 hs-text-label hs-font-bold no-underline"
+                className="nhsuk-button mb-0 inline-flex items-center justify-center gap-2 align-top max-sm:mb-2 max-sm:w-full no-underline"
               >
                 Get in touch
               </Link>
               <CompareToggleButton
                 appId={app.id}
                 solid
-                size="none"
-                className="px-6 py-4 hs-text-label hs-font-bold"
               />
             </div>
+          )}
         </div>
+      </PdpShareRegion>
+
+      {hasPdpAlerts ? (
+        <PdpShareRegion shareKey="alerts" label="Alerts and notices" excludeFromShareUi className="mb-6 space-y-6">
+          {app.clinical_safety_alert && <div><AlertBox type="danger"><strong>Clinical safety: </strong>{app.clinical_safety_alert}</AlertBox></div>}
+          {app.dtac_status === 'required_not_confirmed' && <div><AlertBox type="danger"><strong>DTAC not confirmed: </strong>{app.dtac_note}</AlertBox></div>}
         </PdpShareRegion>
+      ) : null}
 
-        {hasPdpAlerts ? (
-          <PdpShareRegion shareKey="alerts" label="Alerts and notices" excludeFromShareUi className="mb-6 space-y-6">
-            {app.clinical_safety_alert && <div><AlertBox type="danger"><strong>Clinical safety: </strong>{app.clinical_safety_alert}</AlertBox></div>}
-            {app.dtac_status === 'required_not_confirmed' && <div><AlertBox type="danger"><strong>DTAC not confirmed: </strong>{app.dtac_note}</AlertBox></div>}
-          </PdpShareRegion>
-        ) : null}
-
-        <div className="mb-6 space-y-4">
-          {showPdpFactsGrid ? (
-          <PdpShareRegion
-            shareKey="sidebar-summary"
-            label="Quick facts, assurance and sources"
-            description="Device class, assurance statements, supplier email, product tiers, and how this profile was sourced."
-            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          >
-
-            <div className="hs-surface-card-sm bg-white rounded-xl border p-6" style={{ borderColor: 'var(--border)' }}>
-              <div className="hs-text-caption hs-font-bold uppercase tracking-wide mb-4" style={{ color: 'var(--text-muted)' }}>Quick facts</div>
-              <div className="space-y-4 hs-text-label">
-                <div>
-                  <div className="hs-text-caption hs-font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--text-muted)' }}>Maturity</div>
-                  <MaturityBadge level={app.maturity_level} />
-                </div>
-                <div>
-                  <div className="hs-text-caption hs-font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--text-muted)' }}>Local effort</div>
-                  <EffortBadge level={app.local_wraparound} />
-                </div>
-                <div>
-                  <div className="hs-text-caption hs-font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--text-muted)' }}>Device class</div>
-                  <div style={{ fontWeight: 600 }}>{app.device_class}</div>
-                  {app.device_class_note && <div className="hs-text-caption mt-1" style={{ color: '#7A4800' }}>⚠ {app.device_class_note}</div>}
-                  <DeviceClassDetails deviceClass={app.device_class} />
-                </div>
-                <div>
-                  <div className="hs-text-caption hs-font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--text-muted)' }}>Supervision model</div>
-                  <SupervisionBadge model={app.supervision_model} />
-                </div>
-                <div>
-                  <div className="hs-text-caption hs-font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--text-muted)' }}>Target patients</div>
-                  <div className="hs-text-caption" style={{ color: 'var(--text-secondary)', lineHeight: 1.5 }}>{app.target_patients}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="hs-surface-card-sm bg-white rounded-xl border p-6 space-y-4" style={{ borderColor: 'var(--border)' }}>
-              <div className="hs-text-caption hs-font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--text-muted)' }}>Assurance</div>
-              {[
-                { label: 'DTAC', val: <DtacBadge status={app.dtac_status} /> },
-                { label: 'DCB0129', val: app.dcb0129_status },
-                { label: 'GDPR', val: app.gdpr_note?.split('.')[0] },
-                { label: 'ISO 27001', val: app.iso27001 },
-                { label: 'Cyber Essentials', val: app.cyber_essentials },
-                { label: 'DSP Toolkit', val: app.dspt_status },
-              ].map(r => (
-                <div key={r.label} className="flex items-start gap-2 hs-text-caption">
-                  <span className="w-28 flex-shrink-0 hs-font-normal" style={{ color: 'var(--text-muted)' }}>{r.label}</span>
-                  {typeof r.val === 'string' ? <span style={{ color: 'var(--text-secondary)' }}>{r.val}</span> : r.val}
-                </div>
-              ))}
-              {app.cyber_notes && (
-                <div className="hs-text-caption p-2 rounded mt-2" style={{ background: '#FEF5E6', color: '#7A4800' }}>
-                  {app.cyber_notes}
-                </div>
-              )}
-            </div>
-
-            <PdpSupplierContactCard email={app.supplier_contact_email} />
-
-            {app.product_tiers?.length > 0 && (
-              <div className="hs-surface-card-sm bg-white rounded-xl border p-6" style={{ borderColor: 'var(--border)' }}>
-                <div className="hs-text-caption hs-font-bold uppercase tracking-wide mb-4" style={{ color: 'var(--text-muted)' }}>Product tiers</div>
-                {app.product_tiers.map((t: any) => (
-                  <div key={t.tier_name} className="mb-4 last:mb-0">
-                    <div className="hs-font-bold hs-text-label" style={{ color: accent }}>{t.tier_name}</div>
-                    <div className="hs-text-caption mt-1" style={{ color: 'var(--text-secondary)', lineHeight: 1.5 }}>{t.description}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="hs-surface-card-sm rounded-lg p-4 hs-text-caption" style={{ background: '#F0F4F5', border: '1px solid var(--border)', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              <strong style={{ color: 'var(--text-secondary)' }}>Sources: </strong>{app.source_summary}
-              <br /><br />
-              {app.confidence_note}
-            </div>
-          </PdpShareRegion>
-          ) : null}
-        </div>
-
+      {summaryOverview ? (
+        <PdpOverviewSummary app={app} narrative={narrative} sections={sections} />
+      ) : (
         <PdpShareRegion
           shareKey="commissioning-snapshot"
           label="Commissioning snapshot"
           description="Governance, pricing model, integration, and where it's live."
-          className="hs-decision-snapshot"
+          className="hs-decision-snapshot mb-6"
         >
           <PdpCommissioningSnapshot
             cards={commissioningCards}
             whereLiveApp={app}
-            whereLiveHref={hasNhsExperience ? '#nhs-experience' : undefined}
+            whereLiveHref={hasNhsExperience ? pdpSectionPath(app.slug, 'nhs-experience') : undefined}
           />
         </PdpShareRegion>
-        </div>
-        </div>
+      )}
 
-        <div className="hs-page">
-        <div className={onThisPageLinks.length >= 2 ? 'hs-pdp-with-sidebar' : undefined}>
-          {onThisPageLinks.length >= 2 ? (
-            <aside className="hs-pdp-with-sidebar__aside">
-              <PdpOnThisPage links={onThisPageLinks} title={app.app_name} />
-            </aside>
-          ) : null}
+      {overview.length > 0 && (
+        <PdpShareRegion
+          shareKey="overview"
+          label={`Overview of ${app.app_name}`}
+          description="Plain-English summary for buyers and commissioners."
+          className="mb-8"
+        >
+          <section aria-labelledby="pdp-overview-heading">
+            <h2 id="pdp-overview-heading" className="nhsuk-heading-l hs-pdp-heading">
+              Overview of {app.app_name}
+            </h2>
+            {overview.map((paragraph, i) => (
+              <p
+                key={i}
+                className={`nhsuk-body-m ${i < overview.length - 1 ? '' : 'nhsuk-u-margin-bottom-0'}`}
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                {paragraph}
+              </p>
+            ))}
+          </section>
+        </PdpShareRegion>
+      )}
 
-          <div className="hs-pdp-with-sidebar__main">
-            {showNarrativeSpine && (
-              <PdpNarrativeSpine
-                app={app}
-                narrative={narrative}
-                localValue={<PdpLocalValue app={app} narrative={narrative} context={commissionerContext} />}
-                fundingLevers={<PdpFundingLevers narrative={narrative} fundingIds={linkedFundingIds} />}
-                assurance={<PdpAssurancePassport app={app} narrative={narrative} />}
-                implementation={<PdpImplementation app={app} narrative={narrative} />}
-                nhsExperience={hasNhsExperience ? <PdpNhsExperience app={app} /> : undefined}
-                resources={showNarrativeSpine ? <PdpResources app={app} /> : undefined}
-                expressInterest={
-                  <PdpShareRegion shareKey="express-interest" label="Express interest callout" excludeFromShareUi>
-                    <PdpExpressInterestCallout accent={accent} slug={app.slug} />
-                  </PdpShareRegion>
-                }
-              />
-            )}
-
-            <div className="space-y-4">
-              {!showNarrativeSpine && (
-              <PdpShareRegion shareKey="express-interest" label="Express interest callout" excludeFromShareUi>
-              <div className="hs-surface-card-sm rounded-b-xl border overflow-hidden" style={{ borderColor: accent }}>
-                <PdpExpressInterestCallout accent={accent} slug={app.slug} />
-              </div>
-              </PdpShareRegion>
-              )}
-
-            </div>
+      {!showNarrativeSpine && (
+        <PdpShareRegion shareKey="express-interest" label="Express interest callout" excludeFromShareUi>
+          <div className="hs-surface-card-sm rounded-b-xl border overflow-hidden" style={{ borderColor: accent }}>
+            <PdpExpressInterestCallout accent={accent} slug={app.slug} />
           </div>
-        </div>
-        </div>
-        </PdpSharePrintProvider>
-      </div>
+        </PdpShareRegion>
+      )}
+    </PdpFrame>
   )
 }

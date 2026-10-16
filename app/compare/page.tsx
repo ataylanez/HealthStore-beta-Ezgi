@@ -6,7 +6,7 @@ export const metadata = { title: 'Comparison tool — NHS HealthStore' }
 
 function CompareSkeleton() {
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
       <div className="mb-4 flex flex-wrap items-center gap-2 hs-text-label" style={{ color: 'var(--text-muted)' }} aria-hidden>
         <div style={{ height: 14, width: 48, background: 'var(--border)', borderRadius: 4 }} />
         <span>/</span>

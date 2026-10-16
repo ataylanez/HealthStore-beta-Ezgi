@@ -7,12 +7,18 @@ import { splitPdpEvidence } from '@/lib/pdpEvidence'
 import { pdpSectionTitle, pdpPatientCohortLabel, resolvePdpLocalArea } from '@/lib/pdpSections'
 import type { PdpSectionId } from '@/lib/pdpSections'
 
-export type PdpOnThisPageLink = { id: string; label: string }
+/** A product section that lives on its own page under /apps/[slug]/[id]. */
+export type PdpSectionLink = { id: PdpSectionId; label: string; href: string }
 
 /**
- * Builds anchor links for the PDP "On this page" nav from the narrative spine sections.
+ * Builds the list of section pages for a product, in reading order. Each entry
+ * becomes a route (/apps/[slug]/[id]) and a side-nav link.
+ *
+ * Labels come from the same title source as the rendered sections, so editing a
+ * section title automatically updates its nav entry (single source of truth).
+ * The two local-value sections share one page (local-impact) with a merged label.
  */
-export function buildPdpOnThisPageLinks(input: {
+export function buildPdpSectionLinks(input: {
   app: App
   narrative: ProductNarrative | null
   showNarrativeSpine: boolean
@@ -20,22 +26,23 @@ export function buildPdpOnThisPageLinks(input: {
   hasLinkedFunding: boolean
   /** Commissioner context — needed to resolve the projected-impact area label. */
   context?: CommissionerContext
-}): PdpOnThisPageLink[] {
+}): PdpSectionLink[] {
   const { app, narrative, showNarrativeSpine, showLocalValue, hasLinkedFunding, context } = input
-  const links: PdpOnThisPageLink[] = []
+  const links: PdpSectionLink[] = []
 
-  // Labels come from the same title source as the rendered sections, so editing a
-  // section title automatically updates its nav entry (single source of truth).
   const localArea = showLocalValue && context ? resolvePdpLocalArea(app, context) : null
-  const push = (id: PdpSectionId) =>
+  const push = (id: PdpSectionId, label?: string) =>
     links.push({
       id,
-      label: pdpSectionTitle(id, {
-        appName: app.app_name,
-        areaLabel: localArea?.areaLabel,
-        isExample: localArea?.isExample,
-        patientCohortLabel: pdpPatientCohortLabel(app.condition_tags),
-      }),
+      href: `/apps/${app.slug}/${id}`,
+      label:
+        label ??
+        pdpSectionTitle(id, {
+          appName: app.app_name,
+          areaLabel: localArea?.areaLabel,
+          isExample: localArea?.isExample,
+          patientCohortLabel: pdpPatientCohortLabel(app.condition_tags),
+        }),
     })
 
   const hasNhsExperience =
@@ -57,8 +64,7 @@ export function buildPdpOnThisPageLinks(input: {
       push('how-it-helps')
     }
     if (showLocalValue) {
-      push('local-impact')
-      push('local-value-worth')
+      push('local-impact', `${app.app_name}'s local impact and worth`)
     }
     const economics = narrative.commissioner_economics
     if ((economics?.funding_levers?.length ?? 0) > 0 || !!economics?.tariff_note?.trim() || hasLinkedFunding) {
@@ -88,4 +94,9 @@ export function buildPdpOnThisPageLinks(input: {
   }
 
   return links
+}
+
+/** Finds a section by its URL segment; undefined when the product has no such page. */
+export function getPdpSection(links: PdpSectionLink[], section: string): PdpSectionLink | undefined {
+  return links.find((l) => l.id === section)
 }

@@ -79,39 +79,41 @@ function Confirmation({ section }: { section: CompanySection }) {
   const outstanding = COMPANY_SECTIONS.filter((s) => !companySectionSubmitted(s.id, values))
 
   return (
-    <div className="hs-page">
-      <div className="max-w-2xl">
-        <div className="nhsuk-panel" style={{ textAlign: 'center' }}>
-          <h1 ref={headingRef} tabIndex={-1} className="nhsuk-panel__title outline-none">
-            {section.title} submitted
-          </h1>
-          <div className="nhsuk-panel__body">{companyName}</div>
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <div className="nhsuk-panel" style={{ textAlign: 'center' }}>
+            <h1 ref={headingRef} tabIndex={-1} className="nhsuk-panel__title outline-none">
+              {section.title} submitted
+            </h1>
+            <div className="nhsuk-panel__body">{companyName}</div>
+          </div>
+          <h2 className="nhsuk-heading-m nhsuk-u-margin-top-6">What happens next</h2>
+          <p style={{ fontSize: 'var(--text-body)' }}>
+            This section is now up to date. It is shown on your {COMPANY_TITLE} page, where you can change it at any
+            time.
+          </p>
+          {outstanding.length > 0 && (
+            <>
+              <p style={{ fontSize: 'var(--text-body)' }}>You still need to complete:</p>
+              <ul className="nhsuk-list nhsuk-list--bullet">
+                {outstanding.map((s) => (
+                  <li key={s.id}>{s.title}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          <p style={{ fontSize: 'var(--text-body)' }}>
+            <Link className="nhsuk-link" href={COMPANY_PATHS.page}>
+              {COMPANY_TITLE}
+            </Link>
+          </p>
+          <p style={{ fontSize: 'var(--text-body)' }}>
+            <Link className="nhsuk-link" href={PORTAL_PATHS.dashboard}>
+              Dashboard
+            </Link>
+          </p>
         </div>
-        <h2 className="nhsuk-heading-m nhsuk-u-margin-top-6">What happens next</h2>
-        <p style={{ fontSize: 'var(--text-body)' }}>
-          This section is now up to date. It is shown on your {COMPANY_TITLE} page, where you can change it at any
-          time.
-        </p>
-        {outstanding.length > 0 && (
-          <>
-            <p style={{ fontSize: 'var(--text-body)' }}>You still need to complete:</p>
-            <ul className="nhsuk-list nhsuk-list--bullet">
-              {outstanding.map((s) => (
-                <li key={s.id}>{s.title}</li>
-              ))}
-            </ul>
-          </>
-        )}
-        <p style={{ fontSize: 'var(--text-body)' }}>
-          <Link className="nhsuk-link" href={COMPANY_PATHS.page}>
-            {COMPANY_TITLE}
-          </Link>
-        </p>
-        <p style={{ fontSize: 'var(--text-body)' }}>
-          <Link className="nhsuk-link" href={PORTAL_PATHS.dashboard}>
-            Dashboard
-          </Link>
-        </p>
       </div>
     </div>
   )

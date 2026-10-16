@@ -6,16 +6,18 @@ export const metadata = { title: `Manage products — ${PORTAL_SERVICE_NAME}` }
 
 export default function ManageProductsPage() {
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
       <PortalBreadcrumb items={[{ label: 'Product management', href: PORTAL_PATHS.products }, { label: 'Manage products' }]} />
-      <div className="max-w-3xl">
-        <div className="hs-section">
-          <h1 className="page-title-h1">Manage products</h1>
-          <p className="m-0 hs-measure leading-relaxed" style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}>
-            Manage and update assurance documents and information for your existing HealthStore products.
-          </p>
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <div className="hs-section">
+            <h1 className="nhsuk-heading-xl">Manage products</h1>
+            <p className="nhsuk-body-l hs-measure">
+              Manage and update assurance documents and information for your existing HealthStore products.
+            </p>
+          </div>
+          <ManagedProductsTable />
         </div>
-        <ManagedProductsTable />
       </div>
     </div>
   )

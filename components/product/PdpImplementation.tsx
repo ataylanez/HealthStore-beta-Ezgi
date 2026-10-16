@@ -56,7 +56,7 @@ export default function PdpImplementation({
 
       {impl.prerequisites?.length > 0 && (
         <div>
-          <h3 className="hs-pdp-subheading hs-font-bold mb-2" style={{ fontSize: 'var(--text-card-title-sm)' }}>
+          <h3 className="nhsuk-heading-s hs-pdp-subheading">
             Local prerequisites
           </h3>
           <ul className="space-y-1" style={{ margin: 0, paddingLeft: 20, maxWidth: 720, lineHeight: 1.7, color: 'var(--text-secondary)', fontSize: 'var(--text-label)' }}>

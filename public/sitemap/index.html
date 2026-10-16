@@ -387,19 +387,35 @@
               tech: 'The COPD filter also includes products tagged pulmonary_rehab. A skeleton grid shows while the list loads.',
               children: [
                 {
-                  route: '/apps/[slug]', title: 'Product page',
+                  route: '/apps/[slug]', title: 'Product overview',
                   access: 'Anyone with the site password',
-                  purpose: 'The main page for a product: what it does, the evidence behind it, what it takes to run locally, and how to get support with commissioning it.',
+                  purpose: 'The front page for a product: who makes it, what it does in one line, and a snapshot of the commissioning basics. The detail lives on the section pages listed in the side menu.',
                   on: [
                     'The page trail back to the catalogue',
+                    'A side menu headed with the product name, listing each section page for this product (only for products with a written-up story)',
                     'A header with the product’s logo, name, supplier, condition tags, maturity badges and a one-line description',
                     'Two buttons: “Get in touch” and a compare toggle',
                     'Warnings where relevant, for example if clinical safety information has not been confirmed',
-                    'A snapshot strip: what platforms it runs on, how it connects to NHS systems, and where it is already live',
-                    'An “On this page” side menu for jumping between sections',
+                    'A snapshot strip: what platforms it runs on, how it connects to NHS systems, and where it is already live. Each tile links to the matching section page.'
+                  ],
+                  actions: ['Get in touch → the express interest journey', 'Compare → adds the product to your comparison list, then /compare', 'Side menu and snapshot tiles → the section pages below'],
+                  note: 'Products without a written-up story (most of the catalogue) have an overview only, with no side menu or section pages.',
+                  file: 'app/apps/[slug]/page.tsx, components/product/PdpFrame.tsx, components/PdpSectionNav.tsx',
+                  data: 'Product content from content/apps/{slug}.json; the one-line proposition from lib/content/productNarratives.ts where a narrative exists',
+                  tech: 'Shared page model in lib/pdpPageModel.ts resolves the product, commissioner context and the list of section pages once for the overview and every section route.',
+                  example: '/apps/mycopd',
+                  children: [
                     {
-                      text: 'The story of the product.',
-                      sub: [
+                      route: '/apps/[slug]/[section]', title: 'Product section pages',
+                      access: 'Anyone with the site password',
+                      purpose: 'One page per part of the product’s story, so each page carries a single idea. The section title is the page heading, with the product name as a caption above it.',
+                      on: [
+                        'The page trail: catalogue → product overview → this section',
+                        'The same side menu as the overview, with the current page highlighted',
+                        'The section content, headed by the section title with the product name as a caption',
+                        {
+                          text: 'The sections, in side-menu order. Each one is its own address, e.g. /apps/luscii/the-problem.',
+                          sub: [
                         {
                           heading: 'The problem it addresses',
                           text: 'A few sentences explaining the gap in care this product is trying to fix. For example: too many patients ending up in hospital, or long waits for a service. It also says why this matters to a buyer right now. Its job is to set the scene.',
@@ -419,8 +435,8 @@
                           ]
                         },
                         {
-                          heading: 'What using the product could mean for patients',
-                          text: 'What it could be worth (calculations in these sections and their origin are a work in progress: NICE, national data). The human and resource impact: an estimate of what the product could save in your area, roughly how many hospital admissions and A&E visits might be avoided, shown as a cautious-to-optimistic range. The monetary impact: a worked example of costs versus savings. The figures use information about an average population (local population is a future iteration). All information here is clearly labelled as illustrative only.',
+                          heading: 'The product’s local impact and worth',
+                          text: 'Two parts on one page. What using the product could mean for patients, and what it could be worth (calculations in these sections and their origin are a work in progress: NICE, national data). The human and resource impact: an estimate of what the product could save in your area, roughly how many hospital admissions and A&E visits might be avoided, shown as a cautious-to-optimistic range. The monetary impact: a worked example of costs versus savings. The figures use information about an average population (local population is a future iteration). All information here is clearly labelled as illustrative only.',
                           needs: [
                             'Product facts don’t answer “will it pay for itself”',
                             'Payment can penalise the right clinical choice',
@@ -477,15 +493,15 @@
                           text: 'Additional features that are helpful for the buyer, such as product videos and a way to try a demo.'
                         }
                       ]
-                    }
-                  ],
-                  actions: ['Get in touch → the express interest journey', 'Compare → adds the product to your comparison list, then /compare', 'Snapshot tiles jump to the matching section further down the page'],
-                  note: 'Product pages only show the sections they have content for. A product with less information available simply has a shorter story with fewer sections.',
-                  file: 'app/apps/[slug]/page.tsx, components/Pdp*.tsx',
-                  data: 'Product content from content/apps/{slug}.json; the narrative sections from lib/content/productNarratives.ts; funding and deployment information from the content files',
-                  tech: 'Example slugs: luscii, mycopd, myheart, joint-academy.',
-                  example: '/apps/mycopd',
-                  children: [
+                        }
+                      ],
+                      actions: ['Side menu → any other section or back to the overview', 'Express interest callout on “How to commission and procure” → the express interest journey'],
+                      note: 'Section addresses: the-problem, how-it-helps, local-impact (impact and worth together), funding-levers, assurance, implementation, nhs-experience, how-to-buy, resources. A product only has the pages it has content for; a section address a product does not have returns “page not found”.',
+                      file: 'app/apps/[slug]/[section]/page.tsx, components/product/Pdp*.tsx, components/PdpSection.tsx',
+                      data: 'Narrative sections from lib/content/productNarratives.ts; funding and deployment information from content/apps/{slug}.json; section titles from lib/pdpSections.ts',
+                      tech: 'Products with section pages: luscii, mycopd, myheart, joint-academy.',
+                      example: '/apps/luscii/the-problem'
+                    },
                     {
                       route: 'Express interest journey', title: 'Express interest journey (7 steps)',
                       access: 'Anyone with the site password',

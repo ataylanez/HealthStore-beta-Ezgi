@@ -51,29 +51,31 @@ export default function PdpFundingLevers({
           <div className="hs-font-bold hs-text-label mb-1" style={{ color: 'var(--text-primary)' }}>
             Tariff and QOF implications
           </div>
-          <p className="hs-text-label" style={{ color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
+          <p className="nhsuk-body-m nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-secondary)' }}>
             {tariffNote}
           </p>
         </div>
       )}
 
       {levers.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        // [Provenance: NHS] grid row, one-half columns from tablet.
+        <div className="nhsuk-grid-row">
           {levers.map((f) => (
-            <div
-              key={f.label}
-              className="hs-surface-card-sm bg-white rounded-lg border p-4"
-              style={{ borderColor: 'var(--border)' }}
-            >
-              <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-                <div className="hs-font-bold hs-text-label" style={{ color: 'var(--text-secondary)' }}>
-                  {f.label}
+            <div key={f.label} className="nhsuk-grid-column-one-half">
+              <div
+                className="hs-surface-card-sm bg-white border p-4 nhsuk-u-margin-bottom-3"
+                style={{ borderColor: 'var(--border)' }}
+              >
+                <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+                  <p className="nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-primary)' }}>
+                    {f.label}
+                  </p>
+                  <span className={leverStatusClass(f.status)}>{f.status}</span>
                 </div>
-                <span className={leverStatusClass(f.status)}>{f.status}</span>
+                <p className="nhsuk-body-s nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-secondary)' }}>
+                  {f.note}
+                </p>
               </div>
-              <p className="hs-text-caption" style={{ color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
-                {f.note}
-              </p>
             </div>
           ))}
         </div>
@@ -81,7 +83,7 @@ export default function PdpFundingLevers({
 
       {schemes.length > 0 && (
         <div>
-          <h3 className="hs-pdp-subheading hs-font-bold mb-3" style={{ fontSize: 'var(--text-card-title-sm)' }}>
+          <h3 className="nhsuk-heading-s hs-pdp-subheading">
             Linked funding schemes
           </h3>
           <div className="grid gap-4 grid-cols-1">

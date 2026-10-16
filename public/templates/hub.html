@@ -13,7 +13,7 @@
       <p class="ds-eyebrow">Templates &middot; T3</p>
       <h1 class="ds-page-title">Hub (card grid)</h1>
       <p class="ds-lede">
-        Landing page that routes users onwards: breadcrumb, H1, intro, then a grid of clickable cards.
+        Landing page that routes users onwards: breadcrumb, title and lede in a two-thirds column, then an NHS card group.
       </p>
     </div>
 
@@ -21,8 +21,8 @@
     <table class="ds-table">
       <thead><tr><th>Route</th><th>H1</th><th>Cards</th></tr></thead>
       <tbody>
-        <tr><td><code>/catalogue</code></td><td>Product catalogue</td><td>&ldquo;Care pathways&rdquo; clickable cards (title + product count) linking to the filtered listing, plus a &ldquo;coming soon&rdquo; grid of non-clickable roadmap cards</td></tr>
-        <tr><td><code>/resources</code></td><td>Resource library</td><td>Four resource clickable cards (title + description)</td></tr>
+        <tr><td><code>/catalogue</code></td><td>Product catalogue</td><td>Clickable cards for live pathways (title and product count) linking to the filtered listing, and secondary cards for pathways that are coming soon, in the same card group</td></tr>
+        <tr><td><code>/resources</code></td><td>Resource library</td><td>Six resource cards (title and description). Five link to section indexes; &ldquo;Long-term management of a DTx&rdquo; has no page yet</td></tr>
       </tbody>
     </table>
 
@@ -30,23 +30,22 @@
     <table class="ds-table">
       <thead><tr><th style="width:26%">Region</th><th>Content</th><th style="width:20%">Who edits</th></tr></thead>
       <tbody>
-        <tr><td>Breadcrumb + page header</td><td>H1 + grey intro paragraph.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
-        <tr><td>Card grid</td><td>Clickable cards in the catalogue <code>app-card</code> style: NHS-blue underlined title, supporting line in secondary text. 2&ndash;3 columns responsive.</td><td><span class="badge badge-green">CMS editor</span> (title, description, destination)</td></tr>
-        <tr><td>Counts / derived labels</td><td>Product counts on catalogue cards come from the product data, not editors.</td><td><span class="badge badge-blue">Automatic</span></td></tr>
-        <tr><td>Secondary sections</td><td>Optional extras: &ldquo;See all products&rdquo; link line, roadmap (&ldquo;coming soon&rdquo;) card grid.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
+        <tr><td>Breadcrumb and page header</td><td>Extra-large title and NHS lede, in the two-thirds column. Breadcrumb sits above the main area.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
+        <tr><td>Card group</td><td>NHS clickable cards, one-third wide, equal height, stacking on small screens. Live cards carry a description and a chevron. Coming-soon cards use the quieter secondary style and are not links.</td><td><span class="badge badge-green">CMS editor</span> (title, description, destination)</td></tr>
+        <tr><td>Counts and derived labels</td><td>Product counts on catalogue cards come from the product data, not editors.</td><td><span class="badge badge-blue">Automatic</span></td></tr>
       </tbody>
     </table>
 
     <h2>Notes</h2>
     <p>
-      One <code>HubPage</code> type with an orderable list of card entries (label, description, link) covers both
+      One <code>HubPage</code> type with an orderable list of card entries (label, description, link, and whether the card is live or coming soon) covers both
       pages. Card destinations can be internal page choosers so links stay valid as the tree changes. The catalogue
-      hub's pathway counts should be computed from the product index at render time.
+      hub&rsquo;s pathway counts should be computed from the product index at render time.
     </p>
 
-    <h3 style="color: var(--text-muted)">On template consolidation</h3>
+    <h3>On template consolidation</h3>
     <ul>
-      <li>Optional: implement the card grid as a StreamField block on <a href="/templates/content-page.html">T2 Content page</a> and drop this template entirely. Trade-off: simpler template count vs a laxer content model.</li>
+      <li>Optional: implement the card group as a StreamField block on <a href="/templates/content-page.html">T2 Content page</a> and drop this template entirely. Trade-off: a smaller template count against a looser content model.</li>
     </ul>
   </div>
   <script src="/DS/assets/ds.js" defer></script>

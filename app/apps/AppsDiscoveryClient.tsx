@@ -57,82 +57,72 @@ export default function AppsDiscoveryClient({
   )
 
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container">
       <PageBreadcrumb items={[{ label: 'Product catalogue' }]} />
-      <div className="hs-section max-w-3xl">
-        <h1 className="page-title-h1 mb-4">Product catalogue</h1>
-        <div className="space-y-2 text-balance" style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-          <p className="m-0">Browse digital therapeutics by pathway and condition.</p>
-        </div>
-      </div>
-
-      <section aria-labelledby="digital-therapeutics-heading">
-        <h2
-          id="digital-therapeutics-heading"
-          className="mb-4 hs-font-bold"
-          style={{ fontFamily: 'Frutiger, Arial, sans-serif', fontSize: 'var(--text-section-alt)', color: 'var(--text-primary)' }}
-        >
-          Care pathways
-        </h2>
-        <ul className="m-0 grid list-none grid-cols-1 gap-6 p-0 sm:grid-cols-2 lg:grid-cols-3">
-          {availableConditions.map(c => (
-            <li key={c.id} className="flex min-h-0">
-              <ClickableChevronCard
-                variant="primary"
-                href={`/catalogue/digital-therapeutics?condition=${encodeURIComponent(c.id)}`}
-                title={c.label}
-                description={`${c.count} ${c.count === 1 ? 'product' : 'products'}`}
-                headingLevel={3}
-                className="w-full"
-              />
-            </li>
-          ))}
-        </ul>
-        <p className="mt-8">
-          <Link
-            href="/catalogue/digital-therapeutics"
-            className="hs-text-body hs-font-bold underline underline-offset-2"
-            style={{ color: 'var(--nhs-blue)' }}
-          >
-            See all products in the catalogue
-          </Link>
-          <span style={{ fontSize: 'var(--text-label)', color: 'var(--text-muted)' }}>
-            {' '}
-            · {totalAppCount} {totalAppCount === 1 ? 'product' : 'products'}
-          </span>
-        </p>
-      </section>
-
-      {roadmapConditions.length > 0 ? (
-        <section aria-labelledby="coming-soon-heading" className="mt-12">
-          <h2
-            id="coming-soon-heading"
-            className="mb-2 hs-font-bold"
-            style={{ fontFamily: 'Frutiger, Arial, sans-serif', fontSize: 'var(--text-card-title-sm)', color: 'var(--text-primary)' }}
-          >
-            Pathways and conditions coming to the NHS HealthStore soon
-          </h2>
-          <p className="mb-4" style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}>
-            The NHS HealthStore is growing. Additional pathways are on our roadmap and will be available as evidence and supplier readiness are confirmed.
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {roadmapConditions.map(c => (
-              <div
-                key={c.id}
-                className="rounded-xl border p-6 text-left"
-                style={{ borderColor: 'var(--border)', background: '#F0F4F5' }}
-              >
-                <div className="hs-font-bold" style={{ fontFamily: 'Frutiger, Arial, sans-serif', fontSize: 'var(--text-card-title-sm)', color: 'var(--text-primary)' }}>
-                  {c.label}
-                </div>
-                <div style={{ fontSize: 'var(--text-label)', color: 'var(--text-muted)', marginTop: 4 }}>
-                  Coming soon
-                </div>
-              </div>
-            ))}
+      <div className="nhsuk-main-wrapper nhsuk-main-wrapper--s">
+        <div className="nhsuk-grid-row">
+          <div className="nhsuk-grid-column-two-thirds">
+            <h1 className="nhsuk-heading-xl">Product catalogue</h1>
+            <p className="nhsuk-lede-text">Browse digital therapeutics by pathway and condition.</p>
           </div>
+        </div>
+
+        <section aria-labelledby="digital-therapeutics-heading" className="nhsuk-u-margin-bottom-7">
+          <h2 id="digital-therapeutics-heading" className="nhsuk-heading-l">
+            Care pathways
+          </h2>
+          {/* [Provenance: NHS] Card group of clickable chevron cards, one-third columns. */}
+          <ul className="nhsuk-grid-row nhsuk-card-group">
+            {availableConditions.map(c => (
+              <li key={c.id} className="nhsuk-grid-column-one-third nhsuk-card-group__item">
+                <ClickableChevronCard
+                  variant="primary"
+                  href={`/catalogue/digital-therapeutics?condition=${encodeURIComponent(c.id)}`}
+                  title={c.label}
+                  description={`${c.count} ${c.count === 1 ? 'product' : 'products'}`}
+                  headingLevel={3}
+                  className="w-full"
+                />
+              </li>
+            ))}
+          </ul>
+          <p className="nhsuk-body-m">
+            <Link href="/catalogue/digital-therapeutics">See all products in the catalogue</Link>
+            <span className="hs-text-label" style={{ color: 'var(--text-secondary)' }}>
+              {' '}
+              · {totalAppCount} {totalAppCount === 1 ? 'product' : 'products'}
+            </span>
+          </p>
         </section>
-      ) : null}
+
+        {roadmapConditions.length > 0 ? (
+          <section aria-labelledby="coming-soon-heading">
+            <div className="nhsuk-grid-row">
+              <div className="nhsuk-grid-column-two-thirds">
+                <h2 id="coming-soon-heading" className="nhsuk-heading-m">
+                  Pathways and conditions coming to the NHS HealthStore soon
+                </h2>
+                <p className="nhsuk-body-m">
+                  The NHS HealthStore is growing. Additional pathways are on our roadmap and will be available as evidence and supplier readiness are confirmed.
+                </p>
+              </div>
+            </div>
+            {/* [Provenance: NHS] Non-clickable cards in a card group. */}
+            <ul className="nhsuk-grid-row nhsuk-card-group">
+              {roadmapConditions.map(c => (
+                <li key={c.id} className="nhsuk-grid-column-one-third nhsuk-card-group__item">
+                  <div className="nhsuk-card nhsuk-card--secondary">
+                    <div className="nhsuk-card__content nhsuk-card__content--secondary">
+                      <h3 className="nhsuk-card__heading nhsuk-heading-s">{c.label}</h3>
+                      <p className="nhsuk-card__description nhsuk-body-s">Coming soon</p>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+      </div>
     </div>
   )
 }

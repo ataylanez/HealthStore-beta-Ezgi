@@ -49,7 +49,7 @@ export default function CoverageSankey({ stages, ariaLabel }: Props) {
               </text>
 
               {/* Label below */}
-              <text x={x + barW / 2} y={topMargin + maxBarH + 24} textAnchor="middle" fontSize={13} fill="#4c6272">
+              <text x={x + barW / 2} y={topMargin + maxBarH + 24} textAnchor="middle" fontSize={14} fill="#4c6272">
                 {stage.label}
               </text>
 
@@ -74,7 +74,7 @@ export default function CoverageSankey({ stages, ariaLabel }: Props) {
                   <g>
                     <path d={`${pathTop} L ${endX} ${nextY + nextBarH} C ${midX} ${nextY + nextBarH}, ${midX} ${y + barH}, ${startX} ${y + barH} Z`}
                       fill="#005eb8" opacity={0.12} />
-                    <text x={midX} y={labelY} textAnchor="middle" fontSize={11} fill="#d5281b" fontWeight={600}>
+                    <text x={midX} y={labelY} textAnchor="middle" fontSize={14} fill="#d5281b" fontWeight={600}>
                       {dropLabel}
                     </text>
                   </g>
@@ -86,9 +86,9 @@ export default function CoverageSankey({ stages, ariaLabel }: Props) {
       </svg>
 
       {/* Accessible table fallback */}
-      <details style={{ marginTop: 8, fontSize: 13 }}>
+      <details className="hs-text-label" style={{ marginTop: 8 }}>
         <summary style={{ cursor: 'pointer', color: '#005eb8' }}>View as table</summary>
-        <table className="hs-table" style={{ marginTop: 8, fontSize: 13 }}>
+        <table className="hs-table" style={{ marginTop: 8 }}>
           <thead>
             <tr>
               <th>Stage</th>

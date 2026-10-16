@@ -48,44 +48,46 @@ export default function SupplierSignInForm() {
   const errorFor = (field: string) => errors.find((er) => er.field === field)?.message
 
   return (
-    <div className="hs-page">
-      <div className="max-w-2xl">
-        <ErrorSummary errors={errors} />
-        <h1 className="page-title-h1">Sign in to the Supplier portal</h1>
-        <p className="nhsuk-body-m">
-          Use the email address and password the NHS HealthStore team sent you. This prototype accepts any email address
-          and password.
-        </p>
-        <form noValidate onSubmit={handleSubmit}>
-          <FormField id="email" label="Email address" error={errorFor('email')}>
-            {(field) => (
-              <TextInput
-                {...field}
-                name="email"
-                type="email"
-                autoComplete="email"
-                spellCheck={false}
-                className="nhsuk-input--width-20"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            )}
-          </FormField>
-          <FormField id="password" label="Password" error={errorFor('password')}>
-            {(field) => (
-              <TextInput
-                {...field}
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                className="nhsuk-input--width-20"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            )}
-          </FormField>
-          <Button type="submit">Sign in</Button>
-        </form>
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <ErrorSummary errors={errors} />
+          <h1 className="nhsuk-heading-xl">Sign in to the Supplier portal</h1>
+          <p className="nhsuk-body-m">
+            Use the email address and password the NHS HealthStore team sent you. This prototype accepts any email address
+            and password.
+          </p>
+          <form noValidate onSubmit={handleSubmit}>
+            <FormField id="email" label="Email address" error={errorFor('email')}>
+              {(field) => (
+                <TextInput
+                  {...field}
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  spellCheck={false}
+                  className="nhsuk-input--width-20"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              )}
+            </FormField>
+            <FormField id="password" label="Password" error={errorFor('password')}>
+              {(field) => (
+                <TextInput
+                  {...field}
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  className="nhsuk-input--width-20"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              )}
+            </FormField>
+            <Button type="submit">Sign in</Button>
+          </form>
+        </div>
       </div>
     </div>
   )

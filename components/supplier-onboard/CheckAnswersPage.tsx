@@ -65,58 +65,60 @@ export default function CheckAnswersPage({ formId }: { formId: string }) {
   }
 
   return (
-    <div className="hs-page">
-      <div className="max-w-3xl">
-        <BackLink href={taskListHref} />
-        <h1 ref={headingRef} tabIndex={-1} className="page-title-h1 outline-none">
-          Check your answers before submitting
-        </h1>
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <BackLink href={taskListHref} />
+          <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
+            Check your answers before submitting
+          </h1>
 
-        {SECTIONS.map((section, sectionIndex) => (
-          <section key={section.id} aria-labelledby={`${section.id}-check-heading`} className="nhsuk-u-margin-bottom-7">
-            <h2 id={`${section.id}-check-heading`} className="nhsuk-heading-m">
-              {sectionIndex + 1}. {section.title}
-            </h2>
-            {section.tasks.map((task) => {
-              const answers = getAnswers(task.id)
-              const visible = visibleQuestions(task, answers)
-              return (
-                <div key={task.id} className="nhsuk-u-margin-bottom-5">
-                  {/* Task title shown only when it is not simply repeated by its single question. */}
-                  {(visible.length !== 1 || visible[0].question.label !== task.title) && (
-                    <h3 className="nhsuk-heading-s nhsuk-u-margin-bottom-2">{task.title}</h3>
-                  )}
-                  <dl className="nhsuk-summary-list">
-                    {visible.map(({ question, step }) => (
-                      <div key={question.id} className="nhsuk-summary-list__row">
-                        <dt className="nhsuk-summary-list__key">
-                          {question.code && (
-                            <span className="nhsuk-u-secondary-text-color nhsuk-body-s nhsuk-u-margin-bottom-0" style={{ display: 'block' }}>
-                              {question.code}
-                            </span>
-                          )}
-                          {question.label}
-                        </dt>
-                        <dd className="nhsuk-summary-list__value">{formatAnswer(question, answers)}</dd>
-                        <dd className="nhsuk-summary-list__actions">
-                          <Link className="hs-link-button" href={taskStepHref(formId, task, step)}>
-                            Change<span className="nhsuk-u-visually-hidden"> {question.code ? `${question.code} ` : ''}{question.label}</span>
-                          </Link>
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              )
-            })}
-          </section>
-        ))}
+          {SECTIONS.map((section, sectionIndex) => (
+            <section key={section.id} aria-labelledby={`${section.id}-check-heading`} className="nhsuk-u-margin-bottom-7">
+              <h2 id={`${section.id}-check-heading`} className="nhsuk-heading-m">
+                {sectionIndex + 1}. {section.title}
+              </h2>
+              {section.tasks.map((task) => {
+                const answers = getAnswers(task.id)
+                const visible = visibleQuestions(task, answers)
+                return (
+                  <div key={task.id} className="nhsuk-u-margin-bottom-5">
+                    {/* Task title shown only when it is not simply repeated by its single question. */}
+                    {(visible.length !== 1 || visible[0].question.label !== task.title) && (
+                      <h3 className="nhsuk-heading-s nhsuk-u-margin-bottom-2">{task.title}</h3>
+                    )}
+                    <dl className="nhsuk-summary-list">
+                      {visible.map(({ question, step }) => (
+                        <div key={question.id} className="nhsuk-summary-list__row">
+                          <dt className="nhsuk-summary-list__key">
+                            {question.code && (
+                              <span className="nhsuk-u-secondary-text-color nhsuk-body-s nhsuk-u-margin-bottom-0" style={{ display: 'block' }}>
+                                {question.code}
+                              </span>
+                            )}
+                            {question.label}
+                          </dt>
+                          <dd className="nhsuk-summary-list__value">{formatAnswer(question, answers)}</dd>
+                          <dd className="nhsuk-summary-list__actions">
+                            <Link className="hs-link-button" href={taskStepHref(formId, task, step)}>
+                              Change<span className="nhsuk-u-visually-hidden"> {question.code ? `${question.code} ` : ''}{question.label}</span>
+                            </Link>
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                )
+              })}
+            </section>
+          ))}
 
-        <h2 className="nhsuk-heading-m">Submit your onboarding form</h2>
-        <p className="nhsuk-body-m">{SUBMISSION_DECLARATION}</p>
-        <Button variant="confirm" onClick={confirmAndSubmit} loading={submitting}>
-          {submitting ? 'Submitting…' : 'Confirm and submit'}
-        </Button>
+          <h2 className="nhsuk-heading-m">Submit your onboarding form</h2>
+          <p className="nhsuk-body-m">{SUBMISSION_DECLARATION}</p>
+          <Button variant="confirm" onClick={confirmAndSubmit} loading={submitting}>
+            {submitting ? 'Submitting…' : 'Confirm and submit'}
+          </Button>
+        </div>
       </div>
     </div>
   )

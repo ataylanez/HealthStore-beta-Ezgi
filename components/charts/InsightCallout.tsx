@@ -19,7 +19,7 @@ export default function InsightCallout({
     <div
       style={{
         borderLeft: '8px solid',
-        padding: '14px 20px',
+        padding: 'var(--space-3) var(--space-4)',
         fontSize: 'var(--text-body)',
         lineHeight: 1.5,
         color: '#212b32',

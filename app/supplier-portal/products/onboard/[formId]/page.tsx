@@ -26,7 +26,7 @@ export default async function SupplierOnboardFormPage({ params }: { params: Para
   if (!form) notFound()
 
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
       <PortalBreadcrumb
         items={[
           { label: 'Product management', href: PORTAL_PATHS.products },
@@ -34,27 +34,26 @@ export default async function SupplierOnboardFormPage({ params }: { params: Para
           { label: form.productName },
         ]}
       />
-      <div className="max-w-3xl">
-        <div className="hs-section">
-          <span className="nhsuk-caption-l">{form.productName}</span>
-          <h1 className="page-title-h1">{SERVICE_NAME}</h1>
-          <p
-            className="m-0 hs-measure leading-relaxed"
-            style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}
-          >
-            Complete each task below to onboard your product to the NHS HealthStore. You can
-            complete the tasks in any order and return to this page at any time.
-          </p>
-          {/* Blue notice panel — same treatment as the Interoperability panel on product pages
-              (PdpAssurancePassport). */}
-          <div className="rounded-lg p-4 mt-4" style={{ background: '#E6F0FB', border: '1px solid var(--border)' }}>
-            <p className="nhsuk-body-m nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-              {ONBOARDING_NOTICE}
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <div className="hs-section">
+            <span className="nhsuk-caption-l">{form.productName}</span>
+            <h1 className="nhsuk-heading-xl">{SERVICE_NAME}</h1>
+            <p className="nhsuk-body-l">
+              Complete each task below to onboard your product to the NHS HealthStore. You can
+              complete the tasks in any order and return to this page at any time.
             </p>
+            {/* NHS inset text for the onboarding notice. */}
+            <div className="nhsuk-inset-text">
+              <span className="nhsuk-u-visually-hidden">Information: </span>
+              <p className="nhsuk-u-margin-bottom-0">
+                {ONBOARDING_NOTICE}
+              </p>
+            </div>
+            {form.actionNeeded && <FormActionNeededNotice formId={form.id} message={form.actionNeeded} />}
           </div>
-          {form.actionNeeded && <FormActionNeededNotice formId={form.id} message={form.actionNeeded} />}
+          <SupplierOnboardingTaskList formId={form.id} />
         </div>
-        <SupplierOnboardingTaskList formId={form.id} />
       </div>
     </div>
   )

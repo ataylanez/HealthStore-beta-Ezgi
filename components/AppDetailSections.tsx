@@ -90,34 +90,34 @@ export function ScaleAndMaturitySection({ app, showDeploymentRegister = true }: 
           className="rounded-lg px-4 py-2 hs-text-label w-fit"
           style={{ background: '#F0F4F5', border: '1px solid var(--border)' }}
         >
-          <span className="hs-text-caption hs-font-bold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Maturity </span>
+          <span className="hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>Maturity </span>
           <MaturityBadge level={app.maturity_level} />
         </div>
         <div
           className="rounded-lg px-4 py-2 hs-text-label w-fit"
           style={{ background: '#F0F4F5', border: '1px solid var(--border)' }}
         >
-          <span className="hs-text-caption hs-font-bold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Evidence strength </span>
+          <span className="hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>Evidence strength </span>
           <EvidenceBadge strength={app.evidence_strength} />
         </div>
       </div>
-      <dl className="space-y-4 hs-text-label mb-6" style={{ color: 'var(--text-secondary)' }}>
+      <dl className="space-y-4 mb-6" style={{ color: 'var(--text-secondary)' }}>
         {app.evidence_strength_rationale && (
           <div>
-            <dt className="hs-text-caption hs-font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--text-muted)' }}>Evidence overview</dt>
-            <dd className="hs-text-label" style={{ lineHeight: 1.6 }}>{app.evidence_strength_rationale}</dd>
+            <dt className="hs-text-label hs-font-bold mb-1" style={{ color: 'var(--text-muted)' }}>Evidence overview</dt>
+            <dd className="nhsuk-body-m nhsuk-u-margin-bottom-0">{app.evidence_strength_rationale}</dd>
           </div>
         )}
         {app.patients_covered_note && (
           <div>
-            <dt className="hs-text-caption hs-font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--text-muted)' }}>Population reach</dt>
+            <dt className="hs-text-label hs-font-bold mb-1" style={{ color: 'var(--text-muted)' }}>Population reach</dt>
             <dd style={{ lineHeight: 1.6 }}>{app.patients_covered_note}</dd>
           </div>
         )}
       </dl>
       {showDeploymentRegister && (
         <div>
-          <div className="hs-text-caption hs-font-bold uppercase tracking-wide mb-4" style={{ color: 'var(--text-muted)' }}>Where it&apos;s live</div>
+          <div className="hs-text-label hs-font-bold mb-4" style={{ color: 'var(--text-muted)' }}>Where it&apos;s live</div>
           <DeploymentRegisterTable rows={deploymentRows} />
         </div>
       )}
@@ -150,14 +150,14 @@ export function WhatItTakesLocallySection({ app, accent }: { app: any; accent: s
     <div>
       {app.local_wraparound && (
         <div className="mb-4 flex flex-wrap items-center gap-2 hs-text-label">
-          <span className="hs-text-caption hs-font-bold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Local effort</span>
+          <span className="hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>Local effort</span>
           <EffortBadge level={app.local_wraparound} />
         </div>
       )}
       {app.local_wraparound_detail && (
-        <p className="hs-text-label mb-4" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>{app.local_wraparound_detail}</p>
+        <p className="nhsuk-body-m" style={{ color: 'var(--text-secondary)' }}>{app.local_wraparound_detail}</p>
       )}
-      <div className="space-y-4 hs-text-label" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+      <div className="space-y-4" style={{ color: 'var(--text-secondary)' }}>
         {app.onboarding_model && (
           <div>
             <strong style={{ color: 'var(--text-primary)' }}>Onboarding model:</strong>{' '}
@@ -192,22 +192,22 @@ export function WhatItTakesLocallySection({ app, accent }: { app: any; accent: s
           </div>
         )}
         {app.escalation_note && (
-          <div className="hs-text-label" style={{ color: 'var(--text-secondary)' }}>
+          <div style={{ color: 'var(--text-secondary)' }}>
             <strong style={{ color: 'var(--text-primary)' }}>Escalation:</strong> {app.escalation_note}
           </div>
         )}
         {app.operating_hours_caveat && (
-          <div className="rounded-lg p-4 hs-text-label" style={{ background: '#FEF5E6', color: '#7A4800' }}>
+          <div className="rounded-lg p-4" style={{ background: '#FEF5E6', color: '#7A4800' }}>
             <strong>Hours caveat:</strong> {app.operating_hours_caveat}
           </div>
         )}
       </div>
       {app.implementation_prerequisites?.length > 0 && (
         <div className="mt-6">
-          <div className="hs-text-caption hs-font-bold uppercase tracking-wide mb-2" style={{ color: 'var(--text-muted)' }}>Prerequisites</div>
+          <div className="hs-text-label hs-font-bold mb-2" style={{ color: 'var(--text-muted)' }}>Prerequisites</div>
           <ul className="space-y-2">
             {app.implementation_prerequisites.map((p: string, i: number) => (
-              <li key={i} className="flex items-start gap-2 hs-text-label" style={{ color: 'var(--text-secondary)' }}>
+              <li key={i} className="flex items-start gap-2" style={{ color: 'var(--text-secondary)' }}>
                 <span className="mt-1 flex-shrink-0" style={{ color: accent }}>✓</span>
                 {p}
               </li>
@@ -252,7 +252,7 @@ function CaseStudyCard({ caseStudy: cs, plain }: { caseStudy: any; plain?: boole
             </div>
           ) : null}
           {cs.outcome ? (
-            <p className="hs-text-label m-0" style={{ color: 'var(--text-primary)', lineHeight: 1.55 }}>{cs.outcome}</p>
+            <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">{cs.outcome}</p>
           ) : null}
         </div>
       ) : null}
@@ -316,7 +316,7 @@ export function PeerReviewedEvaluationCard({
             </div>
           ) : null}
           {study.key_results ? (
-            <p className="hs-text-label m-0" style={{ color: 'var(--text-primary)', lineHeight: 1.55 }}>{study.key_results}</p>
+            <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">{study.key_results}</p>
           ) : null}
         </div>
       ) : null}
@@ -419,13 +419,13 @@ export function DemoAccessSection({ app, accent }: { app: any; accent: string })
   return (
     <div>
       {app.demo_notes && (
-        <p className="hs-text-label mb-4" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>{app.demo_notes}</p>
+        <p className="nhsuk-body-m" style={{ color: 'var(--text-secondary)' }}>{app.demo_notes}</p>
       )}
       {(app.demo_variants?.length > 0 || studiesLink) && (
         <ul className="space-y-2">
           {app.demo_variants?.map((d: any) => (
             <li key={d.url}>
-              <a href={d.url} target="_blank" rel="noopener noreferrer" className="hs-text-label hs-font-normal hover:underline" style={{ color: accent }}>
+              <a href={d.url} target="_blank" rel="noopener noreferrer" className="hs-text-label hs-font-normal underline hover:no-underline" style={{ color: accent }}>
                 {d.label} (opens in a new tab)
               </a>
             </li>
@@ -436,7 +436,7 @@ export function DemoAccessSection({ app, accent }: { app: any; accent: string })
                 href={studiesLink.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hs-text-label hs-font-normal hover:underline"
+                className="hs-text-label hs-font-normal underline hover:no-underline"
                 style={{ color: accent }}
               >
                 {studiesLink.label} (opens in a new tab)
@@ -649,7 +649,7 @@ export function SafetyAndGovernanceSection({ app }: { app: any }) {
       ) : null}
 
       <div>
-        <div className="mb-1 hs-text-caption hs-font-bold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Clinical safety</div>
+        <div className="mb-1 hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>Clinical safety</div>
         <dl>
           <GovernanceRow label="DTAC">
             <span className="inline-flex flex-wrap items-center gap-2">
@@ -677,7 +677,7 @@ export function SafetyAndGovernanceSection({ app }: { app: any }) {
       </div>
 
       <div id="data-information-governance">
-        <div className="mb-1 hs-text-caption hs-font-bold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Data & information governance</div>
+        <div className="mb-1 hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>Data & information governance</div>
         <dl>
           <GovernanceRow label="GDPR / data protection" value={app.gdpr_note} mutedWhenEmpty />
           <GovernanceRow label="ISO 27001" value={app.iso27001} mutedWhenEmpty />

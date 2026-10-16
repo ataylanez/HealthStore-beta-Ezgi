@@ -38,33 +38,34 @@ const RESOURCES = [
 
 export default function ResourcesPage() {
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container">
       <PageBreadcrumb items={[{ label: 'Resource library' }]} />
-      <div className="hs-section">
-        <h1 className="page-title-h1">Resource library</h1>
-        <p
-          className="m-0 hs-measure leading-relaxed"
-          style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}
-        >
-          Training and practical guidance for recommending, enrolling and managing digital therapeutics with patients.
-        </p>
-      </div>
+      <div className="nhsuk-main-wrapper nhsuk-main-wrapper--s">
+        <div className="nhsuk-grid-row">
+          <div className="nhsuk-grid-column-two-thirds">
+            <h1 className="nhsuk-heading-xl">Resource library</h1>
+            <p className="nhsuk-lede-text">
+              Training and practical guidance for recommending, enrolling and managing digital therapeutics with patients.
+            </p>
+          </div>
+        </div>
 
-      {/* NHS secondary cards — same pattern as nhs.uk/nhs-services Urgent / Mental health / Vaccination */}
-      <ul className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-12 p-0 sm:grid-cols-2 lg:grid-cols-3">
-        {RESOURCES.map(item => (
-          <li key={item.title} className="flex h-full min-h-0">
-            <ClickableChevronCard
-              variant="secondary"
-              href={item.href}
-              title={item.title}
-              description={item.description}
-              headingLevel={2}
-              className="flex h-full w-full flex-col"
-            />
-          </li>
-        ))}
-      </ul>
+        {/* [Provenance: NHS] Secondary cards in a card group — same pattern as nhs.uk/nhs-services */}
+        <ul className="nhsuk-grid-row nhsuk-card-group">
+          {RESOURCES.map(item => (
+            <li key={item.title} className="nhsuk-grid-column-one-third nhsuk-card-group__item">
+              <ClickableChevronCard
+                variant="secondary"
+                href={item.href}
+                title={item.title}
+                description={item.description}
+                headingLevel={2}
+                className="flex h-full w-full flex-col"
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }

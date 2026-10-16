@@ -159,7 +159,7 @@ export default function PublishedPageEditor({
       ) : null}
 
       <span className="nhsuk-caption-l">{caption}</span>
-      <h1 ref={headingRef} tabIndex={-1} className="page-title-h1 outline-none">
+      <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
         {title}
       </h1>
 

@@ -42,33 +42,31 @@ export function FundingDirectoryCard({ f }: { f: FundingDirectoryRecord; apps?: 
 
   return (
     // [Provenance: NHS] NHS Card.
-    <article aria-labelledby={titleId} className="nhsuk-card overflow-hidden">
+    <article aria-labelledby={titleId} className="nhsuk-card">
       <div className="nhsuk-card__content">
-        <div className="mb-2">
-          <h3 id={titleId} className="nhsuk-card__heading m-0 leading-snug" style={{ maxWidth: 'none' }}>
-            {f.title}
-          </h3>
-        </div>
+        <h3 id={titleId} className="nhsuk-card__heading nhsuk-heading-m">
+          {f.title}
+        </h3>
 
         {f.total_value ? (
-          <p className="mb-4 m-0 hs-text-body hs-font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
+          <p className="nhsuk-body-m nhsuk-u-font-weight-bold" style={{ color: 'var(--text-primary)' }}>
             {f.total_value}
           </p>
         ) : (
-          <p className="mb-4 m-0 hs-text-label hs-font-normal leading-tight" style={{ color: 'var(--text-muted)' }}>
+          <p className="nhsuk-body-s" style={{ color: 'var(--text-secondary)' }}>
             Amount not stated
           </p>
         )}
 
-        <p className="mb-4 m-0 leading-relaxed" style={{ fontSize: 'var(--text-body)', color: 'var(--text-secondary)' }}>
+        <p className="nhsuk-body-m" style={{ color: 'var(--text-secondary)' }}>
           {f.description}
         </p>
 
-        <p className="mb-4 m-0 hs-text-label leading-snug" style={{ color: 'var(--text-muted)' }}>
+        <p className="nhsuk-body-s" style={{ color: 'var(--text-secondary)' }}>
           {metaLine}
         </p>
 
-        <div className="mb-4 flex flex-wrap gap-1">
+        <div className="nhsuk-u-margin-bottom-3 flex flex-wrap gap-1">
           {f.condition_tags
             .filter(isFundingCondition)
             .map(t => (
@@ -77,19 +75,15 @@ export function FundingDirectoryCard({ f }: { f: FundingDirectoryRecord; apps?: 
         </div>
 
         {f.notes ? (
-          <p className="mb-4 m-0 leading-relaxed" style={{ fontSize: 'var(--text-label)', color: 'var(--text-muted)' }}>
+          <p className="nhsuk-body-s" style={{ color: 'var(--text-secondary)' }}>
             {f.notes}
           </p>
         ) : null}
 
         {f.external_url ? (
-          <a
-            href={f.external_url}
-            className="inline-flex items-center gap-2 py-1 hs-text-label hs-font-bold transition-colors hover:underline focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-            style={{ color: 'var(--nhs-blue)', outlineColor: 'var(--nhs-blue)' }}
-          >
-            <span>{f.external_url_label ?? 'More information'}</span>
-          </a>
+          <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">
+            <a href={f.external_url}>{f.external_url_label ?? 'More information'}</a>
+          </p>
         ) : null}
       </div>
     </article>

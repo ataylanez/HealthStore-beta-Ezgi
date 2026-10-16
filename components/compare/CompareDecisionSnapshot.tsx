@@ -19,7 +19,7 @@ function interopItemsInOrder(items: InteropSnapshotItem[], keys: readonly string
 
 function SnapshotPill({ muted, children }: { muted?: boolean; children: ReactNode }) {
   return (
-    <span className={`badge badge-grey max-w-full text-xs ${muted ? 'opacity-50' : ''}`}>{children}</span>
+    <span className={`badge badge-grey max-w-full ${muted ? 'opacity-50' : ''}`}>{children}</span>
   )
 }
 
@@ -37,7 +37,7 @@ function GovernanceMini({ pills }: { pills: RegulationSnapshotPill[] }) {
     <ul className="m-0 flex list-none flex-wrap gap-1 p-0">
       {pills.map(p => (
         <li key={p.label}>
-          <span className={`badge badge-blue text-xs max-w-full ${p.muted ? 'opacity-50' : ''}`}>{p.label}</span>
+          <span className={`badge badge-blue max-w-full ${p.muted ? 'opacity-50' : ''}`}>{p.label}</span>
         </li>
       ))}
     </ul>
@@ -46,7 +46,7 @@ function GovernanceMini({ pills }: { pills: RegulationSnapshotPill[] }) {
 
 function PricingMini({ card }: { card: Extract<CommissioningSnapshotCard, { kind: 'cost' }> }) {
   if (card.modelPills.length === 0) {
-    return <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Check with supplier</span>
+    return <span className="hs-text-label" style={{ color: 'var(--text-muted)' }}>Check with supplier</span>
   }
   return (
     <div className="flex flex-wrap items-center gap-1">
@@ -54,7 +54,7 @@ function PricingMini({ card }: { card: Extract<CommissioningSnapshotCard, { kind
         <SnapshotPill key={text}>{text}</SnapshotPill>
       ))}
       {card.indicativeNote ? (
-        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{card.indicativeNote}</span>
+        <span className="hs-text-label" style={{ color: 'var(--text-muted)' }}>{card.indicativeNote}</span>
       ) : null}
     </div>
   )
@@ -63,10 +63,10 @@ function PricingMini({ card }: { card: Extract<CommissioningSnapshotCard, { kind
 function IntegrationsMini({ card }: { card: Extract<CommissioningSnapshotCard, { kind: 'interop' }> }) {
   const readyItems = interopItemsInOrder(card.items, INTEGRATION_READY_KEYS)
   if (readyItems.length === 0) {
-    return <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Information not available</span>
+    return <span className="hs-text-label" style={{ color: 'var(--text-muted)' }}>Information not available</span>
   }
   return (
-    <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+    <span className="hs-text-label" style={{ color: 'var(--text-secondary)' }}>
       {readyItems.map(item => item.textLabel ?? item.name).join(' · ')}
     </span>
   )
@@ -74,7 +74,7 @@ function IntegrationsMini({ card }: { card: Extract<CommissioningSnapshotCard, {
 
 function PlatformMini({ card }: { card: Extract<CommissioningSnapshotCard, { kind: 'platform' }> }) {
   return (
-    <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+    <span className="hs-text-label" style={{ color: 'var(--text-secondary)' }}>
       {card.values.join(', ')}
     </span>
   )
@@ -84,9 +84,9 @@ function WhereLiveMini({ app }: { app: App }) {
   const { headline, detail } = getWhereLiveSummary(app)
   return (
     <div>
-      <p className="m-0 text-xs font-bold leading-snug" style={{ color: 'var(--text-primary)' }}>{headline}</p>
+      <p className="nhsuk-body-s nhsuk-u-margin-bottom-0 hs-font-bold" style={{ color: 'var(--text-primary)' }}>{headline}</p>
       {detail ? (
-        <p className="mt-0.5 mb-0 text-xs leading-snug" style={{ color: 'var(--text-secondary)' }}>{detail}</p>
+        <p className="nhsuk-body-s nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-secondary)' }}>{detail}</p>
       ) : null}
     </div>
   )

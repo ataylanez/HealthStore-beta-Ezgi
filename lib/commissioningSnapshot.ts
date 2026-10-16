@@ -95,14 +95,14 @@ function inferProseIntegration(value: string | undefined | null): InteropIntegra
   return null
 }
 
-function regulationCard(app: any): CommissioningSnapshotCard {
+function regulationCard(app: any, opts?: { governanceHref?: string }): CommissioningSnapshotCard {
   const refs = (app.nice_guidance_refs ?? []) as { type?: string }[]
   const hasEva = refs.some(r => r.type === 'EVA')
 
   return {
     kind: 'regulation',
     label: 'Governance',
-    href: '#data-information-governance',
+    href: opts?.governanceHref ?? '#data-information-governance',
     pills: [
       { label: 'NICE-EVA', muted: !hasEva },
       { label: 'DTAC' },
@@ -212,9 +212,9 @@ function interopCard(app: any, opts?: { interopHref?: string }): CommissioningSn
 /** Grid callout cards: governance, pricing model, platform, integration ready (where-live is the 4th slot in the UI). */
 export function getCommissioningSnapshot(
   app: any,
-  opts?: { commercialHref?: string; interopHref?: string; demoHref?: string },
+  opts?: { commercialHref?: string; interopHref?: string; demoHref?: string; governanceHref?: string },
 ): CommissioningSnapshotCard[] {
-  return [regulationCard(app), platformCard(app, opts), costCard(app, opts), interopCard(app, opts)]
+  return [regulationCard(app, opts), platformCard(app, opts), costCard(app, opts), interopCard(app, opts)]
 }
 
 export function getFundingSnapshotCard(

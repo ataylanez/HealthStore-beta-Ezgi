@@ -15,29 +15,31 @@ export default function NotFoundContent() {
   const isPortal = pathname?.startsWith(PORTAL_BASE_PATH) ?? false
 
   return (
-    <div className="hs-page">
-      <div className="max-w-2xl">
-        <h1 className="page-title-h1">Page not found</h1>
-        <p className="nhsuk-body-m">If you entered a web address please check it was correct.</p>
-        <p className="nhsuk-body-m">
-          {isPortal ? (
-            <>
-              Why not browse the{' '}
-              <Link className="nhsuk-link" href={PORTAL_PATHS.dashboard}>
-                Supplier portal dashboard
-              </Link>{' '}
-              to manage your products and pages?
-            </>
-          ) : (
-            <>
-              Why not browse the{' '}
-              <Link className="nhsuk-link" href="/">
-                Commissioning Store homepage
-              </Link>{' '}
-              to find products and information?
-            </>
-          )}
-        </p>
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <h1 className="nhsuk-heading-xl">Page not found</h1>
+          <p className="nhsuk-body-m">If you entered a web address please check it was correct.</p>
+          <p className="nhsuk-body-m">
+            {isPortal ? (
+              <>
+                Why not browse the{' '}
+                <Link className="nhsuk-link" href={PORTAL_PATHS.dashboard}>
+                  Supplier portal dashboard
+                </Link>{' '}
+                to manage your products and pages?
+              </>
+            ) : (
+              <>
+                Why not browse the{' '}
+                <Link className="nhsuk-link" href="/">
+                  Commissioning Store homepage
+                </Link>{' '}
+                to find products and information?
+              </>
+            )}
+          </p>
+        </div>
       </div>
     </div>
   )

@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import type { App } from '@/lib/data'
 import type { ProductNarrative } from '@/lib/content/productModel'
 import { PdpSection } from '@/components/PdpSection'
@@ -6,6 +5,7 @@ import { pdpSectionTitle } from '@/lib/pdpSections'
 import { deriveAssuranceDomains } from '@/lib/content/assuranceDomains'
 import { splitPdpEvidence } from '@/lib/pdpEvidence'
 import PdpClinicalPublications from '@/components/product/PdpClinicalPublications'
+import PdpRegulatoryPosition from '@/components/product/PdpRegulatoryPosition'
 import { STORE_ACCENT } from '@/lib/storeAccent'
 
 /**
@@ -58,55 +58,7 @@ export default function PdpAssurancePassport({
   const interopDomain = domains.find((d) => d.domain === INTEROP_DOMAIN)
 
   const material = packDomains.filter((d) => d.status === 'incomplete' || d.status === 'expired')
-  const reg = narrative.regulatory_position
-  const speedNote = reg?.assurance_speed_note
-
-  const linkStyle = { color: STORE_ACCENT }
-  const regFacts: { label: string; value: ReactNode }[] = []
-  if (reg?.nice) {
-    regFacts.push({
-      label: 'NICE recommendation',
-      value: (
-        <>
-          <a href={reg.nice.url} target="_blank" rel="noopener noreferrer" className="nhsuk-link" style={linkStyle}>
-            {reg.nice.ref}
-          </a>
-          <span className="block">Last updated {reg.nice.last_updated}</span>
-        </>
-      ),
-    })
-  }
-  if (reg?.device_class) {
-    regFacts.push({
-      label: 'Medical device classification',
-      value: (
-        <>
-          <span className="block">{reg.device_class}</span>
-          {reg.mhra_pard && (
-            <a href={reg.mhra_pard.url} target="_blank" rel="noopener noreferrer" className="nhsuk-link" style={linkStyle}>
-              MHRA PARD record
-            </a>
-          )}
-        </>
-      ),
-    })
-  }
-  if (reg && reg.dtac_complete !== undefined) {
-    regFacts.push({
-      label: 'DTAC status',
-      value: reg.dtac_complete ? (
-        <>
-          <strong className="nhsuk-tag nhsuk-tag--green">Complete</strong>
-          <span className="block mt-1">Evidence provided</span>
-        </>
-      ) : (
-        <>
-          <strong className="nhsuk-tag nhsuk-tag--grey">Not complete</strong>
-          <span className="block mt-1">Evidence not provided</span>
-        </>
-      ),
-    })
-  }
+  const speedNote = narrative.regulatory_position?.assurance_speed_note
 
   return (
     <PdpSection
@@ -147,21 +99,7 @@ export default function PdpAssurancePassport({
       )}
 
       {/* R4-2 B: dedicated regulatory-position card */}
-      {regFacts.length > 0 && (
-        <div>
-          <div className="hs-font-bold hs-text-body mb-3" style={{ color: 'var(--text-primary)' }}>
-            Regulatory position
-          </div>
-          <dl className="grid gap-3 sm:grid-cols-3" style={{ margin: 0 }}>
-            {regFacts.map((f) => (
-              <div key={f.label}>
-                <dt className="hs-text-label hs-font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{f.label}</dt>
-                <dd className="hs-text-label" style={{ color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>{f.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      )}
+      <PdpRegulatoryPosition narrative={narrative} />
 
       {/* R3-2 D: NHS task list for domain status (replaces compact chips) */}
       {packDomains.length > 0 && (
@@ -229,13 +167,13 @@ export default function PdpAssurancePassport({
       {/* Evidence half — NICE guidance (moved from the Clinical evidence tab). */}
       {(niceRefs.length > 0 || niceEvidence.length > 0) && (
         <div>
-          <h3 className="hs-pdp-subheading hs-font-bold mb-3" style={{ fontSize: 'var(--text-card-title-sm)' }}>
+          <h3 className="nhsuk-heading-s hs-pdp-subheading">
             NICE guidance
           </h3>
           <div className="space-y-2">
             {niceRefs.map((r: any) => (
               <p key={r.ref} className="m-0 hs-text-body" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                <a href={r.url} className="hover:underline" style={{ color: STORE_ACCENT }}>
+                <a href={r.url} className="underline hover:no-underline" style={{ color: STORE_ACCENT }}>
                   {r.ref}
                 </a>
                 {[r.type, r.date, r.note].filter(Boolean).length > 0 ? (
@@ -249,7 +187,7 @@ export default function PdpAssurancePassport({
             {niceEvidence.map((s: any, i: number) => (
               <p key={s.id ?? i} className="m-0 hs-text-body" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 {s.url_full_text ? (
-                  <a href={s.url_full_text} className="hover:underline" style={{ color: STORE_ACCENT }}>
+                  <a href={s.url_full_text} className="underline hover:no-underline" style={{ color: STORE_ACCENT }}>
                     {s.ref}
                   </a>
                 ) : (

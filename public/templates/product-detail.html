@@ -13,7 +13,8 @@
       <p class="ds-eyebrow">Templates &middot; T6</p>
       <h1 class="ds-page-title">Product detail page</h1>
       <p class="ds-lede">
-        The richest template. This can be rendered from a structured internal product record plus CMS editor.
+        A small set of pages for one product: an overview and one page per section, sharing a contents list and a two-thirds reading column.
+        Rendered from a structured product record plus CMS-edited narrative.
       </p>
     </div>
 
@@ -21,28 +22,33 @@
     <table class="ds-table">
       <thead><tr><th>Route</th><th>H1</th><th>Notes</th></tr></thead>
       <tbody>
-        <tr><td><code>/apps/[slug]</code></td><td><em>Product name</em></td><td></td></tr>
+        <tr><td><code>/apps/[slug]</code></td><td><em>Product name</em>, with the supplier as a caption inside the title</td><td>Overview: short summary of each section, plus links into the section pages</td></tr>
+        <tr><td><code>/apps/[slug]/[section]</code></td><td>The section heading (the product name stays in the contents list)</td><td>One page each for: the problem, how it helps, local impact, what it could be worth, funding levers, assurance, implementation, NHS experience, how to buy, resources</td></tr>
       </tbody>
     </table>
 
     <h2>Structure and content regions</h2>
+    <p>Both the overview and the section pages use the same frame, so the contents list does not move as you go from page to page.</p>
     <table class="ds-table">
       <thead><tr><th style="width:26%">Region</th><th>Content</th><th style="width:20%">Who edits</th></tr></thead>
       <tbody>
-        <tr><td>Hero</td><td>Logo, product name (H1), supplier, product proposition, badges, EOI/compare actions.</td><td><span class="badge badge-blue">Product record</span> <span class="badge badge-green">CMS editor</span> (product proposition)</td></tr>
-        <tr><td>&ldquo;On this page&rdquo; side-nav</td><td>Sticky left nav titled with the product name; labels come from the same source of truth as the section headings.</td><td><span class="badge badge-blue">Automatic</span></td></tr>
-        <tr><td>Content narrative</td><td>Divider-separated sections: the problem it addresses, how it helps, what it could mean locally, what it could be worth, funding levers, assurance and evidence, making it work at your site, NHS experience, how to commission and procure, resources.</td><td><span class="badge badge-blue">Product record</span> <span class="badge badge-green">CMS editor</span></td></tr>
-        <tr><td>(<strong>TBC</strong>) Local value / projected impact</td><td>ROI and cohort modelling.</td><td><span class="badge badge-amber">Site functionality</span> (model + reference data)</td></tr>
-        <tr><td>Express-interest callout</td><td>CTA into the EOI journey (T7).</td><td><span class="badge badge-amber">Site functionality</span></td></tr>
+        <tr><td>Breadcrumb</td><td>Home, catalogue, product. On a section page, the section is the current page and is left off the trail. Sits above the main area.</td><td><span class="badge badge-blue">Automatic</span></td></tr>
+        <tr><td>Contents list</td><td>One-third column. NHS contents list of the overview and the sections. The current page is bold text; the others are links. Labels come from the same list as the section headings.</td><td><span class="badge badge-blue">Automatic</span></td></tr>
+        <tr><td>Title</td><td>Two-thirds column. Extra-large heading. The supplier name is a caption inside the heading, then the value proposition as lede text, then condition and maturity tags, and Add to compare.</td><td><span class="badge badge-blue">Product record</span> <span class="badge badge-green">CMS editor</span> (value proposition)</td></tr>
+        <tr><td>Commissioning snapshot</td><td>A short strip of cost, evidence, where it is live, and funding. Each part links to the matching section page.</td><td><span class="badge badge-blue">Product record</span></td></tr>
+        <tr><td>Overview summaries</td><td>On the overview only: one block per section, with a short summary and a &ldquo;read more&rdquo; link to that section&rsquo;s page.</td><td><span class="badge badge-blue">Product record</span> <span class="badge badge-green">CMS editor</span></td></tr>
+        <tr><td>Section body</td><td>On a section page: the full narrative for that section (prose, lists, summary lists, tables, or the local-value model).</td><td><span class="badge badge-blue">Product record</span> <span class="badge badge-green">CMS editor</span></td></tr>
+        <tr><td>Local value and projected impact</td><td>Cohort and worth modelling on the local-impact and local-value pages.</td><td><span class="badge badge-amber">Site functionality</span> (model and reference data)</td></tr>
+        <tr><td>Express-interest callout</td><td>At the foot of the column. Call to action into the EOI journey (T7).</td><td><span class="badge badge-amber">Site functionality</span></td></tr>
       </tbody>
     </table>
 
     <h2>Notes</h2>
     <p>
-      <strong>Wagtail consideration note:</strong> Products should be a first-class Wagtail page type with typed fields and per-section StreamFields, replacing
-      today&rsquo;s <code>content/apps/*.json</code> + narrative files. Section titles live in one place
-      (<code>lib/pdpSections.ts</code> today) &mdash; keep that principle so the sidebar and headings stay in sync.
-      The local-value modelling and compare/EOI actions are site functionality layered onto the page, not CMS content.
+      <strong>Wagtail consideration note:</strong> Products should be a first-class Wagtail page type with typed fields and a child page (or routable section) per narrative section, replacing
+      today&rsquo;s <code>content/apps/*.json</code> files. Section titles live in one place
+      (<code>lib/pdpSections.ts</code> today) so the contents list and the on-page headings stay in step.
+      The local-value modelling, compare and express-interest actions are site functionality layered onto the page, not CMS content.
     </p>
   </div>
   <script src="/DS/assets/ds.js" defer></script>

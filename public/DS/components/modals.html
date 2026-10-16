@@ -15,7 +15,8 @@
       <p class="ds-lede">
         Overlay surfaces for focused tasks. The overlay/panel/focus-trap recipe is now a single shared
         <code>Modal</code> primitive (<code>components/ui/Modal.tsx</code>) with <code>center</code> and
-        <code>drawer</code> variants. The three portal modals and the AI drawer all run on it.
+        <code>drawer</code> variants. Two consumers remain: the <strong>AI advisor</strong> drawer and the <strong>Clear prototype data</strong>
+        confirmation. Express interest is no longer a modal (it is a multi-step journey) and the share panel was removed.
       </p>
     </div>
 
@@ -24,33 +25,32 @@
       <div class="ds-meta"><div class="ds-meta__k">Hooks</div><div class="ds-meta__v"><code>useFocusTrap</code>, <code>useEscape</code>, <code>useLockBodyScroll</code></div></div>
     </div>
 
-    <h2>Anatomy (static preview)</h2>
+    <h2>Anatomy (static preview) &mdash; centre variant</h2>
     <p>The modal sits on a blurred/tinted scrim. A header with a title and a close button, a scrollable body, and a footer with the primary action.</p>
     <div class="ds-example ds-example--surface">
       <div style="position:relative;border-radius:12px;overflow:hidden;background:rgba(26,35,50,0.35);padding:32px;min-height:280px;display:flex;align-items:center;justify-content:center">
         <div role="dialog" aria-labelledby="m-title" aria-modal="true" style="width:100%;max-width:420px;background:#fff;border-radius:16px;box-shadow:var(--shadow-lg);overflow:hidden">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--border)">
-            <h3 id="m-title" class="ds-u-mt0" style="margin:0;font-size:1.1rem">Express interest in Clinitouch</h3>
+            <h3 id="m-title" class="ds-u-mt0" style="margin:0;font-size:1.1rem">Clear prototype data</h3>
             <button class="ds-btn ds-btn--ghost ds-btn--icon" type="button" aria-label="Close">&times;</button>
           </div>
           <div style="padding:20px">
-            <div class="ds-field" style="margin-bottom:12px"><label class="ds-field__label">Your name</label><input class="ds-input" aria-label="Name demo" value="Alex Carter" readonly style="background:#F7F9FC"></div>
-            <div class="ds-field" style="margin-bottom:0"><label class="ds-field__label">Message to supplier</label><textarea class="ds-textarea" aria-label="Message demo"></textarea></div>
+            <p class="ds-u-mt0" style="margin:0">This clears the compare basket, cookie choice and supplier portal state stored in this browser.</p>
           </div>
           <div style="padding:16px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px">
             <button class="ds-btn ds-btn--ghost" type="button">Cancel</button>
-            <button class="ds-btn ds-btn--primary" type="button">Send interest</button>
+            <button class="ds-btn ds-btn--destructive" type="button">Clear data</button>
           </div>
         </div>
       </div>
     </div>
 
     <h2>Destructive confirmation</h2>
-    <p><code>ClearDataModal</code> is a multi-step destructive flow — the confirm action uses the destructive variant.</p>
+    <p><code>ClearDataModal</code> (opened from the footer) is a destructive flow &mdash; the confirm action uses the destructive button variant and dismissal is locked while clearing.</p>
     <div class="ds-example ds-example--surface">
       <div role="dialog" aria-labelledby="m2-title" style="max-width:420px;margin:0 auto;background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-lg);padding:20px">
-        <h3 id="m2-title" class="ds-u-mt0" style="margin-top:0">Clear all organisation data?</h3>
-        <p class="ds-u-mt0" style="color:var(--text-secondary);font-size:.92rem">This removes saved apps, comparisons and expressions of interest for this organisation. This cannot be undone.</p>
+        <h3 id="m2-title" class="ds-u-mt0" style="margin-top:0">Clear prototype data?</h3>
+        <p class="ds-u-mt0" style="color:var(--text-secondary);font-size:.92rem">This removes the compare basket, your cookie choice and any supplier portal drafts stored in this browser. This cannot be undone.</p>
         <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
           <button class="ds-btn ds-btn--ghost" type="button">Cancel</button>
           <button class="ds-btn ds-btn--destructive" type="button">Delete everything</button>
@@ -63,11 +63,9 @@
     <table class="ds-table">
       <thead><tr><th>Shell</th><th>Variant</th><th>Portal</th><th>Escape</th><th>Focus trap</th><th>Restore focus</th></tr></thead>
       <tbody>
-        <tr><td><code>ExpressInterestModal</code></td><td>center</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Previous</td></tr>
         <tr><td><code>ClearDataModal</code></td><td>center</td><td>Yes</td><td>Yes (locked while loading)</td><td>Yes</td><td>Previous</td></tr>
-        <tr><td><code>SharePagePanel</code></td><td>center</td><td>Yes</td><td>Yes</td><td>Yes</td><td>To trigger</td></tr>
         <tr><td><code>AiAdvisorPanel</code></td><td>drawer</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Previous</td></tr>
-        <tr><td><code>ProductVideosSection</code> lightbox</td><td>bespoke</td><td>Yes</td><td>Yes</td><td>Yes</td><td>To trigger</td></tr>
+        <tr><td><code>ProductVideosSection</code> lightbox (PDP resources)</td><td>bespoke</td><td>Yes</td><td>Yes</td><td>Yes</td><td>To trigger</td></tr>
       </tbody>
     </table>
 
@@ -92,7 +90,7 @@
       <li>Background content is inert / not tabbable.</li>
     </ul>
 
-    <div class="ds-note ds-note--source">Source: <code>components/ui/Modal.tsx</code> (+ <code>useFocusTrap</code>, <code>useEscape</code>, <code>useLockBodyScroll</code>). Consumers: <code>ExpressInterestModal</code>, <code>ClearDataModal</code>, <code>SharePagePanel</code>, <code>AiAdvisorPanel</code>.</div>
+    <div class="ds-note ds-note--source">Source: <code>components/ui/Modal.tsx</code> (+ <code>useFocusTrap</code>, <code>useEscape</code>, <code>useLockBodyScroll</code>). Consumers: <code>ClearDataModal</code>, <code>AiAdvisorPanel</code>.</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

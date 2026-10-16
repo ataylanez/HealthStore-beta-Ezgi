@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Supplier portal — HealthStore Design System</title>
+  <link rel="stylesheet" href="/DS/assets/ds.css">
+</head>
+<body>
+  <div id="ds-root" data-ds-page="supplier-portal" data-ds-provenance="NHS">
+    <div class="ds-page-header">
+      <p class="ds-eyebrow">Patterns</p>
+      <h1 class="ds-page-title">Supplier portal</h1>
+      <p class="ds-lede">
+        The signed-in area for suppliers (<code>/supplier-portal</code>). It is built almost entirely from NHS components: a card-group
+        dashboard, task lists, one-question-per-page forms, summary-list check-your-answers pages and confirmation panels.
+        This page replaces the retired &ldquo;Dashboard&rdquo; pattern (commissioner dashboards were removed from the product).
+      </p>
+    </div>
+
+    <h2>Anatomy</h2>
+    <ol>
+      <li><strong>Sign in</strong> (<code>/supplier-portal/sign-in</code>) &mdash; <code>SupplierSignInForm</code>: two-thirds column, <code>nhsuk-heading-xl</code>, NHS inputs, primary button. Gate is prototype-only (<code>PortalGuard</code>, localStorage).</li>
+      <li><strong>Dashboard</strong> (<code>/supplier-portal</code>) &mdash; supplier name as <code>nhsuk-caption-l</code> above <code>nhsuk-heading-xl</code> &ldquo;Dashboard&rdquo;, an <code>nhsuk-body-l</code> intro, an <strong>attention list</strong> (<code>DashboardAttentionList</code>, two-thirds) of items needing action, then a <code>nhsuk-card-group</code> of five <code>ClickableChevronCard</code>s: Company information, Product management, Published pages, Contact, Account management.</li>
+      <li><strong>Section hubs</strong> (<code>/products</code>, <code>/published</code>) &mdash; same card-group recipe; tables (<code>ManagedProductsTable</code>, <code>OnboardingFormsTable</code>, <code>PublishedPagesTable</code>, <code>StatusTable</code>) list items with a <code>PortalStatusTag</code>.</li>
+      <li><strong>Onboarding a product</strong> (<code>/products/onboard/[formId]</code>) &mdash; an NHS <code>nhsuk-task-list</code> (<code>SupplierOnboardingTaskList</code>) of tasks; each task is a sequence of one-question pages (<code>TaskQuestionPage</code>) ending in a check-your-answers page and a confirmation panel.</li>
+      <li><strong>Editing a field</strong> (<code>/products/manage/[productId]/[field]</code>) &mdash; <code>ProductFieldEditor</code>: product name as <code>nhsuk-caption-l</code>, question as the page title, NHS form group with hint and error message, <code>NhsFileUpload</code> for documents, <strong>Save and continue</strong>.</li>
+      <li><strong>Check answers</strong> &mdash; <code>nhsuk-summary-list</code> with Change links (<code>ProductCheckAnswers</code>, <code>CompanyCheckAnswers</code>, <code>PublishedPageCheckAnswers</code>).</li>
+      <li><strong>Confirmation</strong> &mdash; green <code>nhsuk-panel</code> plus &ldquo;What happens next&rdquo; (<code>ProductSubmissionConfirmation</code>, <code>CompanyConfirmation</code>, <code>PublishedPageConfirmation</code>).</li>
+      <li><strong>Review states</strong> &mdash; <code>ActionNeededCallout</code> / <code>FormActionNeededNotice</code> (<code>nhsuk-warning-callout</code>) when the HealthStore team sends something back; <code>ReviewStatusSummary</code> for the current state.</li>
+    </ol>
+
+    <h2>Status tags</h2>
+    <p><code>PortalStatusTag</code> maps portal states to stock NHS tag colours &mdash; no new styles.</p>
+    <div class="ds-example ds-example--surface">
+      <div class="ds-u-row">
+        <span class="badge badge-grey" style="background:#fff;border:1px solid var(--border)">Incomplete</span>
+        <span class="badge badge-green">Submitted</span>
+        <span class="badge badge-red">Action needed</span>
+        <span class="badge badge-blue">Up to date</span>
+        <span class="badge badge-amber">Draft changes</span>
+      </div>
+    </div>
+    <table class="ds-table">
+      <thead><tr><th>State</th><th>NHS tag</th></tr></thead>
+      <tbody>
+        <tr><td>Incomplete</td><td><code>nhsuk-tag--white</code></td></tr>
+        <tr><td>Submitted</td><td><code>nhsuk-tag--green</code></td></tr>
+        <tr><td>Action needed</td><td><code>nhsuk-tag--red</code></td></tr>
+        <tr><td>Up to date</td><td><code>nhsuk-tag--blue</code></td></tr>
+        <tr><td>Draft changes</td><td><code>nhsuk-tag--yellow</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2>Dashboard layout</h2>
+    <div class="ds-example ds-layout-demo">
+      <div class="nhsuk-width-container">
+        <span class="nhsuk-caption-xl" style="font-size:1.1875rem;margin:0 16px">Example Health Ltd</span>
+        <h1 class="nhsuk-heading-xl" style="margin:0 16px 16px">Dashboard</h1>
+        <div class="nhsuk-grid-row">
+          <div class="nhsuk-grid-column-two-thirds">
+            <div style="background:#fff;border-left:8px solid #ffb81c;padding:16px;margin-bottom:24px">
+              <p style="margin:0 0 4px;font-weight:600">Action needed</p>
+              <p style="margin:0">Luscii &mdash; DTAC evidence needs a newer document. <a href="#ds-main">Update</a></p>
+            </div>
+          </div>
+        </div>
+        <ul class="nhsuk-grid-row nhsuk-card-group">
+          <li class="nhsuk-grid-column-one-third nhsuk-card-group__item"><div class="nhsuk-card nhsuk-card--clickable"><div class="nhsuk-card__content nhsuk-card__content--primary"><h3 class="nhsuk-card__heading nhsuk-heading-m"><a class="nhsuk-card__link" href="#ds-main">Company information</a></h3><p class="nhsuk-card__description">Manage company information and documents.</p></div></div></li>
+          <li class="nhsuk-grid-column-one-third nhsuk-card-group__item"><div class="nhsuk-card nhsuk-card--clickable"><div class="nhsuk-card__content nhsuk-card__content--primary"><h3 class="nhsuk-card__heading nhsuk-heading-m"><a class="nhsuk-card__link" href="#ds-main">Product management</a></h3><p class="nhsuk-card__description">Onboard and manage product assurance information.</p></div></div></li>
+          <li class="nhsuk-grid-column-one-third nhsuk-card-group__item"><div class="nhsuk-card nhsuk-card--clickable"><div class="nhsuk-card__content nhsuk-card__content--primary"><h3 class="nhsuk-card__heading nhsuk-heading-m"><a class="nhsuk-card__link" href="#ds-main">Published pages</a></h3><p class="nhsuk-card__description">Publish and manage pages visible on the store.</p></div></div></li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Loading state</h2>
+    <p><code>PortalSkeletonPage</code> holds the title and card-group shape while the portal state hydrates from localStorage.</p>
+
+    <div class="ds-dosdonts">
+      <div class="ds-panel ds-panel--do">
+        <p class="ds-panel__head">Do</p>
+        <ul>
+          <li>Ask one question per page; put the product or company name in a <code>nhsuk-caption-l</code> above the question.</li>
+          <li>Finish every task with check-your-answers and a confirmation panel.</li>
+          <li>Keep status language to the five states above.</li>
+        </ul>
+      </div>
+      <div class="ds-panel ds-panel--dont">
+        <p class="ds-panel__head">Don't</p>
+        <ul>
+          <li>Build widget or KPI dashboards &mdash; the attention list and card group are the whole dashboard.</li>
+          <li>Invent new tag colours for statuses.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Components used</h2>
+    <p>
+      <a href="/DS/components/cards.html">Card group &amp; chevron cards</a> &middot;
+      <a href="/DS/components/forms.html">Forms, file upload &amp; task list</a> &middot;
+      <a href="/DS/components/summary-list.html">Summary list</a> &middot;
+      <a href="/DS/components/panel.html">Confirmation panel</a> &middot;
+      <a href="/DS/components/alerts.html">Warning callout</a> &middot;
+      <a href="/DS/components/badges-tags.html">Tags</a> &middot;
+      <a href="/DS/components/tables.html">Tables</a> &middot;
+      <a href="/DS/components/loading.html">Skeletons</a>
+    </p>
+
+    <div class="ds-note ds-note--source">Source: <code>app/supplier-portal/**</code>, <code>components/supplier-portal/*</code>, <code>components/supplier-onboard/*</code>, <code>components/nhs/NhsFileUpload.tsx</code>.</div>
+  </div>
+  <script src="/DS/assets/ds.js" defer></script>
+</body>
+</html>

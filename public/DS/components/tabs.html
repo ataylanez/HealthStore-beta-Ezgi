@@ -4,77 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>Tabs — HealthStore Design System</title>
+  <title>Tabs (archived) — HealthStore Design System</title>
   <link rel="stylesheet" href="/DS/assets/ds.css">
 </head>
 <body>
-  <div id="ds-root" data-ds-page="tabs" data-ds-provenance="NHS">
+  <div id="ds-root" data-ds-page="archived" data-ds-provenance="Bespoke">
     <div class="ds-page-header">
-      <p class="ds-eyebrow">Components</p>
-      <h1 class="ds-page-title">Tabs</h1>
-      <p class="ds-lede">
-        Tabs organise the product detail page into sections. The implementation follows NHS/GOV.UK tab structure with
-        full keyboard support and a clear selected state. One of the strongest accessibility patterns in the product.
-      </p>
+      <p class="ds-eyebrow">Components &middot; Archived</p>
+      <h1 class="ds-page-title">Tabs (archived)</h1>
     </div>
-
-    <div class="ds-meta-grid">
-      <div class="ds-meta"><div class="ds-meta__k">Component</div><div class="ds-meta__v"><code>PdpTabs</code> / <code>PdpTab</code></div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Classes</div><div class="ds-meta__v"><code>.nhsuk-tabs*</code></div></div>
+    <div class="ds-note">
+      <strong>This page is kept only so older audit reports still resolve.</strong> <code>nhsuk-tabs</code> was used on the product detail page (<code>PdpTabs</code>) for Evidence / Deployment / Commercial / Technical. In Round 9&ndash;10 each tab became its own page under <code>/apps/[slug]/[section]</code>, navigated with an NHS contents list. No component in the app renders tabs any more.
     </div>
-
-    <h2>Example</h2>
-    <p>Click a tab, or focus one and use the left/right arrow keys.</p>
-    <div class="ds-example">
-      <div class="nhsuk-tabs" data-ds-tabs>
-        <ul class="nhsuk-tabs__list" role="tablist">
-          <li class="nhsuk-tabs__list-item nhsuk-tabs__list-item--selected"><a class="nhsuk-tabs__tab" role="tab" aria-selected="true" href="#tab-overview">Overview</a></li>
-          <li class="nhsuk-tabs__list-item"><a class="nhsuk-tabs__tab" role="tab" aria-selected="false" href="#tab-evidence">Evidence</a></li>
-          <li class="nhsuk-tabs__list-item"><a class="nhsuk-tabs__tab" role="tab" aria-selected="false" href="#tab-deployment">Deployment &amp; adoption</a></li>
-          <li class="nhsuk-tabs__list-item"><a class="nhsuk-tabs__tab" role="tab" aria-selected="false" href="#tab-commercial">Commercial</a></li>
-        </ul>
-        <div class="nhsuk-tabs__panel" id="tab-overview" role="tabpanel">
-          <h3 class="ds-u-mt0" style="margin-top:0">Overview</h3>
-          <p class="ds-u-mt0">Why it matters locally, context of use, and the one-line value proposition.</p>
-        </div>
-        <div class="nhsuk-tabs__panel nhsuk-tabs__panel--hidden" id="tab-evidence" role="tabpanel">
-          <h3 class="ds-u-mt0" style="margin-top:0">Evidence</h3>
-          <p class="ds-u-mt0">Clinical evidence, case studies and NICE guidance references.</p>
-        </div>
-        <div class="nhsuk-tabs__panel nhsuk-tabs__panel--hidden" id="tab-deployment" role="tabpanel">
-          <h3 class="ds-u-mt0" style="margin-top:0">Deployment &amp; adoption</h3>
-          <p class="ds-u-mt0">Where it's live, scale and maturity, and what it takes locally.</p>
-        </div>
-        <div class="nhsuk-tabs__panel nhsuk-tabs__panel--hidden" id="tab-commercial" role="tabpanel">
-          <h3 class="ds-u-mt0" style="margin-top:0">Commercial</h3>
-          <p class="ds-u-mt0">Indicative cost, procurement routes, tariff considerations and related funding.</p>
-        </div>
-      </div>
-    </div>
-<pre class="ds-code"><code>&lt;PdpTabs&gt;
-  &lt;PdpTab label="Overview"&gt; &hellip; &lt;/PdpTab&gt;
-  &lt;PdpTab label="Evidence"&gt; &hellip; &lt;/PdpTab&gt;
-&lt;/PdpTabs&gt;</code></pre>
-
-    <h2>States</h2>
-    <ul>
-      <li><strong>Selected</strong> — white panel-connected tab, blue top border, bold label.</li>
-      <li><strong>Inactive</strong> — grey <code>#f0f4f5</code> background, regular weight (GOV.UK-style treatment).</li>
-      <li><strong>Hover</strong> — underline with thicker decoration.</li>
-      <li><strong>Focus</strong> — yellow outline + inset blue ring.</li>
-    </ul>
-
-    <h2>Responsive</h2>
-    <p>Tabs wrap on small screens and become equal-width on a single row at <code>md</code> and above.</p>
-
-    <h2>Accessibility</h2>
-    <ul>
-      <li><code>role="tablist"</code> / <code>role="tab"</code> / <code>role="tabpanel"</code> with <code>aria-selected</code>.</li>
-      <li>Left/Right arrow keys move between tabs (roving focus); the active panel is revealed.</li>
-      <li>Inactive panels are hidden via <code>.nhsuk-tabs__panel--hidden</code>.</li>
-    </ul>
-
-    <div class="ds-note ds-note--source">Source: <code>components/PdpTabs.tsx</code>; classes in <code>app/globals.css</code> (<code>.nhsuk-tabs*</code>).</div>
+    <h2>Use instead</h2>
+    <p><a href="/DS/patterns/product-detail.html">Product detail</a> pattern (contents list).</p>
+    <p>The full list of retired components and classes, with reasons, is on the <a href="/DS/archived.html">Archived</a> page.</p>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

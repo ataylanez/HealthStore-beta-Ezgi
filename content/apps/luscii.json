@@ -25,6 +25,10 @@
     "clinician_referral"
   ],
   "one_line_value_proposition": "Remote monitoring platform with 25 million global registrations. Can be used as a stand alone system or integrated with local electronic healthcare record systems and clinical work flows",
+  "overview": [
+    "Luscii is a remote monitoring service for adults with chronic obstructive pulmonary disease (COPD). Patients send their symptoms and oxygen readings through an app, and a clinical team reviews any alerts and contacts patients when needed. It's used in virtual wards, after hospital discharge and in primary care.",
+    "To use it, you'll need a clinical team or monitoring hub to review alerts, pulse oximeters for patients, and a data protection impact assessment, because patient data is stored outside the UK. NICE recommends Luscii while more evidence is collected. It's live in several NHS areas, including North West London and Bradford. Luscii is on G-Cloud 14 and prices are agreed with the supplier."
+  ],
   "why_it_matters_locally": "Luscii enables ICBs to build virtual COPD wards at scale without lengthy configuration delays. G-Cloud 14 listing means no separate OJEU tender is required. North West London ICS enrolled 6,000 COPD patients one year ahead of schedule in its implementation.",
   "target_problem_statement": "Limited virtual ward capacity, high COPD admission rates, post-exacerbation monitoring gaps and slow procurement of remote monitoring technology.",
   "nice_guidance_refs": [

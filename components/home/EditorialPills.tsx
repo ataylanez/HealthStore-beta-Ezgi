@@ -1,12 +1,13 @@
 import type { CSSProperties } from 'react'
 import { isVisibleCondition } from '@/lib/visibleConditions'
 
+/* NHS tag geometry: body-s type (14→16px), regular weight, square corners. */
 const pillText: CSSProperties = {
-  fontSize: 12,
-  lineHeight: '1.25',
-  fontWeight: 600,
-  padding: '3px 8px',
-  borderRadius: 6,
+  fontSize: 'var(--text-badge)',
+  lineHeight: '1.3',
+  fontWeight: 400,
+  padding: '2px 8px 3px',
+  borderRadius: 1,
   border: 'none',
   display: 'inline-block',
 }
@@ -59,7 +60,7 @@ export function EditorialPillRow({
   className?: string
 }) {
   return (
-    <div className={`flex flex-wrap gap-1.5 ${className}`}>
+    <div className={`flex flex-wrap gap-2 ${className}`}>
       {topics.map((t) => (
         <EditorialTopicPill key={t} label={t} />
       ))}
@@ -80,7 +81,7 @@ export function EditorialEvidenceMetaRow({
   className?: string
 }) {
   return (
-    <div className={`flex flex-wrap items-center gap-1.5 ${className}`}>
+    <div className={`flex flex-wrap items-center gap-2 ${className}`}>
       <EditorialCategoryPill label={evidenceType} />
       {conditions.filter(isVisibleCondition).map((t) => (
         <EditorialConditionPill key={t} tag={t} />

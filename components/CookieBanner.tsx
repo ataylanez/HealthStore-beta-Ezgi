@@ -26,7 +26,7 @@ export default function CookieBanner({
       aria-label="Cookies on NHS HealthStore"
     >
       <div className="govuk-cookie-banner__message">
-        <div className="hs-page" style={{ paddingBlock: 'var(--space-5)' }}>
+        <div className="nhsuk-width-container" style={{ paddingBlock: 'var(--space-4)' }}>
           <h2
             className="m-0 mb-4 hs-font-bold"
             style={{
@@ -56,7 +56,7 @@ export default function CookieBanner({
             </Button>
             <Link
               href="/cookies"
-              className="inline-flex justify-center sm:justify-start items-center hs-text-label hs-font-bold hover:underline px-1 py-2"
+              className="inline-flex justify-center sm:justify-start items-center hs-text-label hs-font-bold underline hover:no-underline px-1 py-2"
               style={{ color: 'var(--nhs-blue)' }}
             >
               View cookies

@@ -11,6 +11,10 @@ type HomePublicContentProps = {
   caseStudies: CaseStudy[]
 }
 
+/**
+ * Everything below the hero sits in one NHS width container + main wrapper
+ * (no further full-bleed bands), per the NHS page template.
+ */
 export default function HomePublicContent({
   dash: _dash,
   news: _news,
@@ -18,12 +22,11 @@ export default function HomePublicContent({
   caseStudies,
 }: HomePublicContentProps) {
   return (
-    <>
-      <HomeStorytelling />
-
-      <div className="mt-12 md:mt-14">
+    <div className="nhsuk-width-container">
+      <div className="nhsuk-main-wrapper">
+        <HomeStorytelling />
         <HomeCaseStudiesBand caseStudies={caseStudies} />
       </div>
-    </>
+    </div>
   )
 }

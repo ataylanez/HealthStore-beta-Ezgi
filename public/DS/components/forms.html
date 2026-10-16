@@ -13,36 +13,49 @@
       <p class="ds-eyebrow">Components</p>
       <h1 class="ds-page-title">Forms &amp; inputs</h1>
       <p class="ds-lede">
-        Text inputs, selects, textareas, radios and checkboxes. <code>FormField</code> owns label + hint + error and
-        wires <code>id</code> / <code>aria-describedby</code> / <code>aria-invalid</code>. Shared
-        <code>TextInput</code> / <code>Select</code> / <code>Textarea</code> controls sit inside an
-        <code>AuthCard</code> shell where needed. Focus uses the global yellow <code>:focus-visible</code> outline.
+        All form controls are stock NHS components: <code>nhsuk-input</code>, <code>nhsuk-select</code>, <code>nhsuk-textarea</code>,
+        <code>nhsuk-radios</code>, <code>nhsuk-checkboxes</code>, <code>nhsuk-file-upload</code>, <code>nhsuk-task-list</code>. <code>FormField</code> wraps a
+        control in the NHS form group with label, hint and error message and wires <code>aria-describedby</code>. Every form sits in a
+        <code>nhsuk-grid-column-two-thirds</code> column and asks one question per page.
       </p>
     </div>
 
     <div class="ds-meta-grid">
-      <div class="ds-meta"><div class="ds-meta__k">Components</div><div class="ds-meta__v"><code>components/ui/FormField.tsx</code>, <code>AuthCard.tsx</code></div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Focus</div><div class="ds-meta__v">Global <code>:focus-visible</code> (no per-input ring)</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Components</div><div class="ds-meta__v"><code>components/ui/FormField.tsx</code>, <code>components/nhs/NhsFileUpload.tsx</code>, <code>SupplierOnboardingTaskList</code>, <code>ErrorSummary</code> (<code>eoi/journey/shared.tsx</code>)</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Used in</div><div class="ds-meta__v">Express interest journey &middot; supplier sign-in &middot; supplier onboarding &middot; product field editor &middot; catalogue filters &middot; prototype gate</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Focus</div><div class="ds-meta__v">NHS yellow <code>:focus-visible</code> (3px outline, 4px inset shadow)</div></div>
     </div>
 
-    <h2>Text input</h2>
+    <h2>Text input (FormField)</h2>
     <div class="ds-example">
       <div class="ds-field">
         <label class="ds-field__label" for="f-email">Work email</label>
         <p class="ds-field__hint" id="f-email-hint">We'll only use this to contact you about your interest.</p>
-        <input class="ds-input" id="f-email" type="email" aria-describedby="f-email-hint" placeholder="name@nhs.net">
+        <input class="ds-input" id="f-email" type="email" aria-describedby="f-email-hint">
       </div>
     </div>
-<pre class="ds-code"><code>&lt;div class="ds-field"&gt;
-  &lt;label class="ds-field__label" for="email"&gt;Work email&lt;/label&gt;
-  &lt;p class="ds-field__hint" id="email-hint"&gt;We'll only use this &hellip;&lt;/p&gt;
-  &lt;input class="ds-input" id="email" type="email" aria-describedby="email-hint"&gt;
+<pre class="ds-code"><code>&lt;FormField id="email" label="Work email" hint="We'll only use this to contact you about your interest." error={errors.email}&gt;
+  &lt;input class="nhsuk-input nhsuk-input--width-20" type="email" /&gt;
+&lt;/FormField&gt;
+
+&lt;!-- rendered --&gt;
+&lt;div class="nhsuk-form-group"&gt;
+  &lt;label class="nhsuk-label" for="email"&gt;Work email&lt;/label&gt;
+  &lt;div class="nhsuk-hint" id="email-hint"&gt;We'll only use this …&lt;/div&gt;
+  &lt;input class="nhsuk-input nhsuk-input--width-20" id="email" type="email" aria-describedby="email-hint"&gt;
 &lt;/div&gt;</code></pre>
+
+    <h2>Question as page heading</h2>
+    <p>On one-question pages the label <em>is</em> the h1: <code>nhsuk-label-wrapper</code> &gt; <code>h1</code> &gt; <code>label.nhsuk-label.nhsuk-label--l</code>. A context caption (<code>nhsuk-caption-l</code>, e.g. the product name) goes above it.</p>
+<pre class="ds-code"><code>&lt;span class="nhsuk-caption-l"&gt;Luscii&lt;/span&gt;
+&lt;h1 class="nhsuk-label-wrapper"&gt;
+  &lt;label class="nhsuk-label nhsuk-label--l" for="dtac"&gt;What is the product's DTAC status?&lt;/label&gt;
+&lt;/h1&gt;</code></pre>
 
     <h2>Select &amp; textarea</h2>
     <div class="ds-example">
       <div class="ds-field">
-        <label class="ds-field__label" for="f-timeline">Procurement timeline</label>
+        <label class="ds-field__label" for="f-timeline">When do you expect to procure?</label>
         <select class="ds-select" id="f-timeline">
           <option>Not sure yet</option>
           <option>0&ndash;3 months</option>
@@ -51,55 +64,51 @@
         </select>
       </div>
       <div class="ds-field">
-        <label class="ds-field__label" for="f-notes">Notes</label>
-        <textarea class="ds-textarea" id="f-notes" placeholder="Anything the supplier should know"></textarea>
+        <label class="ds-field__label" for="f-notes">Anything the supplier should know?</label>
+        <textarea class="ds-textarea" id="f-notes"></textarea>
       </div>
     </div>
 
     <h2>Error state</h2>
+    <p>Errors are announced twice, as NHS expects: an <a href="/DS/components/error-summary.html">error summary</a> at the top of the page that links to each field, and an <code>nhsuk-error-message</code> on the field itself (<code>nhsuk-form-group--error</code>, <code>nhsuk-input--error</code>).</p>
     <div class="ds-example">
-      <div class="ds-field">
-        <label class="ds-field__label" for="f-err">Password</label>
-        <input class="ds-input" id="f-err" type="password" aria-invalid="true" aria-describedby="f-err-msg" style="border-color:var(--nhs-red);box-shadow:0 0 0 3px rgba(218,41,28,0.15)">
-        <p id="f-err-msg" role="alert" style="color:#7A1210;font-size:.85rem;margin:6px 0 0">Enter your password to continue.</p>
+      <div class="ds-field" style="border-left:4px solid var(--nhs-red);padding-left:16px">
+        <label class="ds-field__label" for="f-err">Work email</label>
+        <p id="f-err-msg" style="color:#d5281b;font-weight:600;margin:0 0 8px"><span class="ds-u-sr">Error:</span> Enter an email address in the correct format, like name@nhs.net</p>
+        <input class="ds-input" id="f-err" type="email" aria-invalid="true" aria-describedby="f-err-msg" style="border:4px solid #d5281b">
       </div>
     </div>
 
-    <h2>Radio cards (entity selection)</h2>
-    <p>The select-entity pattern: radios styled as selectable cards inside a fieldset.</p>
-    <div class="ds-example">
-      <fieldset style="border:0;margin:0;padding:0">
-        <legend class="sr-only">Choose your commissioning entity</legend>
-        <div class="ds-u-stack">
-          <label style="display:flex;gap:12px;align-items:center;border:1px solid var(--nhs-blue);background:#E6F0FB;border-radius:8px;padding:14px 16px;cursor:pointer">
-            <input type="radio" name="icb" checked style="accent-color:var(--nhs-blue)">
-            <span><strong>NHS Example ICB</strong><br><span class="ds-u-muted" style="font-size:.85rem">Integrated Care Board</span></span>
-          </label>
-          <label style="display:flex;gap:12px;align-items:center;border:1px solid var(--border);background:#fff;border-radius:8px;padding:14px 16px;cursor:pointer">
-            <input type="radio" name="icb" style="accent-color:var(--nhs-blue)">
-            <span><strong>NHS Sample ICB</strong><br><span class="ds-u-muted" style="font-size:.85rem">Integrated Care Board</span></span>
-          </label>
-        </div>
-      </fieldset>
-    </div>
+    <h2>Radios &amp; checkboxes</h2>
+    <p>Stock <code>nhsuk-radios</code> / <code>nhsuk-checkboxes</code>. The catalogue filter panel uses the <code>--small</code> modifiers. Groups are always a <code>fieldset</code> with a <code>legend</code> (visually hidden where the heading already says it).</p>
+<pre class="ds-code"><code>&lt;fieldset class="nhsuk-fieldset"&gt;
+  &lt;legend class="nhsuk-fieldset__legend nhsuk-u-visually-hidden"&gt;Condition&lt;/legend&gt;
+  &lt;div class="nhsuk-radios nhsuk-radios--small"&gt;
+    &lt;div class="nhsuk-radios__item"&gt;
+      &lt;input class="nhsuk-radios__input" id="c-copd" name="condition" type="radio" value="copd"&gt;
+      &lt;label class="nhsuk-label nhsuk-radios__label" for="c-copd"&gt;COPD&lt;/label&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/fieldset&gt;</code></pre>
 
-    <h2>Checkbox</h2>
-    <div class="ds-example">
-      <label style="display:flex;gap:10px;align-items:flex-start;font-size:.92rem">
-        <input type="checkbox" checked style="accent-color:var(--nhs-blue);width:18px;height:18px;margin-top:2px">
-        <span>Only show differences when comparing products</span>
-      </label>
-    </div>
+    <h2>File upload</h2>
+    <p><code>NhsFileUpload</code> renders the official NHS file upload with its drop zone (<code>nhsuk-file-upload</code>, initialised with the nhsuk-frontend JS). Used in the supplier portal for assurance documents.</p>
+
+    <h2>Task list</h2>
+    <p><code>SupplierOnboardingTaskList</code> is the official <code>nhsuk-task-list</code>: each task a row with a link, a hint and a status. Completed tasks show plain text (<code>nhsuk-task-list__status--completed</code>); other states use an <code>nhsuk-tag</code>. See <a href="/DS/patterns/supplier-portal.html">Supplier portal</a>.</p>
+
+    <h2>Buttons in forms</h2>
+    <p>One primary <code>nhsuk-button</code> (&ldquo;Continue&rdquo; / &ldquo;Save and continue&rdquo;); secondary actions are links. Button groups use <code>nhsuk-u-margin-*</code> points, never ad-hoc flex gaps.</p>
 
     <h2>Accessibility</h2>
     <ul>
-      <li>Every field has a programmatically associated <code>&lt;label&gt;</code>; hints use <code>aria-describedby</code>.</li>
-      <li>Errors set <code>aria-invalid</code> and reference an <code>role="alert"</code> message.</li>
-      <li>Radio/checkbox groups use <code>&lt;fieldset&gt;</code> + <code>&lt;legend&gt;</code> (may be sr-only).</li>
-      <li>Focus shows the global yellow <code>:focus-visible</code> outline; never remove focus styles.</li>
+      <li>Every field has a programmatically associated <code>&lt;label&gt;</code>; hints and errors are joined with <code>aria-describedby</code>.</li>
+      <li>On submit with errors, focus moves to the error summary; each summary link focuses its field.</li>
+      <li>Radio and checkbox groups use <code>fieldset</code> + <code>legend</code>.</li>
+      <li>Never remove the NHS focus style.</li>
     </ul>
 
-    <div class="ds-note ds-note--source">Source: <code>components/ui/FormField.tsx</code>, <code>components/ui/AuthCard.tsx</code>; login, select-entity, EOI modal, org-settings, catalogue filters.</div>
+    <div class="ds-note ds-note--source">Source: <code>components/ui/FormField.tsx</code>, <code>components/nhs/NhsFileUpload.tsx</code>, <code>components/eoi/journey/steps/*.tsx</code>, <code>components/eoi/journey/shared.tsx</code>, <code>components/supplier-portal/ProductFieldEditor.tsx</code>, <code>components/supplier-onboard/TaskQuestionPage.tsx</code>, <code>app/apps/CatalogueClient.tsx</code>.</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

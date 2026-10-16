@@ -10,6 +10,7 @@ import { X } from 'lucide-react'
 import { buildBrowseSearchParams, parseBrowseConditionParam } from '@/lib/catalogueSearch'
 import { PageBreadcrumb } from '@/components/PageBreadcrumb'
 import { getProductNarrative } from '@/lib/content/productNarratives'
+import { catalogueSummary } from '@/lib/pdpSummary'
 
 const supervisionOptions = Object.entries(supervisionLabels).map(([id, label]) => ({ id, label }))
 
@@ -177,7 +178,7 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
   const resultSummary = `Showing ${resultCount} of ${apps.length} apps`
 
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container">
       <PageBreadcrumb
         items={[
           { label: 'Product catalogue', href: '/catalogue' },
@@ -185,200 +186,185 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
         ]}
       />
 
-      <div className="mb-8">
-        <h1 className="page-title-h1">
-          Digital therapeutics
-        </h1>
-      </div>
+      <div className="nhsuk-main-wrapper nhsuk-main-wrapper--s">
+        <h1 className="nhsuk-heading-xl">Digital therapeutics</h1>
 
-      {/*
-        GOV.UK filter-panel interaction (gov.uk/search/all):
-        - Header row: expandable "Filter" link + result count
-        - Content region expands vertically below the header
-        - Nested details sections for each facet
-        - Apply button submits draft selections and collapses the panel
-        Colours / form controls use NHS tokens and nhsuk-radios / nhsuk-checkboxes.
-      */}
-      <div className="hs-filter-panel mb-6">
-        <div className="hs-filter-panel__header">
-          <button
-            type="button"
-            id={`${filterPanelId}-button`}
-            className="hs-filter-panel__button"
-            aria-expanded={filtersOpen}
-            aria-controls={`${filterPanelId}-content`}
-            onClick={toggleFilters}
-          >
-            <span className="hs-filter-panel__button-inner">Filter</span>
-          </button>
-          <h2 id={`${filterPanelId}-count`} className="hs-filter-panel__count">
-            {resultText}
-          </h2>
-        </div>
-
-        {filtersOpen ? (
-          <div
-            id={`${filterPanelId}-content`}
-            className="hs-filter-panel__content"
-            role="region"
-            aria-labelledby={`${filterPanelId}-button`}
-          >
-            <form onSubmit={applyFilters}>
-              <FilterSection title="Condition">
-                <fieldset className="nhsuk-fieldset">
-                  <legend className="nhsuk-u-visually-hidden">Condition</legend>
-                  <div className="nhsuk-radios">
-                    {conditionOptions.map(o => (
-                      <div key={o.id} className="nhsuk-radios__item">
-                        <input
-                          id={`filter-condition-${o.id}`}
-                          className="nhsuk-radios__input"
-                          name="filter-condition"
-                          type="radio"
-                          checked={draftCondition === o.id}
-                          onChange={() => setDraftCondition(o.id)}
-                        />
-                        <label className="nhsuk-radios__label" htmlFor={`filter-condition-${o.id}`}>
-                          {o.label}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </fieldset>
-              </FilterSection>
-
-              <FilterSection title="Supervision model">
-                <fieldset className="nhsuk-fieldset">
-                  <legend className="nhsuk-u-visually-hidden">Supervision model</legend>
-                  <div className="nhsuk-checkboxes">
-                    {supervisionOptions.map(o => (
-                      <div key={o.id} className="nhsuk-checkboxes__item">
-                        <input
-                          id={`filter-supervision-${o.id}`}
-                          className="nhsuk-checkboxes__input"
-                          type="checkbox"
-                          checked={draftSupervision.includes(o.id)}
-                          onChange={() => toggleDraftSupervision(o.id)}
-                        />
-                        <label className="nhsuk-checkboxes__label" htmlFor={`filter-supervision-${o.id}`}>
-                          {o.label}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </fieldset>
-              </FilterSection>
-
-              <div className="hs-filter-panel__actions">
-                <button type="submit" className="nhsuk-button mb-0 max-sm:mb-2 max-sm:w-full">
-                  Apply filters
-                </button>
-                {(draftCondition !== 'all' || draftSupervision.length > 0) && (
-                  <button
-                    type="button"
-                    className="hs-filter-panel__clear"
-                    onClick={clearAllFilters}
-                  >
-                    Clear filters
-                  </button>
-                )}
-              </div>
-            </form>
-          </div>
-        ) : null}
-      </div>
-
-      {activeFilters.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {activeFilters.map((f, i) => (
-            <FilterPill key={`${i}-${f.label}`} label={f.label} onRemove={f.clear} />
-          ))}
-        </div>
-      )}
-
-      <div ref={liveRegion} aria-live="polite" aria-atomic="true" className="sr-only">
-        {resultSummary}
-      </div>
-
-      {filteredSorted.length === 0 ? (
-        <div className="hs-surface-card text-center py-16 rounded-xl bg-white border" style={{ borderColor: 'var(--border)' }}>
-          <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>
-            No apps match your filters
-          </div>
-          <div style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}>
-            Try adjusting your filter criteria
-          </div>
-        </div>
-      ) : (
-        <div
-          className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr))] xl:[grid-template-columns:repeat(auto-fill,minmax(360px,1fr))] 2xl:[grid-template-columns:repeat(auto-fill,minmax(380px,1fr))]"
-        >
-          {filteredSorted.map((app: App) => {
-            const narrative = getProductNarrative(app.slug)
-            const cardDescription =
-              narrative?.decision_summary?.one_line_proposition ?? app.one_line_value_proposition
-            return (
-            <div key={app.id} className="app-card flex h-full min-h-0 flex-col">
-              <div className="flex min-h-0 flex-1 flex-col" style={{ padding: '1.25rem' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: '0.75rem' }}>
-                  <div className="flex items-center gap-2">
-                    {app.logo_path && (
-                      <Image src={app.logo_path} alt="" width={32} height={32} className="rounded-md flex-shrink-0" />
-                    )}
-                    <div>
-                      <h3
-                        style={{
-                          fontFamily: 'Frutiger, Arial, sans-serif',
-                          fontWeight: 600,
-                          fontSize: 'var(--text-card-title-sm)',
-                          color: 'var(--text-primary)',
-                          marginBottom: 2,
-                        }}
-                      >
-                        {app.app_name}
-                      </h3>
-                      <p style={{ fontSize: 'var(--text-label)', color: 'var(--text-muted)', margin: 0 }}>{app.supplier_name}</p>
-                    </div>
-                  </div>
-                  {app.nhse_125k_eligible && app.slug !== 'clinitouch' && (
-                    <span className="badge badge-green" style={{ flexShrink: 0 }}>
-                      ★ NHSE £125k
-                    </span>
-                  )}
-                </div>
-
-                <p
-                  className="line-clamp-5"
-                  style={{ fontSize: 'var(--text-body)', color: 'var(--text-secondary)', lineHeight: 1.55, marginBottom: '1rem' }}
+        {/* NHS layout: filters in a one-third column, results in a two-thirds column. */}
+        <div className="nhsuk-grid-row">
+          <div className="nhsuk-grid-column-one-third">
+            {/*
+              Filter panel. On small screens it collapses behind a "Filter" toggle
+              (GOV.UK finder interaction); from tablet the toggle is hidden and the
+              panel is always open in the sidebar. Form controls are nhsuk-radios /
+              nhsuk-checkboxes; sections use the NHS Details disclosure.
+            */}
+            <div className="hs-filter-panel">
+              <div className="hs-filter-panel__header">
+                <button
+                  type="button"
+                  id={`${filterPanelId}-button`}
+                  className="hs-filter-panel__button"
+                  aria-expanded={filtersOpen}
+                  aria-controls={`${filterPanelId}-content`}
+                  onClick={toggleFilters}
                 >
-                  {cardDescription}
-                </p>
+                  <span className="hs-filter-panel__button-inner">Filter</span>
+                </button>
+                <h2 className="nhsuk-heading-s hs-filter-panel__title">Filter</h2>
+              </div>
 
-                <div className="flex flex-wrap gap-1" style={{ marginBottom: '1rem' }}>
-                  {app.condition_tags.map((t: string) => (
-                    <ConditionTag key={t} tag={t} />
-                  ))}
-                  <SupervisionBadge model={app.supervision_model} />
-                  <MaturityBadge level={app.maturity_level} hideEstablished />
-                </div>
+              <div
+                id={`${filterPanelId}-content`}
+                className={`hs-filter-panel__content${filtersOpen ? ' hs-filter-panel__content--open' : ''}`}
+              >
+                <form onSubmit={applyFilters}>
+                  <FilterSection title="Condition">
+                    <fieldset className="nhsuk-fieldset">
+                      <legend className="nhsuk-u-visually-hidden">Condition</legend>
+                      <div className="nhsuk-radios nhsuk-radios--small">
+                        {conditionOptions.map(o => (
+                          <div key={o.id} className="nhsuk-radios__item">
+                            <input
+                              id={`filter-condition-${o.id}`}
+                              className="nhsuk-radios__input"
+                              name="filter-condition"
+                              type="radio"
+                              checked={draftCondition === o.id}
+                              onChange={() => setDraftCondition(o.id)}
+                            />
+                            <label className="nhsuk-radios__label" htmlFor={`filter-condition-${o.id}`}>
+                              {o.label}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </fieldset>
+                  </FilterSection>
 
-                <div className="mt-auto flex min-w-0 flex-col">
-                  <div className="grid grid-cols-1 gap-2">
-                    <Link
-                      href={`/apps/${app.slug}`}
-                      className="nhsuk-button mb-0 inline-flex w-full items-center justify-center gap-2 py-4 text-center align-top no-underline hs-text-label hs-font-bold max-sm:mb-2"
-                    >
-                      View product details
-                    </Link>
-                    <CompareToggleButton appId={app.id} solid size="none" className="w-full" />
+                  <FilterSection title="Supervision model">
+                    <fieldset className="nhsuk-fieldset">
+                      <legend className="nhsuk-u-visually-hidden">Supervision model</legend>
+                      <div className="nhsuk-checkboxes nhsuk-checkboxes--small">
+                        {supervisionOptions.map(o => (
+                          <div key={o.id} className="nhsuk-checkboxes__item">
+                            <input
+                              id={`filter-supervision-${o.id}`}
+                              className="nhsuk-checkboxes__input"
+                              type="checkbox"
+                              checked={draftSupervision.includes(o.id)}
+                              onChange={() => toggleDraftSupervision(o.id)}
+                            />
+                            <label className="nhsuk-checkboxes__label" htmlFor={`filter-supervision-${o.id}`}>
+                              {o.label}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </fieldset>
+                  </FilterSection>
+
+                  <div className="hs-filter-panel__actions">
+                    <button type="submit" className="nhsuk-button nhsuk-u-margin-bottom-0">
+                      Apply filters
+                    </button>
+                    {(draftCondition !== 'all' || draftSupervision.length > 0) && (
+                      <button
+                        type="button"
+                        className="hs-filter-panel__clear"
+                        onClick={clearAllFilters}
+                      >
+                        Clear filters
+                      </button>
+                    )}
                   </div>
-                </div>
+                </form>
               </div>
             </div>
-            )
-          })}
+          </div>
+
+          <div className="nhsuk-grid-column-two-thirds">
+            <p className="nhsuk-body-m" id={`${filterPanelId}-count`}>
+              <strong>{resultText}</strong>
+            </p>
+
+            {activeFilters.length > 0 && (
+              <div className="flex flex-wrap gap-2 nhsuk-u-margin-bottom-4">
+                {activeFilters.map((f, i) => (
+                  <FilterPill key={`${i}-${f.label}`} label={f.label} onRemove={f.clear} />
+                ))}
+              </div>
+            )}
+
+            <div ref={liveRegion} aria-live="polite" aria-atomic="true" className="sr-only">
+              {resultSummary}
+            </div>
+
+            {filteredSorted.length === 0 ? (
+              // [Provenance: NHS] Inset text for the empty state.
+              <div className="nhsuk-inset-text">
+                <span className="nhsuk-u-visually-hidden">Information: </span>
+                <p className="nhsuk-u-font-weight-bold nhsuk-u-margin-bottom-1">No apps match your filters</p>
+                <p className="nhsuk-u-margin-bottom-0">Try adjusting your filter criteria</p>
+              </div>
+            ) : (
+              // [Provenance: NHS] One NHS card per result, stacked in the two-thirds column.
+              <ul className="nhsuk-list">
+                {filteredSorted.map((app: App) => {
+                  const narrative = getProductNarrative(app.slug)
+                  const cardDescription = catalogueSummary(app, narrative)
+                  return (
+                    <li key={app.id}>
+                      <article className="nhsuk-card" aria-labelledby={`app-card-${app.id}`}>
+                        <div className="nhsuk-card__content">
+                          <div className="flex items-start gap-3">
+                            {app.logo_path && (
+                              <Image src={app.logo_path} alt="" width={40} height={40} className="flex-shrink-0" />
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <h3 id={`app-card-${app.id}`} className="nhsuk-card__heading nhsuk-heading-m nhsuk-u-margin-bottom-1">
+                                <Link className="nhsuk-card__link" href={`/apps/${app.slug}`}>{app.app_name}</Link>
+                              </h3>
+                              <p className="nhsuk-body-s" style={{ color: 'var(--text-secondary)' }}>{app.supplier_name}</p>
+                            </div>
+                            {app.nhse_125k_eligible && app.slug !== 'clinitouch' && (
+                              <span className="badge badge-green" style={{ flexShrink: 0 }}>
+                                ★ NHSE £125k
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="nhsuk-card__description nhsuk-body-m" style={{ color: 'var(--text-secondary)' }}>
+                            {cardDescription}
+                          </p>
+
+                          <div className="flex flex-wrap gap-1 nhsuk-u-margin-bottom-4">
+                            {app.condition_tags.map((t: string) => (
+                              <ConditionTag key={t} tag={t} />
+                            ))}
+                            <SupervisionBadge model={app.supervision_model} />
+                            <MaturityBadge level={app.maturity_level} hideEstablished />
+                          </div>
+
+                          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                            <Link
+                              href={`/apps/${app.slug}`}
+                              className="nhsuk-button nhsuk-u-margin-bottom-0 inline-flex items-center justify-center gap-2 align-top no-underline max-sm:w-full"
+                            >
+                              View product details
+                            </Link>
+                            <CompareToggleButton appId={app.id} solid />
+                          </div>
+                        </div>
+                      </article>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   )
+
 }

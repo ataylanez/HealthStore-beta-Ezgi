@@ -6,11 +6,11 @@ export const metadata = { title: `Product management — ${PORTAL_SERVICE_NAME}`
 
 export default function ProductManagementPage() {
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
       <PortalBreadcrumb items={[{ label: 'Product management' }]} />
       <div className="hs-section">
-        <h1 className="page-title-h1">Product management</h1>
-        <p className="m-0 hs-measure leading-relaxed" style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}>
+        <h1 className="nhsuk-heading-xl">Product management</h1>
+        <p className="nhsuk-body-l hs-measure">
           Manage and onboard products on to the HealthStore.
         </p>
       </div>

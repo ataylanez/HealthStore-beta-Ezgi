@@ -82,44 +82,46 @@ export default function PublishedPageCheckAnswers({
   }
 
   return (
-    <div className="hs-page">
-      <div className="max-w-3xl">
-        <BackLink href={editHref} />
-        <span className="nhsuk-caption-l">{caption}</span>
-        <h1 ref={headingRef} tabIndex={-1} className="page-title-h1 outline-none">
-          Check your answers before submitting
-        </h1>
-        <p className="nhsuk-body-m">Only the fields you have changed are shown below.</p>
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <BackLink href={editHref} />
+          <span className="nhsuk-caption-l">{caption}</span>
+          <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
+            Check your answers before submitting
+          </h1>
+          <p className="nhsuk-body-m">Only the fields you have changed are shown below.</p>
 
-        <h2 className="nhsuk-heading-m nhsuk-u-margin-top-7">Your changes</h2>
-        <dl className="nhsuk-summary-list">
-          {changedFields.map((field) => {
-            const v = value(field.id)
-            return (
-              <div key={field.id} className="nhsuk-summary-list__row">
-                <dt className="nhsuk-summary-list__key">{field.label}</dt>
-                <dd className="nhsuk-summary-list__value">
-                  {v.trim() ? (
-                    <span style={{ whiteSpace: 'pre-wrap' }}>{v}</span>
-                  ) : (
-                    <span className="nhsuk-u-secondary-text-color">{NOT_PROVIDED}</span>
-                  )}
-                </dd>
-                <dd className="nhsuk-summary-list__actions">
-                  <Link className="hs-link-button" href={`${editHref}#page-${field.id}`}>
-                    Change<span className="nhsuk-u-visually-hidden"> {field.label.toLowerCase()}</span>
-                  </Link>
-                </dd>
-              </div>
-            )
-          })}
-        </dl>
+          <h2 className="nhsuk-heading-m nhsuk-u-margin-top-7">Your changes</h2>
+          <dl className="nhsuk-summary-list">
+            {changedFields.map((field) => {
+              const v = value(field.id)
+              return (
+                <div key={field.id} className="nhsuk-summary-list__row">
+                  <dt className="nhsuk-summary-list__key">{field.label}</dt>
+                  <dd className="nhsuk-summary-list__value">
+                    {v.trim() ? (
+                      <span style={{ whiteSpace: 'pre-wrap' }}>{v}</span>
+                    ) : (
+                      <span className="nhsuk-u-secondary-text-color">{NOT_PROVIDED}</span>
+                    )}
+                  </dd>
+                  <dd className="nhsuk-summary-list__actions">
+                    <Link className="hs-link-button" href={`${editHref}#page-${field.id}`}>
+                      Change<span className="nhsuk-u-visually-hidden"> {field.label.toLowerCase()}</span>
+                    </Link>
+                  </dd>
+                </div>
+              )
+            })}
+          </dl>
 
-        <h2 className="nhsuk-heading-m nhsuk-u-margin-top-7">Submit your changes</h2>
-        <p className="nhsuk-body-m">{DECLARATION}</p>
-        <Button variant="confirm" onClick={confirmAndSubmit} loading={submitting}>
-          {submitting ? 'Submitting…' : 'Confirm and submit'}
-        </Button>
+          <h2 className="nhsuk-heading-m nhsuk-u-margin-top-7">Submit your changes</h2>
+          <p className="nhsuk-body-m">{DECLARATION}</p>
+          <Button variant="confirm" onClick={confirmAndSubmit} loading={submitting}>
+            {submitting ? 'Submitting…' : 'Confirm and submit'}
+          </Button>
+        </div>
       </div>
     </div>
   )

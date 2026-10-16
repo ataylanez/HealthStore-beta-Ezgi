@@ -4,79 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>Collapsible sections — HealthStore Design System</title>
+  <title>Collapsible sections (archived) — HealthStore Design System</title>
   <link rel="stylesheet" href="/DS/assets/ds.css">
 </head>
 <body>
-  <div id="ds-root" data-ds-page="collapsible" data-ds-provenance="NHS">
+  <div id="ds-root" data-ds-page="archived" data-ds-provenance="Bespoke">
     <div class="ds-page-header">
-      <p class="ds-eyebrow">Components</p>
-      <h1 class="ds-page-title">Collapsible sections</h1>
-      <p class="ds-lede">
-        Show/hide content blocks via <code>&lt;Collapsible variant="card | inline | expander"&gt;</code>,
-        sharing <code>useId</code>, open state and <code>aria-expanded</code> / <code>aria-controls</code> / <code>hidden</code>.
-        The <code>expander</code> variant adds a chevron header, hash deep-linking and selective print.
-      </p>
+      <p class="ds-eyebrow">Components &middot; Archived</p>
+      <h1 class="ds-page-title">Collapsible sections (archived)</h1>
     </div>
-
-    <div class="ds-meta-grid">
-      <div class="ds-meta"><div class="ds-meta__k">Component</div><div class="ds-meta__v"><code>components/Collapsible.tsx</code></div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Variants</div><div class="ds-meta__v"><code>card</code>, <code>inline</code>, <code>expander</code></div></div>
+    <div class="ds-note">
+      <strong>This page is kept only so older audit reports still resolve.</strong> The bespoke <code>Collapsible</code> component and its <code>CollapsibleSection</code> / <code>ProductPageExpander</code> shims are no longer imported anywhere. Where content needs to be hidden behind a toggle the app uses the NHS <code>nhsuk-details</code> component (for example the assumptions on the projected-impact page).
     </div>
-
-    <h2>Collapsible section (card)</h2>
-    <p>Try the Show/Hide control.</p>
-    <div class="ds-example ds-example--surface">
-      <section class="hs-surface-card" style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:24px">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-          <div style="flex:1;min-width:0">
-            <h3 style="font-family:var(--font-display);font-size:var(--text-section-alt);font-weight:700;margin:0 0 4px">Procurement, tariff and ROI detail</h3>
-            <p style="font-size:.875rem;color:var(--text-muted);margin:0">Commercial considerations for commissioners.</p>
-            <div style="margin-top:12px;height:2px;border-radius:2px;background:linear-gradient(90deg, var(--nhs-blue), transparent)"></div>
-          </div>
-          <button type="button" class="ds-btn ds-btn--ghost ds-btn--sm" style="border:1px solid var(--border);color:var(--text-muted)"
-            data-ds-toggle="collapse-demo" data-show-label="Show" data-hide-label="Hide" aria-controls="collapse-demo" aria-expanded="true">Hide</button>
-        </div>
-        <div id="collapse-demo" style="padding-top:12px">
-          <p class="ds-u-mt0" style="color:var(--text-secondary);font-size:.92rem">Procurement routes, tariff context, ROI drivers and minimum conditions for success appear here. Default state is open; the toggle persists per session in the product.</p>
-        </div>
-      </section>
-    </div>
-<pre class="ds-code"><code>&lt;Collapsible
-  variant="card"
-  title="Procurement, tariff and ROI detail"
-  description="Commercial considerations for commissioners."
-  defaultOpen
-&gt;
-  &hellip;
-&lt;/Collapsible&gt;</code></pre>
-
-    <h2>Collapsible inline</h2>
-    <p>A lighter variant separated by a top border, for nesting inside an existing card.</p>
-    <div class="ds-example">
-      <div style="border-top:1px solid var(--border);padding-top:20px">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-          <div>
-            <h4 style="font-weight:700;font-size:.95rem;margin:0 0 2px">Implementation prerequisites</h4>
-            <p style="font-size:.8rem;color:var(--text-muted);margin:0">What must be in place before go-live.</p>
-          </div>
-          <button type="button" class="ds-btn ds-btn--ghost ds-btn--sm" style="border:1px solid var(--border);color:var(--text-muted)"
-            data-ds-toggle="collapse-inline" data-show-label="Show" data-hide-label="Hide" aria-controls="collapse-inline" aria-expanded="false">Show</button>
-        </div>
-        <div id="collapse-inline" hidden style="margin-top:16px">
-          <ul class="ds-u-mt0" style="font-size:.9rem;color:var(--text-secondary)"><li>Information governance sign-off</li><li>Clinical safety case (DCB0160)</li></ul>
-        </div>
-      </div>
-    </div>
-
-    <h2>Behaviour &amp; accessibility</h2>
-    <ul>
-      <li>Toggle is a <code>&lt;button&gt;</code> with <code>aria-expanded</code> and <code>aria-controls</code> pointing at the panel.</li>
-      <li>The panel uses the <code>hidden</code> attribute when collapsed (removed from the a11y tree).</li>
-      <li>Label switches between "Show" and "Hide".</li>
-    </ul>
-
-    <div class="ds-note ds-note--source">Source: <code>components/Collapsible.tsx</code>.</div>
+    <h2>Use instead</h2>
+    <p><code>nhsuk-details</code> &mdash; see <a href="/DS/components/alerts.html">Alerts &amp; notifications</a> and <a href="/DS/components/forms.html">Forms</a>.</p>
+    <p>The full list of retired components and classes, with reasons, is on the <a href="/DS/archived.html">Archived</a> page.</p>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

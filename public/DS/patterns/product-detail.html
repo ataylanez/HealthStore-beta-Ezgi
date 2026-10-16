@@ -13,120 +13,139 @@
       <p class="ds-eyebrow">Patterns</p>
       <h1 class="ds-page-title">Product detail (PDP)</h1>
       <p class="ds-lede">
-        The most complex surface in the product: a hero, a persistent decision-snapshot strip, tabbed content, and a
-        sidebar. It composes badges, tabs, cards, collapsibles, tables and CTAs into a single commissioning view.
+        A product is a small NHS-style content hub: an overview page plus one page per section, all sharing a
+        one-third contents list and a two-thirds reading column. Since Round 10 it is laid out entirely with
+        NHS primitives &mdash; width container, grid, contents list, heading-xl with caption, summary lists and inset text.
       </p>
+    </div>
+
+    <div class="ds-note">
+      <strong>What changed in Round 10.</strong> The custom sticky &ldquo;On this page&rdquo; sidebar, the 640px main column, the
+      <code>nhsuk-tabs</code> block and the Save / Share utility cluster are gone. Each former tab is now its own page under
+      <code>/apps/[slug]/[section]</code>. See <a href="/DS/archived.html">Archived</a>.
     </div>
 
     <h2>Anatomy</h2>
     <ol>
-      <li><strong>Breadcrumb</strong> &mdash; Home / Find apps / [product].</li>
-      <li><strong>Hero</strong> &mdash; logo, name, supplier, value proposition, trimmed signal badges, one primary <strong>Express interest</strong> CTA + a quiet Save / Compare / Share utility cluster.</li>
-      <li><strong>Decision snapshot strip</strong> &mdash; persistent 4-up summary (platform, indicative cost, integration capability, live deployments).</li>
-      <li><strong>On this page</strong> &mdash; sticky sidebar nav (right on desktop) with anchor links to narrative and reference sections.</li>
-      <li><strong>Narrative spine</strong> &mdash; for curated products: problem &rarr; how it helps &rarr; local value &rarr; how to buy &rarr; assurance &rarr; making it work &rarr; <strong>NHS experience</strong> (deployment register + case studies, moved out of the tabs to avoid duplication).</li>
-      <li><strong>Tabs</strong> &mdash; Evidence, Deployment &amp; adoption, Commercial, Technical &amp; integration.</li>
-      <li><strong>Sidebar</strong> &mdash; supplier contact, demo access, share/print.</li>
+      <li><strong>Breadcrumb</strong> &mdash; Home / Product catalogue / [product] (on section pages: &hellip; / [product] / [section]). Sits inside the width container, above the main wrapper.</li>
+      <li><strong>Frame</strong> (<code>PdpFrame</code>) &mdash; <code>nhsuk-width-container</code> &rarr; <code>nhsuk-main-wrapper--s</code> &rarr; <code>nhsuk-grid-row</code> with a <code>one-third</code> aside and a <code>two-thirds</code> main column. The aside stacks above the content on mobile.</li>
+      <li><strong>Section navigation</strong> (<code>PdpSectionNav</code>) &mdash; an NHS <code>nhsuk-contents-list</code> of the product&rsquo;s pages. The current page is plain bold text (<code>nhsuk-contents-list__current</code>), not a link.</li>
+      <li><strong>Title</strong> &mdash; <code>nhsuk-heading-xl</code> with the supplier as a <code>nhsuk-caption-xl</code> inside the h1, then the value proposition as <code>nhsuk-lede-text</code>, then condition / maturity / supervision tags.</li>
+      <li><strong>Actions</strong> &mdash; <code>CompareToggleButton</code> (solid button, pressed state) next to the title; the <strong>Express interest</strong> callout (<code>PdpExpressInterestCallout</code>) at the end of the column.</li>
+      <li><strong>Commissioning snapshot</strong> (<code>PdpCommissioningSnapshot</code>) &mdash; a compact summary of cost, evidence, where it is live and funding; each segment links to the relevant section page.</li>
+      <li><strong>Overview summaries</strong> (<code>PdpOverviewSummary</code>) &mdash; one <code>nhsuk-heading-l</code> block per section with a short summary (bullets, inset text or a sentence) and a &ldquo;Read more about&hellip;&rdquo; link to the section page.</li>
+      <li><strong>Section pages</strong> &mdash; the problem &rarr; how it helps &rarr; projected impact &rarr; local value &rarr; funding levers &rarr; assurance &rarr; implementation &rarr; NHS experience &rarr; how to buy &rarr; resources. Each page renders one component (<code>PdpProblem</code>, <code>PdpHowItHelps</code>, <code>PdpLocalValue</code>, <code>PdpFundingLevers</code>, <code>PdpAssurancePassport</code>, <code>PdpImplementation</code>, <code>PdpNhsExperience</code>, <code>PdpHowToBuy</code>, <code>PdpResources</code>).</li>
+      <li><strong>Share &amp; print</strong> (<code>PdpSharePrintContext</code>) &mdash; regions are tagged so a shared link can show a subset of the page; the UI is a plain NHS button row, not a cluster.</li>
     </ol>
 
-    <h2>Hero</h2>
-    <p>
-      <strong>One primary action.</strong> Express interest is the sole
-      filled CTA; Save / Compare / Share sit in a quiet, tinted utility cluster (44px targets, consistent icon + label). Hero
-      badges are trimmed to <strong>condition + decision signals</strong> (maturity if not &ldquo;Established&rdquo;, content
-      confidence) &mdash; supervision model, NICE references and the NHS App badge sit in the commissioning snapshot
-      and detail sections.
-    </p>
-    <div class="ds-example ds-example--surface">
-      <div class="hs-surface-card-sm" style="background:#fff;border:1px solid var(--border);border-radius:0;padding:24px">
-        <nav aria-label="Breadcrumb" style="margin-bottom:12px"><ol style="display:flex;gap:6px;list-style:none;margin:0;padding:0;font-size:.82rem;color:var(--text-muted)"><li><a href="#ds-main" style="color:#005EB8;text-decoration:none">Home</a></li><li aria-hidden>/</li><li><a href="#ds-main" style="color:#005EB8;text-decoration:none">Find apps</a></li><li aria-hidden>/</li><li aria-current="page" style="color:var(--text-primary)">Clinitouch</li></ol></nav>
-        <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
-          <div style="width:56px;height:56px;border-radius:12px;background:var(--nhs-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.4rem">C</div>
-          <div style="flex:1;min-width:220px">
-            <div class="ds-u-row" style="margin-bottom:10px"><span class="badge badge-teal">COPD</span><span class="badge badge-green">Scaled</span><span class="badge badge-blue">Supplier-reported</span></div>
-            <h2 class="ds-u-mt0" style="margin:0;font-size:1.6rem">Clinitouch</h2>
-            <p class="ds-u-muted ds-u-mt0" style="margin:2px 0 10px">Clinitouch Ltd</p>
-            <p class="ds-u-mt0" style="margin:0 0 12px;color:var(--text-secondary)">Remote monitoring that keeps COPD patients supported at home with clinician oversight.</p>
-            <button class="ds-btn ds-btn--primary" type="button">Express interest</button>
+    <h2>Layout</h2>
+    <div class="ds-example ds-layout-demo">
+      <span class="ds-layout-demo__label">nhsuk-width-container &rarr; nhsuk-main-wrapper--s &rarr; grid</span>
+      <div class="nhsuk-width-container">
+        <div class="nhsuk-grid-row">
+          <div class="nhsuk-grid-column-one-third">
+            <nav class="nhsuk-contents-list" aria-label="Example contents">
+              <ol class="nhsuk-contents-list__list">
+                <li class="nhsuk-contents-list__item"><span class="nhsuk-contents-list__current">Overview</span></li>
+                <li class="nhsuk-contents-list__item"><a class="nhsuk-contents-list__link" href="#ds-main">The problem</a></li>
+                <li class="nhsuk-contents-list__item"><a class="nhsuk-contents-list__link" href="#ds-main">How Luscii helps</a></li>
+                <li class="nhsuk-contents-list__item"><a class="nhsuk-contents-list__link" href="#ds-main">Projected impact</a></li>
+                <li class="nhsuk-contents-list__item"><a class="nhsuk-contents-list__link" href="#ds-main">Assurance and evidence</a></li>
+                <li class="nhsuk-contents-list__item"><a class="nhsuk-contents-list__link" href="#ds-main">How to buy</a></li>
+              </ol>
+            </nav>
           </div>
-        </div>
-        <div style="display:flex;justify-content:flex-end;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
-          <div style="display:inline-flex;flex-wrap:wrap;gap:8px;background:#F0F4F5;border-radius:8px;padding:4px 4px 8px">
-            <button class="ds-btn ds-btn--secondary ds-btn--sm" type="button">&#8599; Share</button>
-            <button class="ds-btn ds-btn--toggle ds-btn--sm" type="button" aria-pressed="false">&#9734; Save</button>
-            <button class="ds-btn ds-btn--toggle ds-btn--sm" type="button" aria-pressed="false">&#8646; Add to compare</button>
+          <div class="nhsuk-grid-column-two-thirds">
+            <h1 class="nhsuk-heading-xl" style="margin-bottom:16px"><span class="nhsuk-caption-xl">Luscii Healthtech</span>Luscii</h1>
+            <p class="nhsuk-lede-text" style="margin-bottom:16px">Remote monitoring that keeps COPD patients supported at home with clinician oversight.</p>
+            <div class="ds-u-row" style="margin-bottom:16px"><span class="badge badge-teal">COPD</span><span class="badge badge-green">Scaled</span><span class="badge badge-grey">Clinician-supervised</span></div>
+            <button class="ds-btn ds-btn--toggle" type="button" aria-pressed="false">Add to compare</button>
           </div>
         </div>
       </div>
     </div>
+<pre class="ds-code"><code>&lt;div class="nhsuk-width-container"&gt;
+  &lt;PageBreadcrumb items={…} /&gt;
+  &lt;div class="nhsuk-main-wrapper nhsuk-main-wrapper--s"&gt;
+    &lt;div class="nhsuk-grid-row"&gt;
+      &lt;aside class="nhsuk-grid-column-one-third"&gt;
+        &lt;PdpSectionNav sections={sections} title={app.app_name} /&gt;
+      &lt;/aside&gt;
+      &lt;div class="nhsuk-grid-column-two-thirds"&gt;
+        &lt;h1 class="nhsuk-heading-xl"&gt;
+          &lt;span class="nhsuk-caption-xl"&gt;{supplier}&lt;/span&gt;{name}
+        &lt;/h1&gt;
+        &lt;p class="nhsuk-lede-text"&gt;{value proposition}&lt;/p&gt;
+        …
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
 
-    <h2>Decision snapshot strip</h2>
-    <p>The persistent commissioning summary (<code>PdpCommissioningSnapshot</code>). Four equal segments so width stays stable even when funding is absent.</p>
+    <h2>Section pages</h2>
+    <p>Every section lives at <code>/apps/[slug]/[section]</code> and uses the same frame, so the contents list never moves. The section
+      heading is an <code>nhsuk-heading-l</code> (<code>.hs-pdp-heading</code> adds only the anchor offset). Titles come from one place,
+      <code>lib/pdpSections.ts</code>, so the nav label and the on-page heading can never drift apart.</p>
+    <table class="ds-table">
+      <thead><tr><th>Segment</th><th>Component</th><th>Main NHS components used</th></tr></thead>
+      <tbody>
+        <tr><td><code>the-problem</code></td><td><code>PdpProblem</code></td><td>Body text, <code>nhsuk-inset-text</code></td></tr>
+        <tr><td><code>how-it-helps</code></td><td><code>PdpHowItHelps</code></td><td>Lists, <code>ProcessSteps</code> / <code>BeforeAfterImpact</code> storytelling</td></tr>
+        <tr><td><code>local-impact</code>, <code>local-value-worth</code></td><td><code>PdpLocalValue</code>, <code>PdpWorthTiles</code></td><td>Tiles on the NHS grid, charts, <code>nhsuk-details</code> for assumptions</td></tr>
+        <tr><td><code>funding-levers</code></td><td><code>PdpFundingLevers</code></td><td><code>nhsuk-summary-list</code>, <code>nhsuk-tag</code></td></tr>
+        <tr><td><code>assurance</code></td><td><code>PdpAssurancePassport</code>, <code>PdpRegulatoryPosition</code></td><td><code>nhsuk-summary-list</code>, <code>nhsuk-tag</code>, <code>nhsuk-warning-callout</code></td></tr>
+        <tr><td><code>implementation</code></td><td><code>PdpImplementation</code></td><td>Lists, <code>nhsuk-inset-text</code></td></tr>
+        <tr><td><code>nhs-experience</code></td><td><code>PdpNhsExperience</code>, <code>PdpWhereLive</code>, <code>DeploymentRegisterTable</code></td><td><code>nhsuk-table</code>, case-study cards</td></tr>
+        <tr><td><code>how-to-buy</code></td><td><code>PdpHowToBuy</code></td><td><code>nhsuk-summary-list</code>, Express interest callout</td></tr>
+        <tr><td><code>resources</code></td><td><code>PdpResources</code>, <code>PdpClinicalPublications</code></td><td>Lists of links, publication cards</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Commissioning snapshot</h2>
+    <p>Still a bespoke strip (<code>.hs-snapshot-strip__*</code>) because NHS has no equivalent; it uses NHS points for padding (16/24) and
+      <code>nhsuk-body-s</code> for labels. Four equal segments keep width stable even when funding is absent. Each segment is a link to its section page.</p>
     <div class="ds-example ds-example--surface">
       <div class="hs-decision-snapshot" style="border-radius:0">
         <div class="hs-snapshot-strip__grid">
           <div class="hs-snapshot-strip__segment"><p class="hs-snapshot-strip__heading">Indicative cost</p><div class="hs-snapshot-strip__body"><span class="badge badge-grey">Contact supplier</span></div></div>
           <div class="hs-snapshot-strip__segment"><p class="hs-snapshot-strip__heading">Evidence</p><div class="hs-snapshot-strip__body"><span class="badge badge-green">Strong</span></div></div>
-          <div class="hs-snapshot-strip__segment"><p class="hs-snapshot-strip__heading">Where it's live</p><div class="hs-snapshot-strip__body"><span class="badge badge-blue">5 ICBs</span></div></div>
+          <div class="hs-snapshot-strip__segment"><p class="hs-snapshot-strip__heading">Where it&rsquo;s live</p><div class="hs-snapshot-strip__body"><span class="badge badge-blue">5 ICBs</span></div></div>
           <div class="hs-snapshot-strip__segment"><p class="hs-snapshot-strip__heading">Funding</p><div class="hs-snapshot-strip__body"><span class="badge badge-green">2 opportunities</span></div></div>
         </div>
       </div>
     </div>
 
-    <h2>On this page</h2>
-    <p>
-      Sticky sidebar beside the main column from <code>lg</code> breakpoint. The current section is signalled with bold text
-      and a 5px vertical line (pattern aligned with
-      <a href="https://design-guide.publishing.service.gov.uk/components/related-navigation/">GOV.UK related navigation</a>).
-      On smaller screens the nav stacks above
-      the content. Links use hash anchors so <code>PdpTabs</code> opens the correct tab before scrolling.
-    </p>
-    <div class="ds-example ds-example--surface">
-      <div class="hs-pdp-with-sidebar" style="max-width:48rem">
-        <div class="hs-pdp-with-sidebar__main">
-          <p class="ds-u-mt0 ds-u-muted" style="font-size:.85rem">Main column — narrative spine, tabs, express interest.</p>
-        </div>
-        <aside class="hs-pdp-with-sidebar__aside">
-          <nav class="hs-on-this-page" aria-label="On this page">
-            <strong class="hs-on-this-page__title">On this page</strong>
-            <ul class="hs-on-this-page__list">
-              <li><a class="hs-on-this-page__link" href="#the-problem">The problem</a></li>
-              <li><a class="hs-on-this-page__link hs-on-this-page__link--active" href="#how-it-helps" aria-current="location">How Clinitouch helps</a></li>
-              <li><a class="hs-on-this-page__link" href="#local-impact">Projected impact</a></li>
-              <li><a class="hs-on-this-page__link" href="#assurance">Assurance and evidence</a></li>
-              <li><a class="hs-on-this-page__link" href="#clinical-evidence">Clinical evidence</a></li>
-            </ul>
-          </nav>
-        </aside>
-      </div>
-    </div>
-
-    <h2>Tabbed content</h2>
-    <div class="ds-example">
-      <div class="nhsuk-tabs" data-ds-tabs>
-        <ul class="nhsuk-tabs__list" role="tablist">
-          <li class="nhsuk-tabs__list-item nhsuk-tabs__list-item--selected"><a class="nhsuk-tabs__tab" role="tab" aria-selected="true" href="#pdp-ev">Evidence</a></li>
-          <li class="nhsuk-tabs__list-item"><a class="nhsuk-tabs__tab" role="tab" aria-selected="false" href="#pdp-dep">Deployment</a></li>
+    <div class="ds-dosdonts">
+      <div class="ds-panel ds-panel--do">
+        <p class="ds-panel__head">Do</p>
+        <ul>
+          <li>Keep the contents list to the product&rsquo;s own pages; link out to the catalogue via the breadcrumb.</li>
+          <li>Give each section page one <code>nhsuk-heading-l</code> and keep the h1 for the product name.</li>
+          <li>Use <code>nhsuk-summary-list</code> for key/value facts and <code>nhsuk-inset-text</code> for caveats.</li>
         </ul>
-        <div class="nhsuk-tabs__panel" id="pdp-ev" role="tabpanel">
-          <div class="card-evidence" style="margin-bottom:0"><div class="ds-u-row" style="margin-bottom:6px"><span class="badge badge-blue">RCT</span><span class="badge badge-grey">n=240</span></div><strong>Reduced admissions in a 12-month trial.</strong><p class="ds-u-mt0 ds-u-muted" style="font-size:.85rem;margin:4px 0 0">Author et al., Journal 2024</p></div>
-        </div>
-        <div class="nhsuk-tabs__panel nhsuk-tabs__panel--hidden" id="pdp-dep" role="tabpanel"><p class="ds-u-mt0">"Where it's live" deployment register and scale &amp; maturity. See <a href="/DS/components/tables.html">Tables</a>.</p></div>
+      </div>
+      <div class="ds-panel ds-panel--dont">
+        <p class="ds-panel__head">Don't</p>
+        <ul>
+          <li>Reintroduce tabs, sticky sidebars or a secondary action cluster in the title area.</li>
+          <li>Constrain the main column below the NHS two-thirds width.</li>
+          <li>Hide the section navigation on mobile &mdash; it stacks above the content.</li>
+        </ul>
       </div>
     </div>
 
     <h2>Components used</h2>
     <p>
-      <a href="/DS/components/navigation.html">Breadcrumb</a> &middot;
-      <a href="/DS/components/badges-tags.html">Badges</a> &middot;
+      <a href="/DS/components/navigation.html">Breadcrumb &amp; contents list</a> &middot;
+      <a href="/DS/components/badges-tags.html">Tags</a> &middot;
       <a href="/DS/components/buttons.html">Buttons</a> &middot;
-      <a href="/DS/components/tabs.html">Tabs</a> &middot;
-      <a href="/DS/components/cards.html">Evidence cards</a> &middot;
-      <a href="/DS/components/collapsible.html">Collapsible sections</a> &middot;
-      <a href="/DS/components/tables.html">Deployment table</a>
+      <a href="/DS/components/toggles.html">Compare toggle</a> &middot;
+      <a href="/DS/components/summary-list.html">Summary list</a> &middot;
+      <a href="/DS/components/alerts.html">Inset text &amp; warning callout</a> &middot;
+      <a href="/DS/components/tables.html">Deployment register table</a>
     </p>
 
-    <div class="ds-note ds-note--source">Source: <code>app/apps/[slug]/page.tsx</code>, <code>components/PdpOnThisPage.tsx</code>, <code>components/PdpTabs.tsx</code>, <code>components/PdpCommissioningSnapshot.tsx</code>, <code>components/AppDetailSections.tsx</code>, <code>app/apps/[slug]/pdpBlocks.tsx</code>.</div>
+    <div class="ds-note ds-note--source">Source: <code>app/apps/[slug]/page.tsx</code>, <code>app/apps/[slug]/[section]/page.tsx</code>, <code>components/product/PdpFrame.tsx</code>, <code>components/PdpSectionNav.tsx</code>, <code>components/product/PdpOverviewSummary.tsx</code>, <code>components/PdpCommissioningSnapshot.tsx</code>, <code>lib/pdpSections.ts</code>, <code>lib/pdpPageModel.ts</code>.</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

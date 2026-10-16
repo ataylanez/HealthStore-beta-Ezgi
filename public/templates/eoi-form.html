@@ -13,8 +13,8 @@
       <p class="ds-eyebrow">Templates &middot; T7</p>
       <h1 class="ds-page-title">EOI (Form)</h1>
       <p class="ds-lede">
-      Transactional flow: Starting with one question per screen, progressing grouped question screens as transaction
-      progresses, a check-answers step, then confirmation.
+        Transactional flow. One question per page, then check your answers, then confirmation.
+        Each step is its own address and uses the two-thirds question-page layout.
       </p>
     </div>
 
@@ -37,9 +37,9 @@
     <table class="ds-table">
       <thead><tr><th style="width:26%">Region</th><th>Content</th><th style="width:20%">Who edits</th></tr></thead>
       <tbody>
-        <tr><td>Question page</td><td>Back link, H1 question, hint text, single input group (radios / text / fieldset), Continue button. Form components with error summary on validation failure.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
-        <tr><td>Check answers</td><td>Summary list with change links back into individual steps.</td><td><span class="badge badge-amber">Site functionality</span></td></tr>
-        <tr><td>Confirmation</td><td>Confirmation panel, what-happens-next copy, onward links.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
+        <tr><td>Question page</td><td>Two-thirds column. Back link above the main area, the question as the page title, hint text, one group of NHS fields (text, radios or checkboxes), and Continue. On a failed check, an error summary at the top of the page and an error on the field.</td><td><span class="badge badge-green">CMS editor</span> (wording)</td></tr>
+        <tr><td>Check answers</td><td>NHS summary list with change links back into individual steps.</td><td><span class="badge badge-amber">Site functionality</span></td></tr>
+        <tr><td>Confirmation</td><td>Green NHS confirmation panel, what-happens-next copy, onward links.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
       </tbody>
     </table>
 
@@ -47,9 +47,12 @@
     <p>
       <strong>Wagtail consideration note:</strong> Each step is its own route, but the flow itself stays in site code: validation, step guards, answer
       state and email verification are logic, not content. The question copy, hints and confirmation text are what
-      the Back Office team edits (per the CMS editor tags above) &mdash; expose these as editable strings/snippets
-      rather than modelling the steps as CMS pages. Wagtail&rsquo;s form builder is not a good fit for multi-step
-      verified journeys.
+      the Back Office team edits &mdash; expose these as editable strings or snippets
+      rather than modelling the steps as CMS pages. Wagtail&rsquo;s form builder is a poor fit for a multi-step
+      journey that verifies an email address.
+    </p>
+    <p>
+      Supplier onboarding and the supplier portal editors ask one question per page in the same layout. They are not part of this template: they are site functionality for suppliers, described on the <a href="/DS/patterns/supplier-portal.html">Supplier portal</a> pattern.
     </p>
   </div>
   <script src="/DS/assets/ds.js" defer></script>

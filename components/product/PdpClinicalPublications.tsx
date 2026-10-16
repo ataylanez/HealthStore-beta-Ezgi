@@ -16,7 +16,7 @@ export default function PdpClinicalPublications({
   return (
     <div className={className || undefined}>
       {showHeading && (
-        <h3 className="hs-pdp-subheading hs-font-bold mb-3" style={{ fontSize: 'var(--text-card-title-sm)' }}>
+        <h3 className="nhsuk-heading-s hs-pdp-subheading">
           Clinical publications and evaluations
         </h3>
       )}

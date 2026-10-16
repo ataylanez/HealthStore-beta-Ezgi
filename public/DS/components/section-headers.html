@@ -13,58 +13,45 @@
       <p class="ds-eyebrow">Components</p>
       <h1 class="ds-page-title">Section headers</h1>
       <p class="ds-lede">
-        A consistent heading block for content sections: a bold title, an optional description, and a blue-to-transparent
-        underline rule. Used throughout the PDP and content pages.
+        Section headings are plain NHS headings. A page section is an <code>&lt;h2 class="nhsuk-heading-l"&gt;</code>;
+        sub-sections are <code>nhsuk-heading-m</code> / <code>nhsuk-heading-s</code>. The gradient-rule <code>SectionHeader</code>
+        component is retired from the PDP and is only still rendered by <code>ProductVideosSection</code>.
       </p>
     </div>
 
     <div class="ds-meta-grid">
-      <div class="ds-meta"><div class="ds-meta__k">Component</div><div class="ds-meta__v"><code>SectionHeader</code></div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Source</div><div class="ds-meta__v"><code>components/Badges.tsx</code></div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Canonical</div><div class="ds-meta__v"><code>nhsuk-heading-l</code> (h2) &middot; <code>nhsuk-heading-m</code> (h3) &middot; <code>nhsuk-heading-s</code> (h4)</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">PDP helper</div><div class="ds-meta__v"><code>PdpSection</code> renders <code>&lt;h2 class="nhsuk-heading-l hs-pdp-heading"&gt;</code>; <code>.hs-pdp-heading</code> only adds the anchor scroll offset</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Legacy</div><div class="ds-meta__v"><code>SectionHeader</code> in <code>components/Badges.tsx</code> &mdash; candidate for removal</div></div>
     </div>
 
-    <h2>Default</h2>
+    <h2>Page section</h2>
     <div class="ds-example">
-      <div style="margin-bottom:0">
-        <h2 style="font-family:var(--font-display);font-size:var(--text-section-alt);font-weight:700;color:var(--text-primary);margin:0 0 4px">Clinical evidence</h2>
-        <p style="font-size:.875rem;color:var(--text-muted);margin:0">RCTs, service evaluations and NICE assessments behind this product.</p>
-        <div style="margin-top:12px;height:2px;border-radius:2px;background:linear-gradient(90deg, var(--nhs-blue), transparent)"></div>
-      </div>
+      <h2 class="nhsuk-heading-l" style="margin-bottom:8px">Assurance and evidence</h2>
+      <p style="margin:0;color:var(--text-secondary)">Regulatory status, DTAC and the clinical studies behind this product.</p>
     </div>
-<pre class="ds-code"><code>&lt;SectionHeader
-  title="Clinical evidence"
-  description="RCTs, service evaluations and NICE assessments behind this product."
-/&gt;</code></pre>
+<pre class="ds-code"><code>&lt;h2 class="nhsuk-heading-l"&gt;Assurance and evidence&lt;/h2&gt;
+&lt;p class="nhsuk-body-m"&gt;Regulatory status, DTAC and the clinical studies behind this product.&lt;/p&gt;</code></pre>
 
-    <h2>Without description</h2>
+    <h2>Section with caption</h2>
+    <p>When a section needs context above its title use a caption inside the heading, matching the page-title pattern.</p>
     <div class="ds-example">
-      <div>
-        <h2 style="font-family:var(--font-display);font-size:var(--text-section-alt);font-weight:700;color:var(--text-primary);margin:0">Where it's live</h2>
-        <div style="margin-top:12px;height:2px;border-radius:2px;background:linear-gradient(90deg, var(--nhs-blue), transparent)"></div>
-      </div>
+      <h2 class="nhsuk-heading-l" style="margin-bottom:0"><span class="nhsuk-caption-xl" style="font-size:1.1875rem">Projected impact</span>What Luscii could mean for NHS Example ICB</h2>
     </div>
+<pre class="ds-code"><code>&lt;h2 class="nhsuk-heading-l"&gt;
+  &lt;span class="nhsuk-caption-l"&gt;Projected impact&lt;/span&gt;
+  What Luscii could mean for NHS Example ICB
+&lt;/h2&gt;</code></pre>
 
-    <h2>Anatomy</h2>
-    <table class="ds-table">
-      <thead><tr><th>Part</th><th>Token / value</th></tr></thead>
-      <tbody>
-        <tr><td>Title</td><td><code>--text-section-alt</code> (1.4rem), weight 700, <code>--text-primary</code></td></tr>
-        <tr><td>Description</td><td><code>--text-xs</code> (0.875rem), <code>--text-muted</code></td></tr>
-        <tr><td>Rule</td><td>2px, <code>linear-gradient(90deg, var(--nhs-blue), transparent)</code> (decorative only)</td></tr>
-      </tbody>
-    </table>
-
-    <h2>Shared primitives</h2>
-    <p><code>SectionHeader</code> and <code>PdpSection</code> both use <code>--text-section-alt</code> + <code>--text-primary</code> for section titles. NHS blue on the gradient rule is decorative, not a link affordance.</p>
-
-    <h2>Accessibility</h2>
+    <h2>Rules</h2>
     <ul>
-      <li>Renders a real <code>&lt;h2&gt;</code>; pass an <code>id</code> to make it a heading target.</li>
-      <li>Keep heading order logical — don't skip levels for styling.</li>
-      <li>The gradient rule is decorative.</li>
+      <li>One <code>nhsuk-heading-xl</code> per page; sections start at <code>nhsuk-heading-l</code> and nest downwards without skipping levels.</li>
+      <li>No decorative rules, gradients or eyebrow labels above headings.</li>
+      <li>A description under a heading is ordinary body text, not small grey text.</li>
+      <li>Use <code>nhsuk-u-margin-top-*</code> between sections rather than bespoke section classes.</li>
     </ul>
 
-    <div class="ds-note ds-note--source">Source: <code>SectionHeader</code> in <code>components/Badges.tsx</code>; <code>PdpSection</code> in <code>components/PdpSection.tsx</code>.</div>
+    <div class="ds-note ds-note--source">Source: <code>components/PdpSection.tsx</code>, <code>components/product/PdpOverviewSummary.tsx</code>, <code>app/page.tsx</code>; nhsuk-frontend headings.</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

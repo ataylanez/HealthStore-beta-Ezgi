@@ -36,35 +36,34 @@ const PREPARING_LINKS = [
 
 export default function PreparingToRecommendPage() {
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container">
       <PageBreadcrumb
         items={[
           { label: 'Resource library', href: '/resources' },
           { label: 'Preparing to recommend a DTx' },
         ]}
       />
-      <h1 className="page-title-h1">Preparing to recommend a DTx</h1>
-      <p
-        className="hs-measure"
-        style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)', marginBottom: 40 }}
-      >
+      <div className="nhsuk-main-wrapper nhsuk-main-wrapper--s">
+      <div className="nhsuk-grid-row">
+      <div className="nhsuk-grid-column-two-thirds">
+      <h1 className="nhsuk-heading-xl">Preparing to recommend a DTx</h1>
+      <p className="nhsuk-lede-text">
         What to understand before recommending a digital therapeutic — how The NHS HealthStore works, how to embed a
         DTx in a pathway, which patients are suitable, and how to introduce it in the consultation.
       </p>
 
-      <ul className="nhsuk-list" style={{ maxWidth: '40rem' }}>
+      <ul className="nhsuk-list nhsuk-list--bullet">
         {PREPARING_LINKS.map(item => (
-          <li key={item.title} style={{ marginBottom: '1rem' }}>
-            <Link
-              href={item.href}
-              className="nhsuk-link"
-              style={{ fontSize: 'var(--text-body)', fontWeight: 600 }}
-            >
+          <li key={item.title}>
+            <Link href={item.href}>
               {item.title}
             </Link>
           </li>
         ))}
       </ul>
+      </div>
+      </div>
+      </div>
     </div>
   )
 }

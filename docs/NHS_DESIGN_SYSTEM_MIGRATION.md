@@ -156,8 +156,34 @@ Landed (foundation-level, so it flattens the whole app with few edits):
   `[..]` values and `min-h-[44px]` touch targets left intact.
 - `Button` SIZE paddings reconciled to NHS steps (8/16/24px) with `min-h` holding the 44px target.
 - Page width kept at ~1280px (not NHS 960px) by decision; Tailwind grid/flex layouts retained —
-  only gutters/spacing normalised, no swap to `.nhsuk-grid-*`.
+  only gutters/spacing normalised, no swap to `.nhsuk-grid-*`. **Reversed in iteration 5 — see below.**
 - Mirrored tokens/utilities in `public/DS/assets/ds.css` + `public/DS/styles/spacing.html`.
+
+### Delivery status (iteration 5 — NHS layout & typography alignment)
+
+Designer-facing audit with before/after screenshots and the prioritised plan lives at
+`public/nhs-audit/index.html` (URL `/nhs-audit`, reachable by URL only — not linked from any
+navigation) and `public/nhs-audit/NHS-Audit.pdf`.
+
+- **The 1280px decision is reversed.** Every page now uses `.nhsuk-width-container` (960px) and
+  `.nhsuk-main-wrapper` (`--s` below breadcrumbs). The 80rem overrides on the header, navigation
+  and phase banner were removed so the whole frame follows the NHS container. `.hs-page` is kept
+  only as a thin alias of the NHS geometry and has no remaining consumers; `.hs-page-narrow` was
+  removed; `.hs-measure` now equals the two-thirds column (613px).
+- Reading content, forms, journeys and the supplier portal sit in `nhsuk-grid-row >
+  nhsuk-grid-column-two-thirds`; PDP and catalogue use one-third + two-thirds; card rows use
+  `nhsuk-card-group` with one-third / one-half columns.
+- Headings: `.page-title-h1` → `nhsuk-heading-xl` (with `nhsuk-caption-xl` for PDP supplier);
+  PDP section titles `nhsuk-heading-l`, sub-sections `nhsuk-heading-s`; lede `nhsuk-lede-text`
+  (22/26, replacing the deprecated 24pt). Custom `.page-title-h1` / `.hs-section-title` rules
+  removed.
+- Removed all uppercase + letter-spaced labels, weight-500 usage and the unused Frutiger Light
+  face; fixed-px chart/pill text raised to NHS body-s; links underlined at rest.
+- Home relaid on `nhsuk-hero` + width container; PDP uses `nhsuk-contents-list`, summary lists and
+  inset text; catalogue uses a one-third filter column and a stacked `nhsuk-card` list.
+- Deferred / needs decision (detailed in the audit): breadcrumb outside `<main>`, `nhsuk-pagination`,
+  BackToTop FAB, AI Advisor drawer, compare count badge, GOV.UK-styled `.nhsuk-tag`, compare tables
+  at 960px, deletion of unused CSS and `* 2.tsx` duplicates.
 
 Notes:
 - Links inherit the NHS underline from the `nhs` cascade layer (Tailwind preflight sits lower).

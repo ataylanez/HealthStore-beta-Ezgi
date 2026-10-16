@@ -13,130 +13,79 @@
       <p class="ds-eyebrow">Components</p>
       <h1 class="ds-page-title">Alerts &amp; notifications</h1>
       <p class="ds-lede">
-        Inline messages that draw attention to status, warnings or errors. The product's <code>AlertBox</code> uses a
-        left-border + tint pattern with three semantic types.
+        Inline messages use the two NHS components for this job: <strong>inset text</strong> for information and
+        <strong>warning callout</strong> for things the reader must not miss. Transient feedback uses a single global <strong>toast</strong>.
+        The bespoke tinted alert boxes and page banners are retired.
       </p>
     </div>
 
     <div class="ds-meta-grid">
-      <div class="ds-meta"><div class="ds-meta__k">Component</div><div class="ds-meta__v"><code>AlertBox</code></div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Source</div><div class="ds-meta__v"><code>components/Badges.tsx</code></div></div>
+      <div class="ds-meta"><div class="ds-meta__k">NHS classes</div><div class="ds-meta__v"><code>nhsuk-inset-text</code>, <code>nhsuk-warning-callout</code>, <code>nhsuk-details</code></div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Components</div><div class="ds-meta__v"><code>AlertBox</code> (<code>components/Badges.tsx</code>) wraps both; <code>ActionNeededCallout</code> (portal); <code>Toast</code> (<code>components/ui/Toast.tsx</code>)</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Used in</div><div class="ds-meta__v">Inset text in 12 files &middot; warning callout in 3 &middot; details in 4</div></div>
     </div>
 
-    <h2>Types</h2>
-    <div class="ds-example ds-example--surface">
-      <div class="ds-example__stack">
-        <div role="status" style="border-radius:8px;padding:16px;display:flex;gap:12px;font-size:.9rem;background:#E6F0FB;border-left:4px solid #005EB8;color:#003087">
-          <span aria-hidden style="font-weight:700">&#8505;</span>
-          <div><strong>Info.</strong> This entry is supplier-reported. Verify details before procurement.</div>
-        </div>
-        <div role="status" style="border-radius:8px;padding:16px;display:flex;gap:12px;font-size:.9rem;background:#FEF5E6;border-left:4px solid #D5840D;color:#7A4800">
-          <span aria-hidden style="font-weight:700">&#9888;</span>
-          <div><strong>Warning.</strong> DTAC passed but a refresh is required for current deployment.</div>
-        </div>
-        <div role="alert" style="border-radius:8px;padding:16px;display:flex;gap:12px;font-size:.9rem;background:#FDECEA;border-left:4px solid #DA291C;color:#7A1210">
-          <span aria-hidden style="font-weight:700">&#10005;</span>
-          <div><strong>Danger.</strong> Contradictory evidence has been flagged for this product.</div>
-        </div>
-      </div>
-    </div>
-<pre class="ds-code"><code>&lt;AlertBox type="info"&gt;Supplier-reported &hellip;&lt;/AlertBox&gt;
-&lt;AlertBox type="warning"&gt;DTAC refresh required &hellip;&lt;/AlertBox&gt;
-&lt;AlertBox type="danger"&gt;Contradictory evidence &hellip;&lt;/AlertBox&gt;</code></pre>
-
-    <h2>Banners</h2>
-    <p>Full-width contextual banners reuse the tint pattern at page or section scope (e.g. the shared-product view banner, cookie consent region).</p>
+    <h2>Inset text</h2>
+    <p>For information that is useful but not critical: supplier-reported caveats, empty states (&ldquo;No apps match your filters&rdquo;), notes under a summary. Thick NHS-blue left keyline, no background.</p>
     <div class="ds-example">
-      <div role="region" aria-label="Shared view" style="border:1px solid #A2C8E8;background:#EEF6FF;border-radius:8px;padding:14px 16px;font-size:.9rem;color:#003087">
-        You are viewing a shared, read-only version of this product page.
+      <div role="status" style="border-left:8px solid var(--nhs-blue);padding:16px 24px;max-width:620px">
+        <span class="ds-u-sr">Information: </span>
+        <p style="margin:0">This entry is supplier-reported. Verify details with the supplier before procurement.</p>
       </div>
     </div>
+<pre class="ds-code"><code>&lt;div class="nhsuk-inset-text"&gt;
+  &lt;span class="nhsuk-u-visually-hidden"&gt;Information: &lt;/span&gt;
+  &lt;p&gt;This entry is supplier-reported. Verify details with the supplier before procurement.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;!-- or --&gt;
+&lt;AlertBox type="info"&gt;…&lt;/AlertBox&gt;</code></pre>
+
+    <h2>Warning callout</h2>
+    <p>For things that could cause harm or block a decision: a clinical safety alert, DTAC not confirmed, or an &ldquo;Action needed&rdquo; review note in the supplier portal. Yellow label tab, pale-yellow panel.</p>
+    <div class="ds-example">
+      <div role="alert" style="background:#fff9c4;border:1px solid #ffeb3b;max-width:620px;padding:0 24px 24px;position:relative;margin-top:24px">
+        <h3 style="display:inline-block;background:#ffeb3b;margin:0 0 16px -24px;padding:8px 24px;font-size:1.1875rem;font-weight:600;position:relative;top:-16px">Important</h3>
+        <p style="margin:0">DTAC is required for this product but has not been confirmed by the supplier.</p>
+      </div>
+    </div>
+<pre class="ds-code"><code>&lt;div class="nhsuk-warning-callout" role="alert"&gt;
+  &lt;h3 class="nhsuk-warning-callout__label"&gt;
+    &lt;span role="text"&gt;&lt;span class="nhsuk-u-visually-hidden"&gt;Important: &lt;/span&gt;Important&lt;/span&gt;
+  &lt;/h3&gt;
+  &lt;p&gt;DTAC is required for this product but has not been confirmed by the supplier.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;!-- AlertBox maps type="warning" → label "Important", role="status";
+     type="danger" → label "Warning", role="alert" --&gt;</code></pre>
+
+    <h2>Details (progressive disclosure)</h2>
+    <p>Where a note is long or only sometimes needed (chart assumptions, verification steps) use <code>nhsuk-details</code> rather than a collapsible card.</p>
 
     <h2>Toasts</h2>
-    <p>
-      Transient feedback for actions &mdash; save / remove, copy, comparison changes, and provider load failures &mdash; goes
-      through one global service rather than per-feature inline banners. A single <code>ToastProvider</code> is mounted as the
-      outermost provider in <code>AppShell</code>; any client component or provider calls <code>useToast()</code> and gets
-      <code>success</code>, <code>error</code> and <code>info</code>. Toasts render in a <strong>top-centre</strong> portal,
-      auto-dismiss (errors linger longer), and are manually dismissible.
-    </p>
-    <div class="ds-example">
-      <div style="position:relative;height:200px;border:1px dashed var(--border);border-radius:12px;background:#f8fafc;overflow:hidden">
-        <div style="position:absolute;left:50%;top:12px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;width:min(340px,90%)">
-          <div style="display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid #CBD5E1;border-left:4px solid #007F3B;border-radius:10px;padding:10px 12px;box-shadow:0 6px 20px rgba(15,23,42,.12)">
-            <span aria-hidden style="color:#007F3B;font-weight:700">&#10003;</span>
-            <span style="font-size:.85rem;color:#1A2332">Saved to your saved apps.</span>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid #CBD5E1;border-left:4px solid #005EB8;border-radius:10px;padding:10px 12px;box-shadow:0 6px 20px rgba(15,23,42,.12)">
-            <span aria-hidden style="color:#005EB8;font-weight:700">&#8505;</span>
-            <span style="font-size:.85rem;color:#1A2332">Added to the comparison tool (2/4).</span>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid #CBD5E1;border-left:4px solid #DA291C;border-radius:10px;padding:10px 12px;box-shadow:0 6px 20px rgba(15,23,42,.12)">
-            <span aria-hidden style="color:#DA291C;font-weight:700">&#9888;</span>
-            <span style="font-size:.85rem;color:#1A2332">Couldn&rsquo;t save &mdash; try again.</span>
-          </div>
-        </div>
+    <p>Transient confirmations and failures (&ldquo;Added to compare&rdquo;, &ldquo;The comparison tool is full&rdquo;, &ldquo;Copied link&rdquo;). One <code>ToastProvider</code> is mounted in <code>AppShell</code>; any client component calls <code>useToast()</code>. Toasts are bespoke (NHS has no toast) and are kept to a single bottom-centre stack, auto-dismissing, with a polite live region.</p>
+    <div class="ds-example ds-example--surface">
+      <div role="status" style="display:inline-flex;align-items:center;gap:12px;background:var(--text-primary);color:#fff;padding:12px 16px;border-radius:4px">
+        <span>Added to compare</span>
+        <button type="button" style="background:none;border:0;color:#fff;text-decoration:underline;cursor:pointer;padding:0">Dismiss</button>
       </div>
     </div>
-<pre class="ds-code"><code>const toast = useToast()
-toast.success('Saved to your saved apps.')
-toast.info('Removed from the comparison tool.')
-toast.error('Couldn&rsquo;t save &mdash; try again.')
-
-// optional inline action (e.g. Undo) for recoverable destructive one-clicks
-toast.info('Comparison tool cleared.', {
-  action: { label: 'Undo', onClick: () =&gt; restore() },
-})</code></pre>
-    <div class="ds-note">
-      Toasts accept an optional <code>action</code>
-      (<code>{ label, onClick }</code>) rendered as an inline button before the dismiss control. This is how a destructive
-      one-click such as Compare <strong>&ldquo;Clear all&rdquo;</strong> stays recoverable (clear immediately, offer
-      <strong>Undo</strong>) instead of gating it behind a confirm dialog.
-    </div>
-    <h3>Toasts vs alerts</h3>
     <table class="ds-table">
-      <thead><tr><th>Use a toast when&hellip;</th><th>Use an inline alert / banner when&hellip;</th></tr></thead>
+      <thead><tr><th>Use a toast when&hellip;</th><th>Use inline text when&hellip;</th></tr></thead>
       <tbody>
-        <tr><td>Confirming a transient action (save, copy, add to compare).</td><td>The message is persistent context (e.g. &ldquo;saving unavailable&rdquo;, shared read-only view).</td></tr>
-        <tr><td>Surfacing an action or load failure that has no on-screen home.</td><td>A form field needs a tied error (<code>FormField</code> error + <code>aria-describedby</code>).</td></tr>
-      </tbody>
-    </table>
-    <h3>Live-region semantics</h3>
-    <ul>
-      <li><code>success</code> + <code>info</code> announce from a polite <code>role="status"</code> region; <code>error</code> from an assertive <code>role="alert"</code> region, so failures interrupt and aren&rsquo;t missed.</li>
-      <li>The visible toast <em>is</em> the live region &mdash; no duplicate hidden announcer.</li>
-      <li>Source: <code>components/ui/Toast.tsx</code>.</li>
-    </ul>
-
-    <h2>Type to role mapping</h2>
-    <table class="ds-table">
-      <thead><tr><th>Type</th><th>Background</th><th>Border</th><th>Role</th></tr></thead>
-      <tbody>
-        <tr><td>info</td><td>#E6F0FB</td><td>#005EB8</td><td><code>role="status"</code></td></tr>
-        <tr><td>warning</td><td>#FEF5E6</td><td>#D5840D</td><td><code>role="status"</code></td></tr>
-        <tr><td>danger</td><td>#FDECEA</td><td>#DA291C</td><td><code>role="alert"</code></td></tr>
+        <tr><td>An action succeeded or failed and there is no on-screen home for the message.</td><td>The message belongs to a field (use the form error) or a section (use inset text / callout).</td></tr>
+        <tr><td>The user may have scrolled away from the trigger.</td><td>The message must persist until the user acts.</td></tr>
       </tbody>
     </table>
 
     <h2>Accessibility</h2>
     <ul>
-      <li>Danger uses <code>role="alert"</code> (assertive); info/warning use <code>role="status"</code> (polite).</li>
-      <li>The icon is decorative (<code>aria-hidden</code>); meaning lives in the text and the leading bold word.</li>
-      <li>Don't rely on the tint alone — keep the "Info/Warning/Danger" label.</li>
+      <li>Danger-level callouts use <code>role="alert"</code>; informational ones use <code>role="status"</code>.</li>
+      <li>Inset text and callouts carry a visually hidden &ldquo;Information:&rdquo; / &ldquo;Important:&rdquo; prefix so the meaning is not conveyed by colour alone.</li>
+      <li>Toasts announce via a polite live region and never trap focus.</li>
     </ul>
 
-    <div class="ds-dosdonts">
-      <div class="ds-panel ds-panel--do">
-        <p class="ds-panel__head">Do</p>
-        <ul><li>Reserve danger for genuine errors/blocks.</li><li>Keep messages short and specific.</li></ul>
-      </div>
-      <div class="ds-panel ds-panel--dont">
-        <p class="ds-panel__head">Don't</p>
-        <ul><li>Stack many alerts at the top of a page.</li><li>Use an alert where a badge or inline hint suffices.</li></ul>
-      </div>
-    </div>
-
-    <div class="ds-note ds-note--source">Source: <code>AlertBox</code> in <code>components/Badges.tsx</code>; banner usage in <code>SharedProductViewBanner</code>.</div>
+    <div class="ds-note ds-note--source">Source: <code>components/Badges.tsx</code> (<code>AlertBox</code>), <code>components/supplier-portal/ActionNeededCallout.tsx</code>, <code>components/ui/Toast.tsx</code>, <code>components/CompareBasketProvider.tsx</code>; nhsuk-frontend inset text, warning callout and details.</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

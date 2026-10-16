@@ -14,7 +14,7 @@
       <h1 class="ds-page-title">Home</h1>
       <p class="ds-lede">
         Service home page with narrative composition. A block-based CMS page: the Back Office team
-        edits copy and section order. If additional widgets are included (see case study section) it can be pulled
+        edits copy and section order. If additional widgets are included (see case study section) they can be pulled
         from structured content.
       </p>
     </div>
@@ -28,14 +28,15 @@
     </table>
 
     <h2>Structure and content regions</h2>
+    <p>The page uses the shared NHS frame: 960px width, shared with the header. There is no breadcrumb on the home page, so the main area uses the taller NHS spacing.</p>
     <table class="ds-table">
       <thead><tr><th style="width:26%">Region</th><th>Content</th><th style="width:20%">Who edits</th></tr></thead>
       <tbody>
-        <tr><td>Hero</td><td>Full-bleed NHS-blue band: headline, supporting line, primary CTA, illustration.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
-        <tr><td>&ldquo;What the NHS HealthStore addresses&rdquo;</td><td>H2 + intro paragraph + three plain (non-clickable) content cards.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
-        <tr><td>&ldquo;How it works&rdquo;</td><td>H2 + numbered vertical steps, each with title, body, illustration and optional action link.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
-        <tr><td>&ldquo;Conditions and pathways we currently support&rdquo;</td><td>H2 + clickable cards linking into the filtered catalogue. *HTG on these cards should be derived from care pathways</td><td><span class="badge badge-green">CMS editor</span> (links validated against catalogue)</td></tr>
-        <tr><td>(<strong>TBC</strong>) Case-studies band</td><td>Dark band of featured case-study cards with a &ldquo;see all&rdquo; link.</td><td><span class="badge badge-blue">Structured content</span></td></tr>
+        <tr><td>Hero</td><td>NHS hero inside the 960px width. Headline and supporting line in the two-thirds column, primary call to action, illustration beside the text.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
+        <tr><td>&ldquo;What the NHS HealthStore addresses&rdquo;</td><td>H2 and intro in the two-thirds column, then three plain (non-clickable) cards in an NHS card group (one-third columns, equal height, stacking on small screens).</td><td><span class="badge badge-green">CMS editor</span></td></tr>
+        <tr><td>&ldquo;How it works&rdquo;</td><td>H2 plus numbered steps, each with a title, body, illustration and optional action link.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
+        <tr><td>&ldquo;Conditions and pathways we currently support&rdquo;</td><td>H2 plus clickable cards in an NHS card group, linking into the filtered catalogue. Headings on these cards should be derived from care pathways.</td><td><span class="badge badge-green">CMS editor</span> (links validated against catalogue)</td></tr>
+        <tr><td>(<strong>TBC</strong>) Case-studies band</td><td>Featured case-study cards with a &ldquo;see all&rdquo; link.</td><td><span class="badge badge-blue">Structured content</span></td></tr>
       </tbody>
     </table>
 
@@ -44,7 +45,7 @@
       <strong>Wagtail consideration note:</strong> Best modelled as a singleton <code>HomePage</code> type with a
       StreamField of section blocks (hero, content-card row, numbered steps, pathway links, case-study band). Section
       order and copy stay editable without developer involvement; the pathway cards and case-study band reference
-      other content rather than duplicating it.
+      other content rather than duplicating it. Card rows render as NHS card groups, not a free-form grid.
     </p>
   </div>
   <script src="/DS/assets/ds.js" defer></script>

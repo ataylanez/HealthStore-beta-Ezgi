@@ -19,7 +19,7 @@ export default async function ProductDocumentsPage({ params }: { params: Params 
   const product = findManagedProduct((await params).productId)
   if (!product) notFound()
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
       <PortalBreadcrumb
         items={[
           { label: 'Product management', href: PORTAL_PATHS.products },
@@ -27,8 +27,10 @@ export default async function ProductDocumentsPage({ params }: { params: Params 
           { label: product.name },
         ]}
       />
-      <div className="max-w-3xl">
-        <ProductDocumentsView productId={product.id} defaults={productDefaults(product)} />
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <ProductDocumentsView productId={product.id} defaults={productDefaults(product)} />
+        </div>
       </div>
     </div>
   )

@@ -19,22 +19,29 @@
 
     <div class="ds-heading-row">
       <h2>Summary</h2>
-      <span class="badge badge-black">Templates last updated 05 August 26</span>
+      <span class="badge badge-black">Templates last updated 16 October 26</span>
     </div>
     <div class="ds-meta-grid">
-      <div class="ds-meta"><div class="ds-meta__k">Number of screens</div><div class="ds-meta__v">10 pages</div></div>
       <div class="ds-meta"><div class="ds-meta__k">Template families</div><div class="ds-meta__v">8 proposed templates</div></div>
       <div class="ds-meta"><div class="ds-meta__k">CMS-authored</div><div class="ds-meta__v">5 templates the Back Office team would edit</div></div>
       <div class="ds-meta"><div class="ds-meta__k">Data / site functionality</div><div class="ds-meta__v">3 templates rendered from product data or site functionality</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Shared frame</div><div class="ds-meta__v">960px width, NHS headings, two-thirds reading column</div></div>
     </div>
     <p>
-      The 10 screens collapse into <strong>8 templates</strong>. Of those,
-      <strong>5 are CMS content templates</strong>, (Home, Content page, Hub, Directory, Product detail page)
+      The public screens collapse into <strong>8 templates</strong>. Of those,
+      <strong>5 are CMS content templates</strong> (Home, Content page, Hub, Directory, Product detail page):
       the pages the Back Office team would create and edit as part of their general tasks. Current thinking is the
-      Product detail page will be a hybrid of the set: a data-backed Wagtail page type whose product proposition and
+      Product detail page will be a hybrid: a data-backed Wagtail page type whose product proposition and
       content narrative are CMS-edited alongside the structured product record. The remaining 3 are driven by product
       data or website functionality: the flows and tools stay in site code, with copy exposed as CMS-editable strings
       where the tags on each template page indicate.
+    </p>
+    <p>
+      Every template uses the same NHS frame: a <strong>960px</strong> page width shared with the header and navigation,
+      the breadcrumb above the main area, an extra-large page title, NHS lede text for the intro, and a
+      <strong>two-thirds</strong> column for reading and forms. Side-by-side pages (the catalogue filters, a product&rsquo;s contents list)
+      put a one-third column beside it.
+      <a href="/templates/alignment.html">What changed in the templates</a> explains how this differs from the 5 August descriptions.
     </p>
 
     <h2>Template inventory</h2>
@@ -50,7 +57,7 @@
         </tr>
         <tr>
           <td><a href="/templates/content-page.html">T2 &middot; Content page</a></td>
-          <td><code>/about</code>, <code>/cookies</code></td>
+          <td><code>/about</code>, <code>/cookies</code>, resource section indexes and articles</td>
           <td><span class="badge badge-green">CMS</span> the workhorse</td>
         </tr>
         <tr>
@@ -70,7 +77,7 @@
         </tr>
         <tr>
           <td><a href="/templates/product-detail.html">T6 &middot; Product detail page</a></td>
-          <td><code>/apps/[slug]</code></td>
+          <td><code>/apps/[slug]</code> and <code>/apps/[slug]/[section]</code></td>
           <td><span class="badge badge-green">CMS</span> data-backed product page type</td>
         </tr>
         <tr>
@@ -97,13 +104,21 @@
         <tr><td><code>/cookies</code></td><td>Cookies</td><td>T2 Content page</td></tr>
         <tr><td><code>/catalogue</code></td><td>Product catalogue</td><td>T3 Hub</td></tr>
         <tr><td><code>/resources</code></td><td>Resource library</td><td>T3 Hub</td></tr>
+        <tr><td><code>/resources/guidance</code></td><td>Training and guidance</td><td>T2 Content page</td></tr>
+        <tr><td><code>/resources/preparing-to-recommend</code></td><td>Preparing to recommend a DTx</td><td>T2 Content page</td></tr>
+        <tr><td><code>/resources/prior-to-appointment</code></td><td>Prior to patient appointment</td><td>T2 Content page</td></tr>
+        <tr><td><code>/resources/during-appointment</code></td><td>During the appointment</td><td>T2 Content page</td></tr>
+        <tr><td><code>/resources/after-appointment</code></td><td>After a patient appointment</td><td>T2 Content page</td></tr>
+        <tr><td><code>/resources/&hellip;/[article]</code></td><td><em>Article title</em></td><td>T2 Content page</td></tr>
         <tr><td><code>/funding</code></td><td>Funding index</td><td>T4 Directory</td></tr>
         <tr><td><code>/catalogue/digital-therapeutics</code></td><td>Digital therapeutics</td><td>T5 Product listing</td></tr>
         <tr><td><code>/apps/[slug]</code></td><td><em>Product name</em> (e.g. Luscii)</td><td>T6 Product detail page</td></tr>
+        <tr><td><code>/apps/[slug]/[section]</code></td><td>Section heading (product name stays in the contents list)</td><td>T6 Product detail page</td></tr>
         <tr><td><code>/apps/[slug]/express-interest/*</code></td><td>Express interest in <em>product</em></td><td>T7 EOI (Form)</td></tr>
         <tr><td><code>/compare</code></td><td>Comparison tool</td><td>T8 Comparison tool</td></tr>
       </tbody>
     </table>
+    <p>The supplier portal (<code>/supplier-portal</code>) is site functionality for suppliers, not a Back Office page type. See the <a href="/DS/patterns/supplier-portal.html">Supplier portal</a> pattern.</p>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

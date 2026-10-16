@@ -16,8 +16,8 @@
 
     <div class="ds-note">
       Spacing follows the <strong>NHS spacing scale</strong> (<code>nhsuk-frontend/core/settings/_spacing.scss</code>): a 4px base grid with
-      points 0&ndash;9. Tailwind shares the 4px base, so <code>p-1/2/4/6/8/10/12/14/16</code> map onto NHS points; off-scale Tailwind steps
-      (12px <code>*-3</code>, 20px <code>*-5</code>, 28px <code>*-7</code>, and fractional 2/6/10/14px) are avoided.
+      points 0&ndash;9. Prefer the NHS spacing utilities (<code>nhsuk-u-margin-*</code>, <code>nhsuk-u-padding-*</code>) and the <code>--space-*</code> tokens.
+      Where Tailwind is still used it must land on an NHS point; off-scale steps (12px <code>*-3</code>, 20px <code>*-5</code>, 28px <code>*-7</code>, fractional 2/6/10/14px) are avoided.
     </div>
 
     <h2>NHS spacing scale (4px base grid)</h2>
@@ -47,47 +47,75 @@
       </tbody>
     </table>
 
-    <h2>Page container</h2>
-    <p>In-app pages use the <code>.hs-page</code> container: a centred ~1280px canvas with NHS gutters (16px mobile &rarr; 32px desktop).</p>
-<pre class="ds-code"><code>&lt;main class="hs-page"&gt;
-  &lt;!-- page content --&gt;
-&lt;/main&gt;
-
-/* narrow reading pages (news, campaigns) */
-&lt;div class="hs-page-narrow"&gt; &hellip; &lt;/div&gt;</code></pre>
+    <h2>Page container &mdash; NHS width container</h2>
+    <p>Every page sits in the NHS <code>nhsuk-width-container</code>: a centred <strong>960px</strong> canvas with NHS gutters
+      (16px on mobile, 32px from the tablet breakpoint). The header, navigation, phase banner, breadcrumb and footer share the
+      same container so all edges line up. The 1280px <code>.hs-page</code> canvas used until Round 9 is archived.</p>
+    <div class="ds-example ds-layout-demo">
+      <span class="ds-layout-demo__label">nhsuk-width-container (max 960px)</span>
+      <div class="nhsuk-width-container">
+        <div class="nhsuk-grid-row">
+          <div class="nhsuk-grid-column-full"><div class="ds-layout-demo__col">Header, navigation and breadcrumb share this width</div></div>
+        </div>
+      </div>
+    </div>
+<pre class="ds-code"><code>&lt;div class="nhsuk-width-container"&gt;
+  &lt;nav class="nhsuk-breadcrumb"&gt;&hellip;&lt;/nav&gt;
+  &lt;main class="nhsuk-main-wrapper nhsuk-main-wrapper--s" id="maincontent"&gt;
+    &lt;div class="nhsuk-grid-row"&gt;
+      &lt;div class="nhsuk-grid-column-two-thirds"&gt;&hellip;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/main&gt;
+&lt;/div&gt;</code></pre>
     <div class="ds-meta-grid">
-      <div class="ds-meta"><div class="ds-meta__k">Max width</div><div class="ds-meta__v">.hs-page 80rem / .hs-page-narrow 48rem</div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Gutters</div><div class="ds-meta__v">16px (mobile) &rarr; 32px (&ge;768px) &mdash; NHS gutter</div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Reading measure</div><div class="ds-meta__v">.hs-measure (~66ch)</div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Section rhythm</div><div class="ds-meta__v">.hs-section 32&rarr;40px / .hs-section-lg 40&rarr;56px</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Max width</div><div class="ds-meta__v">960px (<code>nhsuk-width-container</code>)</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Gutters</div><div class="ds-meta__v">16px &rarr; 32px (&ge;769px) &rarr; auto-centred (&ge;1024px)</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Reading column</div><div class="ds-meta__v"><code>nhsuk-grid-column-two-thirds</code> (&asymp;613px at 960)</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Source</div><div class="ds-meta__v"><code>components/AppShell.tsx</code>, <code>components/product/PdpFrame.tsx</code></div></div>
     </div>
 
-    <h2>Responsive rhythm utilities</h2>
-    <p>Vertical section spacing steps up at the tablet breakpoint, mirroring the NHS responsive spacing scale:</p>
+    <h2>Vertical rhythm &mdash; NHS main wrapper</h2>
+    <p>Top and bottom page padding comes from <code>nhsuk-main-wrapper</code>, not from a bespoke wrapper. Pages with a breadcrumb or
+      back link above the <code>&lt;main&gt;</code> use the <code>--s</code> variant so the title sits close to the breadcrumb.</p>
     <table class="ds-table">
-      <thead><tr><th>Class</th><th>Mobile</th><th>Tablet (&ge;768px)</th></tr></thead>
+      <thead><tr><th>Class</th><th>Mobile</th><th>Tablet+ (&ge;641px)</th><th>Use</th></tr></thead>
       <tbody>
-        <tr><td><code>.hs-section</code></td><td>32px</td><td>40px</td></tr>
-        <tr><td><code>.hs-section-lg</code></td><td>40px</td><td>56px</td></tr>
+        <tr><td><code>nhsuk-main-wrapper</code></td><td>24px</td><td>48px</td><td>Pages with no breadcrumb (home, sign-in)</td></tr>
+        <tr><td><code>nhsuk-main-wrapper--s</code></td><td>16px</td><td>24px</td><td>Pages with a breadcrumb or back link above</td></tr>
+        <tr><td><code>nhsuk-main-wrapper--l</code></td><td>48px</td><td>56px</td><td>Not used</td></tr>
       </tbody>
     </table>
+    <p>Within a page, use NHS spacing utilities (<code>nhsuk-u-margin-top-6</code>, <code>nhsuk-u-margin-bottom-4</code>&hellip;) or the
+      <code>--space-*</code> tokens. <code>.hs-section</code> (32&rarr;40px) remains for stacked home-page sections.</p>
 
-    <h2>Grid conventions</h2>
-    <p>Common responsive grids in the product:</p>
+    <h2>NHS grid</h2>
+    <p>Columns come from <code>nhsuk-grid-row</code> + <code>nhsuk-grid-column-*</code>. Columns stack below the tablet breakpoint (769px).
+      Tailwind <code>grid-cols-*</code> is reserved for things that are not page layout (chart internals, the tile strip inside the PDP).</p>
+    <div class="ds-example ds-layout-demo">
+      <span class="ds-layout-demo__label">one-third / two-thirds</span>
+      <div class="nhsuk-width-container">
+        <div class="nhsuk-grid-row">
+          <div class="nhsuk-grid-column-one-third"><div class="ds-layout-demo__col">one-third<br>Filters, contents list</div></div>
+          <div class="nhsuk-grid-column-two-thirds"><div class="ds-layout-demo__col">two-thirds<br>Reading content, forms, results</div></div>
+        </div>
+      </div>
+    </div>
     <table class="ds-table">
-      <thead><tr><th>Surface</th><th>Grid</th></tr></thead>
+      <thead><tr><th>Layout</th><th>Where</th><th>Grid</th></tr></thead>
       <tbody>
-        <tr><td>Catalogue / saved apps cards</td><td><code>grid sm:grid-cols-2 lg:grid-cols-3 gap-4</code></td></tr>
-        <tr><td>Decision snapshot strip</td><td>2-up &rarr; 4-up at <code>lg</code> (<code>.hs-snapshot-strip__grid</code>)</td></tr>
-        <tr><td>Dashboard widgets</td><td>Bento / auto-fit minmax columns</td></tr>
-        <tr><td>Foundation swatch grids (this DS)</td><td><code>repeat(auto-fill, minmax(180px, 1fr))</code></td></tr>
+        <tr><td>Reading column</td><td>Resources, About, Cookies, Funding intro, Compare intro</td><td><code>two-thirds</code></td></tr>
+        <tr><td>Forms &amp; journeys</td><td>Express interest, supplier onboarding, supplier portal questions</td><td><code>two-thirds</code></td></tr>
+        <tr><td>Side navigation + content</td><td>Product detail page (<code>PdpFrame</code>)</td><td><code>one-third</code> contents list + <code>two-thirds</code></td></tr>
+        <tr><td>Filters + results</td><td>Catalogue, digital therapeutics</td><td><code>one-third</code> filter panel + <code>two-thirds</code> stacked cards</td></tr>
+        <tr><td>Card groups</td><td>Home, Resources hub, supplier portal cards, Funding directory</td><td><code>ul.nhsuk-grid-row.nhsuk-card-group &gt; li.nhsuk-grid-column-one-third.nhsuk-card-group__item</code> (or <code>one-half</code>)</td></tr>
+        <tr><td>Hero</td><td>Home</td><td><code>nhsuk-hero</code> &rarr; <code>nhsuk-width-container</code> &rarr; <code>two-thirds</code></td></tr>
       </tbody>
     </table>
 
     <h2>Minimum touch target</h2>
-    <p>Interactive controls target a <strong>44px</strong> minimum height (visible in <code>.hs-compare-*</code> controls and the proposed <code>.ds-btn</code>). Keep this for buttons, toggles, filter selects and tappable list rows.</p>
+    <p>Interactive controls target a <strong>44px</strong> minimum height (NHS buttons, the compare toggle, filter inputs, tappable list rows).</p>
 
-    <div class="ds-note ds-note--source">Source: NHS spacing scale (<code>nhsuk-frontend/core/settings/_spacing.scss</code>); tokens + <code>.hs-page</code>/<code>.hs-section</code>/<code>.hs-measure</code> utilities in <code>app/globals.css</code>.</div>
+    <div class="ds-note ds-note--source">Source: <code>nhsuk-frontend</code> 9.6 <code>core/settings/_spacing.scss</code>, <code>core/objects/_width-container.scss</code>, <code>core/objects/_grid.scss</code>, <code>core/objects/_main-wrapper.scss</code>; compiled into <code>app/styles/nhsuk-theme.generated.css</code>. Tokens in <code>app/globals.css</code>.</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

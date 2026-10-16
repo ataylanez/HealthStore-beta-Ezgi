@@ -13,16 +13,16 @@
       <p class="ds-eyebrow">Templates &middot; T4</p>
       <h1 class="ds-page-title">Directory / listing</h1>
       <p class="ds-lede">
-        An index page that lists records: breadcrumb, H1, intro, then a stack or grid of record cards. The records
-        themselves are structured content the Back Office team maintains.
+        An index page that lists records: breadcrumb, title and lede, then record cards down the two-thirds column.
+        The records themselves are structured content the Back Office team maintains.
       </p>
     </div>
 
     <h2>Pages using this template</h2>
     <table class="ds-table">
-      <thead><tr><th>Route</th><th>H1</th><th>Record type &amp; card style</th></tr></thead>
+      <thead><tr><th>Route</th><th>H1</th><th>Record type and card style</th></tr></thead>
       <tbody>
-        <tr><td><code>/funding</code></td><td>Funding index</td><td>Funding opportunity records &mdash; vertical stack of cards (title, value, description, sponsor, condition tags).</td></tr>
+        <tr><td><code>/funding</code></td><td>Funding index</td><td>Funding opportunity records. Clickable cards (title, value, description, sponsor, condition tags) in the two-thirds column. Open, upcoming and periodic records share one list. Closed records sit under a &ldquo;Closed (confirm current status)&rdquo; heading.</td></tr>
       </tbody>
     </table>
 
@@ -30,16 +30,15 @@
     <table class="ds-table">
       <thead><tr><th style="width:26%">Region</th><th>Content</th><th style="width:20%">Who edits</th></tr></thead>
       <tbody>
-        <tr><td>Breadcrumb + page header</td><td>H1 + grey intro paragraph.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
-        <tr><td>Record list</td><td>Cards generated from records; ordering and grouping rules (e.g. active vs closed funding) applied at render time.</td><td><span class="badge badge-blue">Structured content</span> (records edited individually)</td></tr>
+        <tr><td>Breadcrumb and page header</td><td>Extra-large title and NHS lede, in the two-thirds column.</td><td><span class="badge badge-green">CMS editor</span></td></tr>
+        <tr><td>Record list</td><td>Clickable cards generated from records. Grouping (active against closed) is applied at render time.</td><td><span class="badge badge-blue">Structured content</span> (records edited individually)</td></tr>
       </tbody>
     </table>
 
     <h2>Notes</h2>
-
-    <h3 style="color: var(--text-muted)">On template consolidation</h3>
+    <h3>On template consolidation</h3>
     <ul>
-      <li>The hidden News / Campaigns / Guidance / Case studies pages were also listing pages; if they return, they slot into this same template (with card-style variants) rather than adding new ones.</li>
+      <li>The hidden News, Campaigns and case-study indexes were also listing pages. If they return, they slot into this same template, with a card-style variant, rather than adding new templates.</li>
     </ul>
   </div>
   <script src="/DS/assets/ds.js" defer></script>

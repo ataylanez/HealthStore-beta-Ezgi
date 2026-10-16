@@ -13,73 +13,80 @@
       <p class="ds-eyebrow">Components</p>
       <h1 class="ds-page-title">Navigation</h1>
       <p class="ds-lede">
-        The global header, the breadcrumb trail, and the back-to-top control. Together they express the site
-        information architecture: Home is L1; Find apps, Comparison tool and Funding index are L2 peers.
+        The NHS header, the phase banner, the NHS breadcrumb and the back-to-top control. Together they express the site
+        information architecture: Home is L1; About, Product catalogue, Comparison tool, Funding index and Resource library are L2 peers.
+        All of them share the 960px <code>nhsuk-width-container</code>.
       </p>
     </div>
 
-    <h2>Primary header</h2>
-    <p>A static white header with the brand, a "Prototype" badge, top-level links and (when signed in) an AI Advisor entry and a second context row.</p>
+    <h2>Header</h2>
+    <p>The stock NHS <code>nhsuk-header</code> (<code>components/Nav.tsx</code>): NHS logo plus the service name &ldquo;HealthStore&rdquo;, a
+      <code>nhsuk-header__navigation</code> row with the five commissioner links and an <strong>AI Advisor</strong> button, and the NHS
+      &ldquo;More&rdquo; drop-down when links overflow. Inside the supplier portal the same header shows portal links instead
+      (Dashboard, Product management, Published pages) and an <code>nhsuk-header__account</code> area with the supplier name and sign out.</p>
     <div class="ds-example ds-example--surface ds-example--tight">
-      <header style="border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff">
-        <div style="display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 16px;border-bottom:1px solid var(--border)">
-          <div style="display:flex;align-items:center;gap:10px">
-            <span class="badge badge-prototype">Prototype</span>
-            <span style="font-weight:700;color:var(--nhs-dark)">HealthStore</span>
+      <header style="background:var(--nhs-blue);color:#fff">
+        <div style="max-width:960px;margin:0 auto;padding:16px 16px 0">
+          <div style="display:flex;align-items:center;gap:12px;padding-bottom:12px">
+            <span style="display:inline-block;background:#fff;color:var(--nhs-blue);font-weight:700;padding:2px 8px;border-radius:2px">NHS</span>
+            <span style="font-weight:600;font-size:1.1875rem">HealthStore</span>
           </div>
-          <nav style="display:flex;gap:4px">
-            <a href="#ds-main" style="padding:6px 12px;border-radius:6px;font-size:.875rem;font-weight:500;text-decoration:none;color:var(--nhs-blue);background:#E6F0FB">Home</a>
-            <a href="#ds-main" style="padding:6px 12px;border-radius:6px;font-size:.875rem;font-weight:500;text-decoration:none;color:var(--text-secondary)">News</a>
-            <a href="#ds-main" style="padding:6px 12px;border-radius:6px;font-size:.875rem;font-weight:500;text-decoration:none;color:var(--text-secondary)">Campaigns</a>
-            <a href="#ds-main" style="padding:6px 12px;border-radius:6px;font-size:.875rem;font-weight:500;text-decoration:none;color:var(--text-secondary)">Case studies</a>
-          </nav>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:rgba(240,244,245,0.9)">
-          <span style="font-size:.875rem;color:#425563">NHS Example ICB</span>
-          <nav style="display:flex;gap:4px">
-            <a href="#ds-main" style="padding:6px 12px;border-radius:6px;font-size:.875rem;font-weight:500;text-decoration:none;color:var(--text-secondary)">Dashboard</a>
-            <a href="#ds-main" style="padding:6px 12px;border-radius:6px;font-size:.875rem;font-weight:500;text-decoration:none;color:var(--text-secondary)">Find apps</a>
-            <a href="#ds-main" style="padding:6px 12px;border-radius:6px;font-size:.875rem;font-weight:500;text-decoration:none;color:var(--text-secondary)">Comparison tool <span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 4px;border-radius:6px;font-size:11px;font-weight:700;background:var(--nhs-blue);color:#fff">2</span></a>
-            <a href="#ds-main" style="padding:6px 12px;border-radius:6px;font-size:.875rem;font-weight:500;text-decoration:none;color:var(--text-secondary)">Funding index</a>
+          <nav aria-label="Example header navigation" style="display:flex;flex-wrap:wrap;gap:0 24px;border-top:1px solid rgba(255,255,255,.3)">
+            <a href="#ds-main" style="color:#fff;text-decoration:none;padding:12px 0;border-bottom:4px solid #fff">Home</a>
+            <a href="#ds-main" style="color:#fff;text-decoration:underline;padding:12px 0">About</a>
+            <a href="#ds-main" style="color:#fff;text-decoration:underline;padding:12px 0">Product catalogue</a>
+            <a href="#ds-main" style="color:#fff;text-decoration:underline;padding:12px 0">Comparison tool <span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;font-size:.875rem;font-weight:600;background:#fff;color:var(--nhs-blue)">2</span></a>
+            <a href="#ds-main" style="color:#fff;text-decoration:underline;padding:12px 0">Funding index</a>
+            <a href="#ds-main" style="color:#fff;text-decoration:underline;padding:12px 0">Resource library</a>
+            <a href="#ds-main" style="color:#fff;text-decoration:underline;padding:12px 0">AI Advisor</a>
           </nav>
         </div>
       </header>
     </div>
-    <div class="ds-note">The Comparison tool link carries a live count badge from the compare basket. Active links use blue text on a <code>#E6F0FB</code> tint.</div>
-    <div class="ds-note"><strong>Active-state matching.</strong> &ldquo;Find apps&rdquo; owns the whole <code>/apps</code> branch &mdash; the catalogue and product pages (<code>/apps/[slug]</code>) &mdash; via prefix matching (<code>path === '/apps' || path.startsWith('/apps/')</code>), so a PDP does not leave the header with nothing highlighted. Exact-match routes (Dashboard, News) stay exact.</div>
+    <div class="ds-note">The Comparison tool link carries a live count (<code>.hs-nav-count</code>) mirrored in its <code>aria-label</code> (&ldquo;Comparison tool, 2 selected&rdquo;). The current section is marked with <code>nhsuk-header__navigation-item--current</code>; &ldquo;Product catalogue&rdquo; owns the whole <code>/catalogue</code> and <code>/apps</code> branch so product pages keep a highlighted header item.</div>
+
+    <h2>Phase banner</h2>
+    <p>Directly under the header, inside the width container: the GOV.UK phase banner recoloured to NHS (<code>PhaseBanner</code>, tag &ldquo;Alpha&rdquo;) with a feedback link. NHS has no equivalent component.</p>
 
     <h2>Breadcrumb</h2>
-    <p>The <code>PageBreadcrumb</code> component. Home is prepended automatically; the current page is omitted (per the NHS pattern), so the trail shows the path back only. Every signed-in page carries one &mdash; for example <code>Home</code> on org-settings.</p>
+    <p>The NHS <code>nhsuk-breadcrumb</code> via <code>PageBreadcrumb</code>. Home is prepended automatically; the current page is omitted, so the trail shows the path back only. On mobile NHS collapses it to a single &ldquo;Back to [parent]&rdquo; link (<code>nhsuk-breadcrumb__backlink</code>). It sits inside <code>nhsuk-width-container</code> <em>above</em> the <code>nhsuk-main-wrapper--s</code>, so the gap to the title is the same on every page.</p>
     <div class="ds-example">
       <nav aria-label="Breadcrumb">
-        <ol style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;list-style:none;margin:0;padding:0;font-size:.875rem;color:var(--text-muted)">
-          <li><a href="#ds-main" style="font-weight:500;color:#005EB8;text-decoration:none">Home</a></li>
-          <li aria-hidden>/</li>
-          <li><a href="#ds-main" style="font-weight:500;color:#005EB8;text-decoration:none">Find apps</a></li>
-          <li aria-hidden>/</li>
-          <li aria-current="page"><span style="color:var(--text-primary)">Clinitouch</span></li>
+        <ol style="display:flex;flex-wrap:wrap;align-items:center;gap:0 8px;list-style:none;margin:0;padding:0">
+          <li><a href="#ds-main" style="color:#005EB8">Home</a></li>
+          <li aria-hidden>&rsaquo;</li>
+          <li><a href="#ds-main" style="color:#005EB8">Product catalogue</a></li>
+          <li aria-hidden>&rsaquo;</li>
+          <li><a href="#ds-main" style="color:#005EB8">Digital therapeutics</a></li>
         </ol>
       </nav>
     </div>
-<pre class="ds-code"><code>&lt;PageBreadcrumb items={[
-  { label: 'Find apps', href: '/apps' },
-  { label: 'Clinitouch' },
-]} /&gt;</code></pre>
+<pre class="ds-code"><code>&lt;div class="nhsuk-width-container"&gt;
+  &lt;PageBreadcrumb items={[
+    { label: 'Product catalogue', href: '/catalogue' },
+    { label: 'Digital therapeutics', href: '/catalogue/digital-therapeutics' },
+    { label: 'Luscii' },   // current page — rendered only as the mobile back link target
+  ]} /&gt;
+  &lt;main class="nhsuk-main-wrapper nhsuk-main-wrapper--s"&gt;…&lt;/main&gt;
+&lt;/div&gt;</code></pre>
+
+    <h2>Contents list (product pages)</h2>
+    <p>Product detail pages use the NHS <code>nhsuk-contents-list</code> (<code>PdpSectionNav</code>) in a one-third column as their section navigation. See <a href="/DS/patterns/product-detail.html">Product detail</a>.</p>
 
     <h2>Back to top</h2>
-    <p>A fixed pill button that appears after scrolling 400px. Maps to <code>.ds-btn--primary .ds-btn--pill</code>.</p>
+    <p><code>BackToTop</code>: a fixed primary button that appears after scrolling 400px on screens above the mobile breakpoint. Bespoke &mdash; NHS has no back-to-top component. Whether to keep it is an open design decision (noted in the Round 10 audit).</p>
     <div class="ds-example ds-example--surface">
-      <button type="button" class="ds-btn ds-btn--primary ds-btn--pill" aria-label="Back to top"><span aria-hidden>&uarr;</span> Back to top</button>
+      <button type="button" class="ds-btn ds-btn--primary" aria-label="Back to top"><span aria-hidden>&uarr;</span> Back to top</button>
     </div>
 
     <h2>Accessibility</h2>
     <ul>
-      <li>Header is a <code>&lt;header&gt;</code>; nav groups are <code>&lt;nav&gt;</code> with labels.</li>
-      <li>Breadcrumb uses an ordered list with <code>aria-current="page"</code> on the last item; separators are <code>aria-hidden</code>.</li>
+      <li>Header is the NHS <code>&lt;header class="nhsuk-header"&gt;</code>; the navigation is a <code>&lt;nav&gt;</code> with a label and a skip link precedes it.</li>
+      <li>Breadcrumb uses the NHS ordered list; separators are CSS, and the mobile back link names its target.</li>
       <li>The mobile menu toggle has an accessible label and the count badge is mirrored in the link's <code>aria-label</code>.</li>
     </ul>
 
-    <div class="ds-note ds-note--source">Source: <code>components/Nav.tsx</code>, <code>components/PageBreadcrumb.tsx</code>, <code>components/BackToTop.tsx</code>.</div>
+    <div class="ds-note ds-note--source">Source: <code>components/Nav.tsx</code>, <code>components/PhaseBanner.tsx</code>, <code>components/PageBreadcrumb.tsx</code>, <code>components/PdpSectionNav.tsx</code>, <code>components/BackToTop.tsx</code>, <code>components/AppShell.tsx</code>.</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

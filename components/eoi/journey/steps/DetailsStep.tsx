@@ -39,78 +39,80 @@ export default function DetailsStep() {
   }
 
   return (
-    <div className="hs-page">
-      <div className="max-w-2xl">
-        <BackLink href={returnToCheck ? `${basePath}/check-answers` : basePath} />
-        <ErrorSummary errors={errors} />
-        <h1 ref={headingRef} tabIndex={-1} className="page-title-h1 outline-none">
-          Your details
-        </h1>
-        <form
-          noValidate
-          onSubmit={(e) => {
-            e.preventDefault()
-            handleSubmit()
-          }}
-        >
-          <FormField id="eoi-name" label="Full name" required error={errorFor('eoi-name')}>
-            {(field) => (
-              <TextInput
-                {...field}
-                value={data.name}
-                onChange={(e) => update({ name: e.target.value })}
-                autoComplete="name"
-                spellCheck={false}
-              />
-            )}
-          </FormField>
-          <FormField
-            id="eoi-email"
-            label="NHS work email address"
-            required
-            error={errorFor('eoi-email')}
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <BackLink href={returnToCheck ? `${basePath}/check-answers` : basePath} />
+          <ErrorSummary errors={errors} />
+          <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
+            Your details
+          </h1>
+          <form
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleSubmit()
+            }}
           >
-            {(field) => (
-              <TextInput
-                {...field}
-                type="email"
-                value={data.email}
-                onChange={(e) => update({ email: e.target.value })}
-                autoComplete="email"
-                spellCheck={false}
-              />
-            )}
-          </FormField>
-          <FormField id="eoi-role" label="Role" required error={errorFor('eoi-role')}>
-            {(field) => (
-              <TextInput {...field} value={data.role} onChange={(e) => update({ role: e.target.value })} />
-            )}
-          </FormField>
-          <FormField id="eoi-org" label="Organisation or ICB" required error={errorFor('eoi-org')}>
-            {(field) => (
-              <TextInput
-                {...field}
-                value={data.organisation}
-                onChange={(e) => update({ organisation: e.target.value })}
-                autoComplete="organization"
-              />
-            )}
-          </FormField>
-          <FormField id="eoi-phone" label="Phone (optional)">
-            {(field) => (
-              <TextInput
-                {...field}
-                type="tel"
-                value={data.phone}
-                onChange={(e) => update({ phone: e.target.value })}
-                autoComplete="tel"
-                spellCheck={false}
-                className="nhsuk-input--width-20"
-              />
-            )}
-          </FormField>
-          <Button type="submit">Continue</Button>
-        </form>
+            <FormField id="eoi-name" label="Full name" required error={errorFor('eoi-name')}>
+              {(field) => (
+                <TextInput
+                  {...field}
+                  value={data.name}
+                  onChange={(e) => update({ name: e.target.value })}
+                  autoComplete="name"
+                  spellCheck={false}
+                />
+              )}
+            </FormField>
+            <FormField
+              id="eoi-email"
+              label="NHS work email address"
+              required
+              error={errorFor('eoi-email')}
+            >
+              {(field) => (
+                <TextInput
+                  {...field}
+                  type="email"
+                  value={data.email}
+                  onChange={(e) => update({ email: e.target.value })}
+                  autoComplete="email"
+                  spellCheck={false}
+                />
+              )}
+            </FormField>
+            <FormField id="eoi-role" label="Role" required error={errorFor('eoi-role')}>
+              {(field) => (
+                <TextInput {...field} value={data.role} onChange={(e) => update({ role: e.target.value })} />
+              )}
+            </FormField>
+            <FormField id="eoi-org" label="Organisation or ICB" required error={errorFor('eoi-org')}>
+              {(field) => (
+                <TextInput
+                  {...field}
+                  value={data.organisation}
+                  onChange={(e) => update({ organisation: e.target.value })}
+                  autoComplete="organization"
+                />
+              )}
+            </FormField>
+            <FormField id="eoi-phone" label="Phone (optional)">
+              {(field) => (
+                <TextInput
+                  {...field}
+                  type="tel"
+                  value={data.phone}
+                  onChange={(e) => update({ phone: e.target.value })}
+                  autoComplete="tel"
+                  spellCheck={false}
+                  className="nhsuk-input--width-20"
+                />
+              )}
+            </FormField>
+            <Button type="submit">Continue</Button>
+          </form>
+        </div>
       </div>
     </div>
   )

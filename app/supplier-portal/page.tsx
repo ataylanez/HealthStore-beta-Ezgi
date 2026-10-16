@@ -7,18 +7,20 @@ export const metadata = { title: `Dashboard — ${PORTAL_SERVICE_NAME}` }
 /** Supplier portal dashboard — landing page after sign-in and entry point to every section. */
 export default function SupplierPortalDashboardPage() {
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
       <div className="hs-section">
         <span className="nhsuk-caption-l">{SAMPLE_SUPPLIER.name}</span>
-        <h1 className="page-title-h1">Dashboard</h1>
-        <p className="m-0 hs-measure leading-relaxed" style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}>
+        <h1 className="nhsuk-heading-xl">Dashboard</h1>
+        <p className="nhsuk-body-l hs-measure">
           Keep your product information and documents up to date, and manage the pages buyers see on the NHS
           Commissioning Store.
         </p>
       </div>
 
-      <div className="max-w-3xl">
-        <DashboardAttentionList />
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <DashboardAttentionList />
+        </div>
       </div>
 
       <section aria-labelledby="sections-heading" className="hs-section">

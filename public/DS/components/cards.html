@@ -4,46 +4,49 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>Cards &amp; surfaces — HealthStore Design System</title>
+  <title>Cards — HealthStore Design System</title>
   <link rel="stylesheet" href="/DS/assets/ds.css">
 </head>
 <body>
   <div id="ds-root" data-ds-page="cards" data-ds-provenance="NHS">
     <div class="ds-page-header">
       <p class="ds-eyebrow">Components</p>
-      <h1 class="ds-page-title">Cards &amp; surfaces</h1>
+      <h1 class="ds-page-title">Cards</h1>
       <p class="ds-lede">
-        Flat, bordered, <strong>square</strong> white panels are the dominant container in the product (NHS aesthetic — no drop shadow).
-        <code>.hs-surface-card</code> / <code>.hs-surface-card-sm</code> and the interactive <code>.app-card</code>
-        own background, border and <code>--radius-card</code> (0px). Dashboard widgets use <code>WidgetShell</code>.
+        The NHS <a href="https://service-manual.nhs.uk/design-system/components/card">card</a> is the only container pattern in the product:
+        flat, bordered, square, no shadow. Navigation uses the <strong>clickable card</strong> (via <code>ClickableChevronCard</code>),
+        lists of cards use <code>nhsuk-card-group</code> on the NHS grid, and content cards (catalogue results, funding directory, case studies) are plain <code>nhsuk-card</code>s.
       </p>
     </div>
 
     <div class="ds-meta-grid">
-      <div class="ds-meta"><div class="ds-meta__k">Canonical classes</div><div class="ds-meta__v"><code>.app-card</code>, <code>.hs-card-chevron</code>, <code>.nhsuk-card__content--primary</code>, <code>.hs-surface-card(-sm)</code></div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Widget shell</div><div class="ds-meta__v"><code>components/ui/WidgetShell.tsx</code></div></div>
+      <div class="ds-meta"><div class="ds-meta__k">NHS classes</div><div class="ds-meta__v"><code>nhsuk-card</code>, <code>nhsuk-card--clickable</code>, <code>nhsuk-card--secondary</code>, <code>nhsuk-card__content--primary</code>, <code>nhsuk-card-group</code></div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Component</div><div class="ds-meta__v"><code>components/ui/ClickableChevronCard.tsx</code> (<code>compact</code> | <code>primary</code> | <code>secondary</code>)</div></div>
       <div class="ds-meta"><div class="ds-meta__k">Radius</div><div class="ds-meta__v"><code>--radius-card</code> · 0px (square)</div></div>
     </div>
 
-    <h2>App card (interactive)</h2>
-    <p>The product result card used in digital therapeutics browse and saved apps (logo, badges, CTAs). Hover shows a blue border (no lift). Distinct from the pathway/resource navigation cards below.</p>
+    <h2>Card group (grid of cards)</h2>
+    <p>Lists of cards are a <code>ul.nhsuk-grid-row.nhsuk-card-group</code> whose items are <code>li.nhsuk-grid-column-one-third.nhsuk-card-group__item</code> (or <code>one-half</code>). Items stretch to equal height. Used on the home page, catalogue hub, resource library, funding index and supplier portal.</p>
+<pre class="ds-code"><code>&lt;ul class="nhsuk-grid-row nhsuk-card-group"&gt;
+  &lt;li class="nhsuk-grid-column-one-third nhsuk-card-group__item"&gt;
+    &lt;ClickableChevronCard variant="primary" href="…" title="…" description="…" /&gt;
+  &lt;/li&gt;
+  …
+&lt;/ul&gt;</code></pre>
+
+    <h2>Content card (catalogue result)</h2>
+    <p>A plain <code>nhsuk-card</code> stacked full-width in the two-thirds results column: product name as <code>nhsuk-card__heading nhsuk-heading-m</code> link, supplier in <code>nhsuk-body-s</code>, description, tags, then a primary button and the compare toggle. Not clickable as a whole &mdash; it contains two actions.</p>
     <div class="ds-example ds-example--surface">
-      <div class="app-card" style="max-width:340px;background:#fff;border:1px solid var(--border);border-radius:0;padding:20px;cursor:pointer">
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-          <div style="width:40px;height:40px;border-radius:4px;background:var(--nhs-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700">C</div>
-          <div>
-            <div style="font-weight:700;font-size:var(--text-card-title)">Clinitouch</div>
-            <div class="ds-u-muted" style="font-size:.82rem">Clinitouch Ltd</div>
-          </div>
+      <article class="nhsuk-card" style="max-width:600px">
+        <div class="nhsuk-card__content">
+          <h3 class="nhsuk-card__heading nhsuk-heading-m" style="margin-bottom:4px"><a class="nhsuk-card__link" href="#ds-main">Luscii</a></h3>
+          <p class="nhsuk-body-s" style="color:var(--text-secondary);margin:0 0 12px">Luscii Healthtech</p>
+          <p class="nhsuk-card__description" style="margin-bottom:12px">Remote monitoring that keeps COPD patients supported at home with clinician oversight.</p>
+          <div class="ds-u-row" style="margin-bottom:16px"><span class="badge badge-teal">COPD</span><span class="badge badge-grey">Clinician-supervised</span></div>
+          <div class="ds-u-row"><button class="ds-btn ds-btn--primary" type="button">View product details</button><button class="ds-btn ds-btn--toggle" type="button" aria-pressed="false">Add to compare</button></div>
         </div>
-        <p class="ds-u-mt0" style="font-size:.9rem;color:var(--text-secondary)">Remote monitoring for COPD patients with clinician oversight.</p>
-        <div class="ds-example__row">
-          <span class="badge badge-green">Scaled</span>
-          <span class="badge badge-green">Strong evidence</span>
-        </div>
-      </div>
+      </article>
     </div>
-<pre class="ds-code"><code>&lt;article class="app-card bg-white border p-5"&gt; &hellip; &lt;/article&gt;</code></pre>
 
     <h2>Primary clickable card (with description + blue chevron)</h2>
     <p>
@@ -55,7 +58,7 @@
     <div class="ds-meta-grid">
       <div class="ds-meta"><div class="ds-meta__k">Component</div><div class="ds-meta__v"><code>ClickableChevronCard</code> · <code>variant=&quot;primary&quot;</code></div></div>
       <div class="ds-meta"><div class="ds-meta__k">Classes</div><div class="ds-meta__v"><code>.nhsuk-card--clickable</code> + <code>.nhsuk-card__content--primary</code> + <code>.app-card</code></div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Used on</div><div class="ds-meta__v">Catalogue pathways · Resource library</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Used on</div><div class="ds-meta__v">Catalogue hub · Resource library · Home · Supplier portal</div></div>
     </div>
     <div class="ds-example ds-example--surface">
       <ul class="nhsuk-grid-row nhsuk-card-group" style="list-style:none;padding:0;margin:0">
@@ -117,7 +120,7 @@
     <h2>Compact clickable card with chevron</h2>
     <p>
       Compact NHS primary card with chevron: whole-card hit target, title on the left, chevron middle-aligned on the right.
-      Body-s title size. Used for the three compact case-study previews on the home page.
+      Body-s title size. Used for the compact case-study previews on the home page.
     </p>
     <div class="ds-meta-grid">
       <div class="ds-meta"><div class="ds-meta__k">Component</div><div class="ds-meta__v"><code>ClickableChevronCard</code> · <code>variant=&quot;compact&quot;</code> (default)</div></div>
@@ -160,83 +163,40 @@
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>
 
-    <h2>Surface cards (static)</h2>
-    <div class="ds-example ds-example--surface">
-      <div class="ds-example__row" style="gap:24px;align-items:stretch">
-        <div class="hs-surface-card-sm" style="flex:1;min-width:220px;background:#fff;border:1px solid var(--border);border-radius:0;padding:20px">
-          <strong>.hs-surface-card-sm</strong>
-          <p class="ds-u-muted ds-u-mt0" style="font-size:.85rem">Flat. PDP cards, sidebar cards, collapsed expanders.</p>
-        </div>
-        <div class="hs-surface-card" style="flex:1;min-width:220px;background:#fff;border:1px solid var(--border);border-radius:0;padding:20px">
-          <strong>.hs-surface-card</strong>
-          <p class="ds-u-muted ds-u-mt0" style="font-size:.85rem">Flat. Catalogue shell, funding cards, collapsible sections, charts.</p>
-        </div>
-      </div>
-    </div>
+    <h2>Secondary card</h2>
+    <p><code>nhsuk-card--secondary</code> (transparent, bottom keyline) for items that are not yet available &mdash; the &ldquo;coming soon&rdquo; pathways on the catalogue hub. Rendered by <code>ClickableChevronCard variant="secondary"</code>, or as a static <code>div</code> when there is nowhere to go.</p>
+<pre class="ds-code"><code>&lt;div class="nhsuk-card nhsuk-card--secondary"&gt;
+  &lt;div class="nhsuk-card__content nhsuk-card__content--secondary"&gt;
+    &lt;h3 class="nhsuk-card__heading nhsuk-heading-m"&gt;Diabetes&lt;/h3&gt;
+    &lt;p class="nhsuk-card__description"&gt;Coming soon&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
 
-    <h2>Inset card</h2>
-    <p>
-      NHS <a href="https://service-manual.nhs.uk/design-system/components/inset-text">inset text</a> treatment on a white
-      card surface: an 8px NHS blue left keyline with NHS inset padding (16px &rarr; 24px), no outline border. Used for the
-      &ldquo;Making it work at your site&rdquo; timeline cards on the PDP.
-    </p>
-    <div class="ds-example ds-example--surface">
-      <div class="hs-inset-card" style="max-width:520px">
-        <strong style="display:block;margin-bottom:4px">Clinical and human wrapper</strong>
-        <p class="ds-u-muted ds-u-mt0" style="font-size:.9rem;margin:0">Named clinical lead reviews alerts within one working day; escalation route agreed with the community respiratory team.</p>
-      </div>
-    </div>
-<pre class="ds-code"><code>&lt;div class="hs-inset-card"&gt; &hellip; &lt;/div&gt;</code></pre>
-
-    <h3>Transparent variant</h3>
-    <p>Stock NHS inset text: same keyline and padding but no background fill, so it sits directly on the page surface. Used for the &ldquo;Supplier support included&rdquo; callout on the PDP.</p>
-    <div class="ds-example">
-      <div class="hs-inset-card hs-inset-card--transparent" style="max-width:520px">
-        <strong style="display:block;margin-bottom:4px">Supplier support included</strong>
-        <p class="ds-u-muted ds-u-mt0" style="font-size:.9rem;margin:0">The supplier provides onboarding, training materials and technical integration support as part of the standard package.</p>
-      </div>
-    </div>
-<pre class="ds-code"><code>&lt;div class="hs-inset-card hs-inset-card--transparent"&gt; &hellip; &lt;/div&gt;</code></pre>
-
-    <h2>Evidence cards (PDP)</h2>
-    <p>Tinted variants of a base evidence row used on the product detail page.</p>
-    <div class="ds-example">
-      <div class="card-evidence" style="background:#f7f9fc">Base evidence row (<code>.card-evidence</code>)</div>
-      <div class="card-evidence card-evidence--gap">Evidence gap (<code>--gap</code>)</div>
-      <div class="card-evidence card-evidence--coi">Conflict of interest (<code>--coi</code>)</div>
-      <div class="card-evidence card-evidence--dq" style="margin-bottom:0">Data-quality flag (<code>--dq</code>)</div>
-    </div>
-
-    <h2>Auth card</h2>
-    <p>Login and entity selection use a larger card with a 6px blue top bar, flat and square (bordered, no shadow).</p>
-    <div class="ds-example ds-example--surface">
-      <div style="max-width:360px;margin:0 auto;background:#fff;border:1px solid var(--border);border-radius:0;overflow:hidden">
-        <div style="height:6px;background:var(--nhs-blue)"></div>
-        <div style="padding:28px">
-          <h3 class="ds-u-mt0" style="margin-top:0">Sign in</h3>
-          <p class="ds-u-muted" style="font-size:.88rem">Access the commissioner store.</p>
-          <div class="ds-field"><label class="ds-field__label">Email</label><input class="ds-input" aria-label="Email demo"></div>
-          <button class="ds-btn ds-btn--primary ds-btn--block" type="button">Continue</button>
-        </div>
-      </div>
-    </div>
-
-    <h2>Surface inventory</h2>
+    <h2>Other card instances</h2>
     <table class="ds-table">
-      <thead><tr><th>Surface</th><th>Definition</th></tr></thead>
+      <thead><tr><th>Instance</th><th>Where</th><th>Built from</th></tr></thead>
       <tbody>
-        <tr><td><code>.app-card</code></td><td>border + <code>--radius-card</code> (0), flat, hover border-colour</td></tr>
-        <tr><td><code>.nhsuk-card__content--primary</code></td><td>Taller clickable card with description + vertically centred blue chevron (catalogue pathways, resource library)</td></tr>
-        <tr><td><code>.hs-card-chevron</code></td><td>Compact clickable card with middle-aligned right chevron (home case-study previews)</td></tr>
-        <tr><td><code>.hs-surface-card</code> / <code>-sm</code></td><td>bg + border + <code>--radius-card</code> (0), flat (no shadow)</td></tr>
-        <tr><td><code>.hs-inset-card</code></td><td>White card with 8px NHS blue left keyline (NHS inset-text treatment)</td></tr>
-        <tr><td><code>.hs-inset-card--transparent</code></td><td>Inset card with no background fill (stock NHS inset text)</td></tr>
-        <tr><td><code>.card-evidence(*)</code></td><td>Tinted PDP evidence rows</td></tr>
-        <tr><td><code>--radius-card</code></td><td>0px — card shells only; buttons/inputs keep 4px</td></tr>
+        <tr><td><code>FundingDirectoryCard</code></td><td>Funding index</td><td><code>nhsuk-card nhsuk-card--clickable</code> + <code>FundingStatusBadge</code></td></tr>
+        <tr><td>Case-study publication card (<code>.hs-case-card--publication</code>)</td><td>PDP &mdash; NHS experience</td><td><code>nhsuk-card</code> with a tag row</td></tr>
+        <tr><td>Worth tiles (<code>PdpWorthTiles</code>)</td><td>PDP &mdash; local value</td><td>White <code>.hs-surface-card-sm</code> tiles on the NHS grid; NHS points for padding</td></tr>
+        <tr><td>Supplier contact (<code>PdpSupplierContactCard</code>)</td><td>PDP &mdash; how to buy</td><td><code>.hs-surface-card-sm</code> &mdash; orphaned component, see Archived</td></tr>
       </tbody>
     </table>
 
-    <div class="ds-note ds-note--source">Source: <code>app/globals.css</code>; <code>components/ui/ClickableChevronCard.tsx</code>; <code>components/ui/WidgetShell.tsx</code>; dashboard widgets, news/campaigns, case-study cards.</div>
+    <h2>Surface inventory</h2>
+    <table class="ds-table">
+      <thead><tr><th>Surface</th><th>Status</th><th>Definition</th></tr></thead>
+      <tbody>
+        <tr><td><code>nhsuk-card</code> (+ <code>--clickable</code>, <code>--secondary</code>)</td><td>Canonical</td><td>NHS card; white, 1px border, 4px bottom border when clickable</td></tr>
+        <tr><td><code>nhsuk-card-group</code></td><td>Canonical</td><td>Equal-height list of cards on the NHS grid</td></tr>
+        <tr><td><code>.hs-card-chevron</code></td><td>In use</td><td>Compact clickable card with middle-aligned chevron (home case studies)</td></tr>
+        <tr><td><code>.app-card</code></td><td>In use</td><td>Adds hover border-colour to a clickable card</td></tr>
+        <tr><td><code>.hs-surface-card</code> / <code>-sm</code></td><td>In use (PDP tiles, compare page shell)</td><td>White, 1px border, square &mdash; same look as <code>nhsuk-card</code>; prefer <code>nhsuk-card</code> for anything new</td></tr>
+        <tr><td><code>.hs-inset-card</code>, <code>.card-evidence</code>, <code>WidgetShell</code>, auth card, <code>.glass-*</code></td><td><a href="/DS/archived.html">Archived</a></td><td>No longer used by any component</td></tr>
+      </tbody>
+    </table>
+
+    <div class="ds-note ds-note--source">Source: <code>components/ui/ClickableChevronCard.tsx</code>, <code>app/apps/CatalogueClient.tsx</code>, <code>app/apps/AppsDiscoveryClient.tsx</code>, <code>components/FundingDirectoryCard.tsx</code>, <code>components/home/CaseStudies.tsx</code>, <code>components/supplier-portal/PortalCardGrid.tsx</code>; <code>app/globals.css</code>.</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

@@ -8,64 +8,62 @@
   <link rel="stylesheet" href="/DS/assets/ds.css">
 </head>
 <body>
-  <div id="ds-root" data-ds-page="compare" data-ds-provenance="Bespoke">
+  <div id="ds-root" data-ds-page="compare" data-ds-provenance="NHS">
     <div class="ds-page-header">
       <p class="ds-eyebrow">Patterns</p>
       <h1 class="ds-page-title">Comparison tool</h1>
       <p class="ds-lede">
-        Side-by-side evaluation of selected DTx apps. Users build a basket (up to four, same condition area), then read a
-        single grouped <strong>decision workspace</strong> &mdash; collapsible attribute groups filtered by a task &ldquo;lens&rdquo;
-        and an optional differences-only toggle.
+        Side-by-side evaluation of up to four digital therapeutics from the same condition area. Users build a basket from
+        the catalogue or product pages with <strong>Add to compare</strong>, then read a series of NHS <strong>responsive tables</strong>,
+        one per decision topic.
       </p>
     </div>
 
-    <div class="ds-note">Vocabulary is &ldquo;DTx app&rdquo;, and the catalogue/PDP add control reads <strong>&ldquo;Add to compare&rdquo;</strong> / <strong>&ldquo;Added&rdquo;</strong>.</div>
-
-    <h2>Controls</h2>
-    <div class="ds-example ds-example--surface">
-      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between">
-        <fieldset class="hs-compare-lens">
-          <legend class="hs-compare-lens__legend">Compare by</legend>
-          <div class="hs-compare-lens__options">
-            <span class="hs-compare-lens__option" data-active="true">Evidence</span>
-            <span class="hs-compare-lens__option" data-active="false">Cost</span>
-            <span class="hs-compare-lens__option" data-active="false">Implementation</span>
-          </div>
-        </fieldset>
-        <label style="display:inline-flex;align-items:center;gap:8px;font-size:.875rem;font-weight:600;color:var(--text-secondary)"><input type="checkbox" style="width:1.125rem;height:1.125rem;accent-color:var(--nhs-blue)"> Only differences</label>
-      </div>
+    <div class="ds-note">
+      <strong>What changed.</strong> The &ldquo;decision workspace&rdquo; (task lens, differences-only toggle, collapsible attribute groups,
+      horizontal scroll) was replaced by plain narrative tables in Round 9, and in Round 10 the page moved into the NHS 960px container with the intro in a two-thirds column.
+      See <a href="/DS/archived.html">Archived</a>.
     </div>
 
-    <h2>Decision workspace</h2>
-    <p>Collapsible attribute groups stacked vertically; decision-critical groups open by default. Selected DTx apps run as aligned columns, and the summary + group grids <strong>scroll horizontally</strong> rather than overflowing the page with 3&ndash;4 apps.</p>
+    <h2>Anatomy</h2>
+    <ol>
+      <li><strong>Breadcrumb</strong> &mdash; Home / Comparison tool.</li>
+      <li><strong>Title and intro</strong> &mdash; <code>nhsuk-heading-xl</code> and an <code>nhsuk-body-l</code> paragraph in a <code>two-thirds</code> column explaining the four-product, same-condition rule.</li>
+      <li><strong>Toolbar</strong> &mdash; a <code>nhsuk-heading-xs</code> &ldquo;Compared condition: COPD&rdquo; line and a <strong>Clear all</strong> link-button (44px target).</li>
+      <li><strong>Narrative tables</strong> (<code>CompareNarrativeTables</code>) &mdash; six <code>nhsuk-table-responsive</code> tables with an <code>nhsuk-table__caption--m</code>: What it is &middot; Evidence and expected impact &middot; Assurance &middot; What it takes to work locally &middot; NHS experience &middot; Cost and commercial route. Products are columns (header shows name, supplier and a <strong>Remove</strong> button); dimensions are row headers.</li>
+      <li><strong>Empty state</strong> &mdash; a sentence and a &ldquo;Go to product catalogue&rdquo; link; no card or illustration.</li>
+    </ol>
+
+    <h2>Table treatment</h2>
+    <p>Below the tablet breakpoint the NHS responsive table stacks each cell with its column heading (<code>nhsuk-table-responsive__heading</code>) so nothing scrolls sideways. Cells that have no value say &ldquo;Check with supplier&rdquo; in secondary text rather than showing a dash. Links to the relevant product page sit in the cell where more detail exists.</p>
     <div class="ds-example ds-example--surface">
-      <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff">
-        <div style="display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:12px 20px;background:#E8EDF3;font-weight:600;font-size:.875rem">Evidence &amp; outcomes <span aria-hidden>&minus;</span></div>
-        <div style="border-top:1px solid var(--border)">
-          <div style="display:grid;grid-template-columns:minmax(140px,200px) 1fr;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border)"><div class="ds-meta__k">Evidence strength</div><div class="ds-u-row"><span class="badge badge-green">Strong</span><span class="badge badge-blue">Moderate</span></div></div>
-          <div style="display:grid;grid-template-columns:minmax(140px,200px) 1fr;gap:12px;padding:16px 20px"><div class="ds-meta__k">Case studies</div><div class="ds-u-muted" style="font-size:.9rem">3 vs 1</div></div>
-        </div>
-      </div>
+      <table class="ds-table" style="margin:0">
+        <caption style="text-align:left;font-weight:600;font-size:1.25rem;padding:0 0 12px">Evidence and expected impact</caption>
+        <thead><tr><th style="width:18%"><span class="ds-u-sr">Dimension</span></th><th>Luscii<br><span style="font-weight:400;color:var(--text-secondary)">Luscii Healthtech</span></th><th>myCOPD<br><span style="font-weight:400;color:var(--text-secondary)">my mhealth</span></th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Evidence strength</th><td>Strong &mdash; RCT and NHS evaluations</td><td>Moderate &mdash; service evaluations</td></tr>
+          <tr><th scope="row">Expected impact</th><td>Fewer unplanned admissions</td><td>Improved self-management</td></tr>
+          <tr><th scope="row">Published studies</th><td><a href="#ds-main">See Luscii evidence</a></td><td><span style="color:var(--text-secondary)">Check with supplier</span></td></tr>
+        </tbody>
+      </table>
     </div>
 
-    <h2>Differences-only empty state</h2>
-    <p>When &ldquo;Only differences&rdquo; is on and the selected DTx apps match on every dimension, the workspace shows a real empty state with a <strong>&ldquo;Show all rows&rdquo;</strong> button (which turns the filter off) instead of a silently blank panel.</p>
-    <div class="ds-example ds-example--surface">
-      <div style="border:1px solid var(--border);border-radius:12px;background:#fff;padding:48px 24px;text-align:center">
-        <p style="margin:0 0 4px;font-weight:600;color:var(--text-primary)">No differences to show</p>
-        <p class="ds-u-muted" style="margin:0 0 20px;font-size:.875rem">The selected DTx apps match on every comparison dimension. Turn off the filter to see the full comparison.</p>
-        <button style="min-height:44px;border-radius:8px;border:1px solid var(--nhs-blue);color:var(--nhs-blue);background:#fff;font-weight:600;padding:0 20px">Show all rows</button>
-      </div>
-    </div>
+    <h2>Add to compare</h2>
+    <p>The entry point is the <a href="/DS/components/toggles.html">compare toggle</a> (<code>CompareToggleButton</code>): an NHS button with <code>aria-pressed</code> that reads <strong>Add to compare</strong> / <strong>Added</strong>. The header shows a count badge next to &ldquo;Comparison tool&rdquo; while the basket is non-empty. Adding a product from a different condition area, or a fifth product, shows a <a href="/DS/components/alerts.html">toast</a> explaining why it was blocked.</p>
+
+    <h2>Loading state</h2>
+    <p><code>CompareSkeleton</code> holds the title, intro and first table shape while the basket hydrates.</p>
 
     <h2>Components used</h2>
     <p>
-      <a href="/DS/components/toggles.html">Lens &amp; diff toggle</a> &middot;
-      <a href="/DS/components/collapsible.html">Workspace groups</a> &middot;
-      <a href="/DS/components/badges-tags.html">Badges</a>
+      <a href="/DS/components/tables.html">Tables</a> &middot;
+      <a href="/DS/components/toggles.html">Compare toggle</a> &middot;
+      <a href="/DS/components/buttons.html">Buttons</a> &middot;
+      <a href="/DS/components/alerts.html">Toast</a> &middot;
+      <a href="/DS/components/loading.html">Skeletons</a>
     </p>
 
-    <div class="ds-note ds-note--source">Source: <code>app/compare/CompareClient.tsx</code>, <code>components/compare/*</code> (<code>CompareLensControl</code>, <code>CompareWorkspaceView</code>).</div>
+    <div class="ds-note ds-note--source">Source: <code>app/compare/page.tsx</code>, <code>app/compare/CompareClient.tsx</code>, <code>components/compare/CompareNarrativeTables.tsx</code>, <code>lib/compareNarrativeContent.ts</code>, <code>components/CompareBasketProvider.tsx</code>, <code>components/CompareToggleButton.tsx</code>.</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

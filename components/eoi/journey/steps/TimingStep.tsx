@@ -21,76 +21,78 @@ export default function TimingStep() {
   }, [hydrated, detailsComplete, data.verified, basePath, router])
 
   return (
-    <div className="hs-page">
-      <div className="max-w-2xl">
-        <BackLink href={returnToCheck ? `${basePath}/check-answers` : `${basePath}/support`} />
-        <h1 ref={headingRef} tabIndex={-1} className="page-title-h1 outline-none">
-          Timing and context
-        </h1>
-        <form
-          noValidate
-          onSubmit={(e) => {
-            e.preventDefault()
-            router.push(`${basePath}/check-answers`)
-          }}
-        >
-          <div className="nhsuk-form-group">
-            <fieldset className="nhsuk-fieldset">
-              <legend className="nhsuk-fieldset__legend nhsuk-fieldset__legend--s">
-                Desired timeline (optional)
-              </legend>
-              <div className="nhsuk-radios">
-                {TIMELINE_OPTIONS.map((o) => (
-                  <div key={o.id} className="nhsuk-radios__item">
-                    <input
-                      className="nhsuk-radios__input"
-                      id={`eoi-timeline-${o.id}`}
-                      type="radio"
-                      name="eoi-timeline"
-                      checked={data.timeline === o.id}
-                      onChange={() => update({ timeline: o.id })}
-                    />
-                    <label
-                      className="nhsuk-radios__label nhsuk-label"
-                      htmlFor={`eoi-timeline-${o.id}`}
-                    >
-                      {o.label}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </fieldset>
-          </div>
-          <FormField
-            id="eoi-population"
-            label="Estimated patient population (optional)"
-            hint="For example, 2,000 COPD patients."
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <BackLink href={returnToCheck ? `${basePath}/check-answers` : `${basePath}/support`} />
+          <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
+            Timing and context
+          </h1>
+          <form
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault()
+              router.push(`${basePath}/check-answers`)
+            }}
           >
-            {(field) => (
-              <TextInput
-                {...field}
-                value={data.population}
-                onChange={(e) => update({ population: e.target.value })}
-                className="nhsuk-input--width-20"
-              />
-            )}
-          </FormField>
-          <FormField
-            id="eoi-notes"
-            label="Additional context (optional)"
-            hint="Do not enter patient-identifiable information."
-          >
-            {(field) => (
-              <Textarea
-                {...field}
-                rows={4}
-                value={data.notes}
-                onChange={(e) => update({ notes: e.target.value })}
-              />
-            )}
-          </FormField>
-          <Button type="submit">Continue</Button>
-        </form>
+            <div className="nhsuk-form-group">
+              <fieldset className="nhsuk-fieldset">
+                <legend className="nhsuk-fieldset__legend nhsuk-fieldset__legend--s">
+                  Desired timeline (optional)
+                </legend>
+                <div className="nhsuk-radios">
+                  {TIMELINE_OPTIONS.map((o) => (
+                    <div key={o.id} className="nhsuk-radios__item">
+                      <input
+                        className="nhsuk-radios__input"
+                        id={`eoi-timeline-${o.id}`}
+                        type="radio"
+                        name="eoi-timeline"
+                        checked={data.timeline === o.id}
+                        onChange={() => update({ timeline: o.id })}
+                      />
+                      <label
+                        className="nhsuk-radios__label nhsuk-label"
+                        htmlFor={`eoi-timeline-${o.id}`}
+                      >
+                        {o.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+            <FormField
+              id="eoi-population"
+              label="Estimated patient population (optional)"
+              hint="For example, 2,000 COPD patients."
+            >
+              {(field) => (
+                <TextInput
+                  {...field}
+                  value={data.population}
+                  onChange={(e) => update({ population: e.target.value })}
+                  className="nhsuk-input--width-20"
+                />
+              )}
+            </FormField>
+            <FormField
+              id="eoi-notes"
+              label="Additional context (optional)"
+              hint="Do not enter patient-identifiable information."
+            >
+              {(field) => (
+                <Textarea
+                  {...field}
+                  rows={4}
+                  value={data.notes}
+                  onChange={(e) => update({ notes: e.target.value })}
+                />
+              )}
+            </FormField>
+            <Button type="submit">Continue</Button>
+          </form>
+        </div>
       </div>
     </div>
   )

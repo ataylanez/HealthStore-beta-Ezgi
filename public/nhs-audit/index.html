@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>NHS layout and typography audit — NHS HealthStore</title>
+<style>
+  @font-face { font-family: 'Frutiger'; src: url('/fonts/Frutiger-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+  @font-face { font-family: 'Frutiger'; src: url('/fonts/Frutiger-Bold.ttf') format('truetype'); font-weight: 600 700; font-display: swap; }
+
+  :root {
+    --blue: #005eb8; --dark-blue: #003087; --text: #212b32; --secondary: #4c6272;
+    --grey-4: #d8dde0; --grey-5: #f0f4f5; --white: #fff; --green: #007f3b;
+    --yellow: #ffeb3b; --red: #d5281b; --orange: #ed8b00; --pale-blue: #e8edee;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--grey-5); -webkit-text-size-adjust: 100%; }
+  body { margin: 0; font-family: Frutiger, Arial, sans-serif; color: var(--text); font-size: 16px; line-height: 1.5; }
+  @media (min-width: 40.0625em) { body { font-size: 19px; line-height: 1.47; } }
+
+  .header { background: var(--blue); color: #fff; }
+  .header .inner { display: flex; align-items: center; gap: 16px; padding: 20px 0; }
+  .nhs-logo { background: #fff; color: var(--blue); font-weight: 700; font-size: 22px; padding: 2px 8px; border-radius: 2px; letter-spacing: 1px; }
+  .header .svc { font-size: 19px; }
+  .container { max-width: 960px; margin: 0 16px; }
+  @media (min-width: 40.0625em) { .container { margin: 0 32px; } }
+  @media (min-width: 1024px) { .container { margin: 0 auto; } }
+  main { padding: 24px 0 24px; }
+  @media (min-width: 40.0625em) { main { padding: 48px 0 48px; } }
+  .two-thirds { max-width: 66.6667%; }
+  @media (max-width: 48em) { .two-thirds { max-width: 100%; } }
+
+  h1 { font-size: 32px; line-height: 1.125; font-weight: 700; margin: 0 0 40px; }
+  h2 { font-size: 27px; line-height: 1.185; font-weight: 700; margin: 56px 0 24px; }
+  h3 { font-size: 22px; line-height: 1.272; font-weight: 700; margin: 40px 0 16px; }
+  h4 { font-size: 19px; line-height: 1.47; font-weight: 700; margin: 24px 0 8px; }
+  @media (min-width: 40.0625em) {
+    h1 { font-size: 48px; line-height: 1.167; margin-bottom: 48px; }
+    h2 { font-size: 36px; line-height: 1.111; }
+    h3 { font-size: 26px; line-height: 1.231; }
+  }
+  p, ul, ol { margin: 0 0 16px; }
+  @media (min-width: 40.0625em) { p, ul, ol { margin-bottom: 24px; } }
+  .lede { font-size: 20px; line-height: 1.4; margin-bottom: 40px; }
+  @media (min-width: 40.0625em) { .lede { font-size: 24px; line-height: 1.33; } }
+  .small { font-size: 14px; line-height: 1.714; }
+  @media (min-width: 40.0625em) { .small { font-size: 16px; line-height: 1.5; } }
+  .muted { color: var(--secondary); }
+  a { color: var(--blue); }
+  a:hover { color: #7c2855; }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.85em; background: var(--pale-blue); padding: 1px 4px; border-radius: 2px; }
+
+  .inset { border-left: 10px solid var(--blue); padding: 16px 24px; margin: 24px 0 40px; background: var(--grey-5); }
+  .inset p:last-child { margin-bottom: 0; }
+  .card { background: #fff; border: 1px solid var(--grey-4); border-bottom-width: 4px; padding: 24px; margin-bottom: 24px; }
+  .card h3, .card h4 { margin-top: 0; }
+  .card :last-child { margin-bottom: 0; }
+
+  .tag { display: inline-block; font-size: 14px; line-height: 1; padding: 5px 8px 4px; border: 1px solid; border-radius: 4px; font-weight: 600; white-space: nowrap; vertical-align: middle; }
+  .tag--p1 { background: #f6d7d2; border-color: var(--red); color: #4c2c25; }
+  .tag--p2 { background: #fff2b8; border-color: #b58300; color: #594d00; }
+  .tag--p3 { background: var(--pale-blue); border-color: #aeb7bd; color: #3b4a56; }
+  .tag--done { background: #cce2d8; border-color: var(--green); color: #00401e; }
+  .tag--deferred { background: var(--pale-blue); border-color: #aeb7bd; color: #3b4a56; }
+  .tag--decision { background: #e2ecf6; border-color: var(--blue); color: var(--dark-blue); }
+  .tag--partial { background: #fff2b8; border-color: #b58300; color: #594d00; }
+
+  table { width: 100%; border-collapse: collapse; margin: 0 0 40px; font-size: 16px; line-height: 1.5; }
+  th, td { text-align: left; vertical-align: top; padding: 12px 16px 12px 0; border-bottom: 1px solid var(--grey-4); }
+  th { font-weight: 700; }
+  td:last-child, th:last-child { padding-right: 0; }
+
+  .summary-list { margin: 0 0 40px; }
+  .summary-list dl { margin: 0; }
+  .summary-list .row { display: grid; grid-template-columns: 1fr; gap: 4px 24px; padding: 12px 0; border-bottom: 1px solid var(--grey-4); }
+  @media (min-width: 40.0625em) { .summary-list .row { grid-template-columns: 28% 1fr; } }
+  .summary-list dt { font-weight: 700; margin: 0; }
+  .summary-list dd { margin: 0; }
+  .summary-list dd p:last-child { margin-bottom: 0; }
+
+  .finding { margin: 0 0 40px; padding: 0 0 8px; border-bottom: 1px solid var(--grey-4); }
+  .finding h3 { margin-top: 0; }
+  .finding .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: -8px 0 16px; }
+  .finding .meta .tag { font-size: 14px; }
+  .finding dl { display: grid; grid-template-columns: 1fr; gap: 8px 24px; margin: 0 0 16px; }
+  @media (min-width: 40.0625em) { .finding dl { grid-template-columns: 11rem 1fr; } }
+  .finding dt { font-weight: 700; margin: 0; }
+  .finding dd { margin: 0; }
+  .finding dd p { margin-bottom: 8px; }
+  .finding dd p:last-child { margin-bottom: 0; }
+
+  .compare { display: grid; grid-template-columns: 1fr; gap: 24px; margin: 24px 0 8px; }
+  @media (min-width: 40.0625em) { .compare { grid-template-columns: 1fr 1fr; } }
+  .compare figure { margin: 0; }
+  .compare figcaption { font-weight: 700; margin-bottom: 8px; font-size: 16px; }
+  .compare figcaption span { font-weight: 400; color: var(--secondary); }
+  .shot { display: block; width: 100%; background: #fff; border: 1px solid var(--grey-4); }
+  .shot img { display: block; width: 100%; height: auto; }
+  .shot--crop { height: 520px; overflow: hidden; }
+  .shot--crop img { object-fit: cover; object-position: top; height: 100%; }
+  .compare--mobile { grid-template-columns: 1fr 1fr; }
+  @media (min-width: 40.0625em) { .compare--mobile { grid-template-columns: 1fr 1fr 1fr 1fr; } }
+  .compare--mobile .shot--crop { height: 420px; }
+  .shot-links { margin: 8px 0 40px; }
+  .page-block { margin-bottom: 56px; padding-bottom: 8px; border-bottom: 1px solid var(--grey-4); }
+  .page-block h3 { margin-top: 0; }
+
+  .contents { margin: 0 0 56px; }
+  .contents ol { list-style: none; padding: 0; margin: 0; }
+  .contents li { position: relative; padding-left: 24px; margin-bottom: 8px; }
+  .contents li::before { content: "—"; position: absolute; left: 0; color: var(--secondary); }
+
+  .footer { background: var(--grey-4); border-top: 4px solid var(--blue); padding: 24px 0 32px; margin-top: 40px; }
+  .footer p { margin: 0; }
+
+  @media print {
+    html { background: #fff; }
+    body { font-size: 11pt; line-height: 1.4; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .container { max-width: 100%; margin: 0; }
+    main { padding: 0; }
+    .two-thirds { max-width: 100%; }
+    h1 { font-size: 26pt; margin-bottom: 18pt; }
+    h2 { font-size: 20pt; margin: 28pt 0 10pt; page-break-after: avoid; break-after: avoid; }
+    h3 { font-size: 15pt; margin: 18pt 0 8pt; page-break-after: avoid; break-after: avoid; }
+    h4 { font-size: 12pt; }
+    .lede { font-size: 13pt; }
+    p, ul, ol, table { margin-bottom: 8pt; }
+    .finding, .page-block, .card, .inset, tr { page-break-inside: avoid; break-inside: avoid; }
+    .page-block { page-break-before: always; break-before: page; border: 0; }
+    .shot--crop { height: 300px; }
+    .compare--mobile .shot--crop { height: 280px; }
+    .compare { gap: 12px; }
+    .tag, .inset, .card, .shot { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    a { color: var(--text); text-decoration: none; }
+    .shot-links { display: none; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="container inner">
+    <span class="nhs-logo">NHS</span>
+    <span class="svc">HealthStore — design audit</span>
+  </div>
+</div>
+
+<main>
+<div class="container">
+
+  <h1>NHS layout and typography audit</h1>
+
+  <p class="lede two-thirds">
+    How far the NHS HealthStore prototype had drifted from the NHS design system's page layouts and typography, what we changed to bring it back, and what is still left to decide.
+  </p>
+
+  <div class="inset two-thirds">
+    <p><strong>Who this is for.</strong> UX and interaction designers working on the HealthStore. It is written in plain language; the technical detail lives in the code and in <code>docs/NHS_DESIGN_SYSTEM_MIGRATION.md</code>.</p>
+    <p><strong>What we checked against.</strong> NHS Frontend version 9.6 (the NHS design system's code), with GOV.UK Frontend only where NHS has no equivalent component. Every "NHS expects" statement below was verified against the NHS Frontend source, not from memory.</p>
+    <p><strong>Date.</strong> 16 October 2026. Screenshots were taken at 1280px (desktop) and 375px (mobile).</p>
+  </div>
+
+  <nav class="contents two-thirds" aria-label="Contents">
+    <h2 style="margin-top:0">Contents</h2>
+    <ol>
+      <li><a href="#summary">Summary</a></li>
+      <li><a href="#expects">What the NHS design system expects</a></li>
+      <li><a href="#findings">Findings: where we were different</a></li>
+      <li><a href="#pages">Page by page, before and after</a></li>
+      <li><a href="#plan">The prioritised plan and what was done</a></li>
+      <li><a href="#deferred">Left for a future iteration</a></li>
+      <li><a href="#decisions">Needs your decision before we act</a></li>
+      <li><a href="#correct">What was already right</a></li>
+    </ol>
+  </nav>
+
+  <!-- ───────────────────────── SUMMARY ───────────────────────── -->
+  <h2 id="summary">Summary</h2>
+  <div class="two-thirds">
+    <p>The site looked NHS-like at a glance (blue header, Frutiger, NHS buttons and form fields) but underneath it was running its own layout system. Pages were <strong>1280px wide instead of the NHS 960px</strong>, almost nothing used the NHS grid, and headings, intro text and labels were styled by hand rather than with the NHS type styles. The result was long reading lines, inconsistent spacing between pages, and a lot of small grey text that NHS content would set at body size.</p>
+    <p>We found <strong>19 distinct deviations</strong> across six themes. <strong>16 are fixed</strong> in this iteration, including everything we rated highest priority; <strong>2 are partly fixed</strong> (what remains is structural or a content review); and <strong>1 group of bespoke components needs a decision</strong> from you (listed at the end).</p>
+    <p>The headline changes:</p>
+    <ul>
+      <li>Every page now sits in the NHS 960px width container with NHS vertical spacing. The header, navigation and "Alpha" banner follow the same width.</li>
+      <li>Reading content, forms and journeys sit in an NHS two-thirds column. Product pages and the catalogue use the NHS one-third / two-thirds layout.</li>
+      <li>All page titles, section headings, intro text and lists use NHS type styles. Capitalised, letter-spaced labels and sub-16px text are gone.</li>
+      <li>The home page uses the NHS hero component and NHS card groups.</li>
+    </ul>
+    <p>The NHS type <em>sizes</em> themselves were already correct in our design tokens. The problem was how text was applied, not the scale.</p>
+  </div>
+
+  <!-- ───────────────────────── EXPECTS ───────────────────────── -->
+  <h2 id="expects">What the NHS design system expects</h2>
+  <div class="two-thirds">
+    <p>A short, non-technical version of the rules we measured ourselves against.</p>
+
+    <div class="summary-list">
+      <dl>
+        <div class="row"><dt>Page width</dt><dd>Content lives in a container no wider than <strong>960px</strong>, centred, with 16px side margins on small screens and 32px on larger ones. The header, navigation and footer share the same width.</dd></div>
+        <div class="row"><dt>Vertical rhythm</dt><dd>The main area has <strong>24px</strong> of padding top and bottom on mobile and <strong>48px</strong> on desktop (or 16/24px when a breadcrumb or back link sits above it). Spacing uses the NHS points scale: 4, 8, 16, 24, 32, 40, 48, 56, 64px.</dd></div>
+        <div class="row"><dt>Grid</dt><dd>A simple row of columns: <strong>two-thirds</strong> for reading content and forms, <strong>one-third</strong> for a contents list or filters, <strong>one-half</strong> and <strong>one-third</strong> for cards. Columns stack on mobile.</dd></div>
+        <div class="row"><dt>Reading width</dt><dd>Body text should never run across the full 960px. Two-thirds (about 613px) is the standard reading column.</dd></div>
+        <div class="row"><dt>Type scale</dt><dd>Desktop: 64, 48, 36, 26, 22, 19, 16, 14px. Mobile: 48, 32, 27, 22, 19, 16, 14, 12px. Body text is 19px on desktop and 16px on mobile. Nothing below "body small" (16/14) is used for content.</dd></div>
+        <div class="row"><dt>Headings</dt><dd>Page title is <strong>heading XL (48px)</strong>, major sections <strong>heading L (36px)</strong>, sub-sections <strong>heading M (26px)</strong> and <strong>heading S (22px)</strong>. Headings are bold (weight 600 in Frutiger) and sentence case. Each heading style carries its own top and bottom spacing, which is what gives NHS pages their consistent rhythm.</dd></div>
+        <div class="row"><dt>Intro text</dt><dd>A page's opening paragraph uses <strong>lede text</strong>: 22px on desktop, 19px on mobile (the older 24px lede was retired).</dd></div>
+        <div class="row"><dt>Labels and captions</dt><dd>Sentence case, normal letter spacing, body-small size at minimum. NHS never uses UPPERCASE letter-spaced labels.</dd></div>
+        <div class="row"><dt>Links</dt><dd>Underlined at rest, blue, and they change colour (not just gain an underline) on hover.</dd></div>
+        <div class="row"><dt>Standard components</dt><dd>Hero, card and card group, contents list, summary list, inset text, breadcrumb, back link, pagination, details. These should be used in place of bespoke equivalents wherever they fit.</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── FINDINGS ───────────────────────── -->
+  <h2 id="findings">Findings: where we were different</h2>
+  <div class="two-thirds">
+    <p>Grouped into six themes. Each one states what NHS expects, what we had, why it matters to users, and what we did. Priority reflects how many pages were affected and how visible the problem was: <span class="tag tag--p1">P1</span> systemic, affects every page; <span class="tag tag--p2">P2</span> affects a whole page type; <span class="tag tag--p3">P3</span> local polish.</p>
+  </div>
+
+  <h3>Theme A — The page frame</h3>
+
+  <div class="finding two-thirds">
+    <h4>A1. Pages were 1280px wide, not 960px</h4>
+    <div class="meta"><span class="tag tag--p1">P1</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>A 960px container, shared by header, navigation, banner and content.</dd>
+      <dt>What we had</dt><dd>Our own page wrapper at 1280px on 51 pages, and the header, navigation and "Alpha" banner forced wider still (1280px) with their own overrides. The NHS container was used once, for the footer.</dd>
+      <dt>Why it matters</dt><dd>Lines of text ran far past a comfortable reading length, every component looked smaller than it does on nhs.uk, and the site felt wider than any NHS service people are used to.</dd>
+      <dt>What we did</dt><dd>Moved every page onto the NHS width container. Removed the header, navigation and banner width overrides so the whole frame is 960px.</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>A2. Vertical spacing came from our wrapper, not the NHS main wrapper</h4>
+    <div class="meta"><span class="tag tag--p1">P1</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>24px / 48px padding around the main area; 16px / 24px when a breadcrumb sits above it. The footer follows immediately.</dd>
+      <dt>What we had</dt><dd>Our wrapper used 32px / 40px, plus an extra 64px gap pushed in above the footer. Several pages then added their own off-scale gaps (72px, 96px, 20px, 1.25rem).</dd>
+      <dt>Why it matters</dt><dd>Page-to-page spacing was inconsistent: the title sat at a different height on the home page, the catalogue and a product page.</dd>
+      <dt>What we did</dt><dd>Adopted the NHS main wrapper (and its "small" variant below breadcrumbs) everywhere. Removed the footer gap and the off-scale values.</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>A3. Breadcrumbs sat inside the padded content area</h4>
+    <div class="meta"><span class="tag tag--p2">P2</span> <span class="tag tag--partial">Partly done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>The breadcrumb sits between the header and the main wrapper, then the main wrapper uses its smaller padding.</dd>
+      <dt>What we had</dt><dd>Breadcrumbs inside the page padding, so the gap above them varied by page.</dd>
+      <dt>What we did</dt><dd>On every shared page frame (product pages, guidance articles, catalogue, funding, resources, cookies, about) the breadcrumb now sits above the main wrapper exactly as NHS lays it out. On the remaining individual pages we pull the breadcrumb up to the same visual position. The one thing left is purely structural: the breadcrumb is still technically inside the <code>&lt;main&gt;</code> landmark. It looks identical; see "Left for a future iteration".</dd>
+    </dl>
+  </div>
+
+  <h3>Theme B — The grid and reading width</h3>
+
+  <div class="finding two-thirds">
+    <h4>B1. The NHS grid was barely used</h4>
+    <div class="meta"><span class="tag tag--p1">P1</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>Rows of one-third / two-thirds / one-half columns.</dd>
+      <dt>What we had</dt><dd>The NHS grid appeared in one file. Everything else used ad-hoc widths: "max-w-2xl", "max-w-3xl", "max-w-[640px]", a 14rem sidebar, a self-filling card grid.</dd>
+      <dt>Why it matters</dt><dd>Reading widths differed between the EOI form, the supplier portal and guidance articles even though they are all "one column of content". Nothing lined up across pages.</dd>
+      <dt>What we did</dt><dd>Forms, journeys, articles, the funding index, cookies, about and the 404 page now use a two-thirds column. Product pages and the catalogue use one-third + two-thirds. Card rows use NHS card groups in one-third or one-half columns.</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>B2. Body text ran across the full page width</h4>
+    <div class="meta"><span class="tag tag--p1">P1</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>Paragraphs in a two-thirds column (about 613px).</dd>
+      <dt>What we had</dt><dd>Intro text on the compare, catalogue, resources and portal pages ran the full 1280px; some pages capped it with our own "measure" class instead of a grid column.</dd>
+      <dt>What we did</dt><dd>Intro text and paragraphs now live inside two-thirds columns. The custom measure class is now only an alias for the same width.</dd>
+    </dl>
+  </div>
+
+  <h3>Theme C — Headings and intro text</h3>
+
+  <div class="finding two-thirds">
+    <h4>C1. Page titles and section headings were styled by hand</h4>
+    <div class="meta"><span class="tag tag--p1">P1</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd><code>heading-xl</code> for page titles, <code>heading-l</code> / <code>-m</code> / <code>-s</code> for sections, each with built-in spacing.</dd>
+      <dt>What we had</dt><dd>40 page titles used a custom "page-title-h1" style; product page sections, home page bands and the funding index each had their own heading styles with their own spacing (and some inline styles). Sizes were right, spacing wasn't.</dd>
+      <dt>Why it matters</dt><dd>The gap between a heading and the content under it, and between a list and the next heading, varied from page to page. This is the single most noticeable "not quite NHS" feeling.</dd>
+      <dt>What we did</dt><dd>All page titles are <code>heading-xl</code>; product section titles are <code>heading-l</code>; sub-sections <code>heading-s</code>; home page bands <code>heading-l</code>; cookies and about page sections <code>heading-m</code>. Custom heading styles were removed.</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>C2. Intro text used the retired 24px lede</h4>
+    <div class="meta"><span class="tag tag--p2">P2</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>Lede text at 22px desktop / 19px mobile (<code>nhsuk-lede-text</code>).</dd>
+      <dt>What we had</dt><dd>A 24px lede token (the pre-v9 size) and, on many pages, a plain grey body-size paragraph doing the lede's job.</dd>
+      <dt>What we did</dt><dd>The lede token now matches NHS 22/26. Page intros use <code>nhsuk-lede-text</code> (resources, guidance, funding, cookies, about) or <code>nhsuk-body-l</code> where the intro is more of a description (portal, compare).</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>C3. The product page title had no supplier caption</h4>
+    <div class="meta"><span class="tag tag--p3">P3</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>Context above a title uses a caption inside the heading (<code>nhsuk-caption-xl</code>).</dd>
+      <dt>What we had</dt><dd>Supplier name as a separate small line.</dd>
+      <dt>What we did</dt><dd>Supplier name is now an NHS caption inside the product title, on both the overview and section pages.</dd>
+    </dl>
+  </div>
+
+  <h3>Theme D — Labels, small text and weights</h3>
+
+  <div class="finding two-thirds">
+    <h4>D1. Uppercase, letter-spaced labels</h4>
+    <div class="meta"><span class="tag tag--p1">P1</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>Sentence case labels at body-small size, no tracking.</dd>
+      <dt>What we had</dt><dd>22 places used UPPERCASE with wide letter spacing (product detail tables, funding results, "what it's worth" tiles, how-to-buy, supplier contact card, pathway headings, before/after chart tiles).</dd>
+      <dt>Why it matters</dt><dd>It is the most visible GOV.UK/marketing-site idiom on the page and reads as "not NHS" immediately. Uppercase is also harder to read for people with dyslexia.</dd>
+      <dt>What we did</dt><dd>All removed. Labels are sentence case, bold where they need weight, at body-small size.</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>D2. Small text doing the job of body text</h4>
+    <div class="meta"><span class="tag tag--p2">P2</span> <span class="tag tag--partial">Partly done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>Running copy at body size (19/16). Body-small (16/14) only for genuine metadata.</dd>
+      <dt>What we had</dt><dd>Our "label" size (16/14) was used about 115 times, often for whole paragraphs — most heavily in the product detail sections, AI advisor panels, funding levers and the compare snapshot.</dd>
+      <dt>What we did</dt><dd>Promoted the running copy to body size in the heaviest files: product detail sections, funding levers, commissioning snapshot, AI chat and advisor panels, compare snapshot (which also used a 12px size — below the NHS minimum). About 105 genuine labels, table cells and metadata remain at body-small, which is correct; a line-by-line content review would decide the few borderline cases.</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>D3. Fixed pixel sizes off the NHS scale</h4>
+    <div class="meta"><span class="tag tag--p2">P2</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>Only sizes from the type scale; 14px is the floor on desktop.</dd>
+      <dt>What we had</dt><dd>12px home-page pills, 12px / 14px scenario controls, 11px / 13px chart labels, a 12px navigation count, a 14px snapshot heading.</dd>
+      <dt>What we did</dt><dd>All moved to NHS body-small or the badge size (which is already on scale).</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>D4. Font weights NHS doesn't use</h4>
+    <div class="meta"><span class="tag tag--p3">P3</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>Regular (400) and bold (600) only.</dd>
+      <dt>What we had</dt><dd>A weight-500 "medium" in scenario controls, and a Frutiger Light (300) font file loaded but never used.</dd>
+      <dt>What we did</dt><dd>Removed both.</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>D5. Links underlined only on hover</h4>
+    <div class="meta"><span class="tag tag--p3">P3</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>Links underlined at rest.</dd>
+      <dt>What we had</dt><dd>The product "on this page" navigation and nine components (detail links, supplier email, concept cards, AI wizard back links, cookie banner "view cookies") gained their underline only on hover.</dd>
+      <dt>What we did</dt><dd>Underlined at rest; the underline lifts on hover, as NHS does. The product navigation is now the NHS contents list.</dd>
+    </dl>
+  </div>
+
+  <h3>Theme E — Page layouts</h3>
+
+  <div class="finding two-thirds">
+    <h4>E1. Home page used a bespoke full-bleed layout</h4>
+    <div class="meta"><span class="tag tag--p2">P2</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>The NHS hero (blue band, title, lede, optional image) followed by content in the width container, cards in NHS card groups.</dd>
+      <dt>What we had</dt><dd>A custom hero at 1280px, storytelling bands that bled edge to edge, and card rows on a Tailwind grid.</dd>
+      <dt>What we did</dt><dd>Hero is now the NHS hero with the illustration in a one-third column; "What the HealthStore addresses", "How it works", "Conditions and pathways" and "Case studies" sit inside the width container with NHS card groups. All content and imagery was kept.</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>E2. Product pages had a custom sidebar that disappeared on mobile</h4>
+    <div class="meta"><span class="tag tag--p2">P2</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>A one-third contents list beside a two-thirds content column; the contents list stacks above the content on mobile.</dd>
+      <dt>What we had</dt><dd>A 14rem sticky sidebar in a custom grid, hidden entirely under 1024px, content capped at 640px, section titles with 72px gaps, metric tiles on a Tailwind grid.</dd>
+      <dt>What we did</dt><dd>NHS contents list in a one-third column (visible on mobile), content in two-thirds, tiles on NHS one-third/one-half columns, "How to buy" and "Regulatory position" as NHS summary lists, callouts as NHS inset text.</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>E3. Catalogue used a GOV.UK-style filter panel and a self-filling card grid</h4>
+    <div class="meta"><span class="tag tag--p2">P2</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>Filters in a one-third column, results in two-thirds as a list of cards; a product count as text, not a heading.</dd>
+      <dt>What we had</dt><dd>A collapsible filter panel above an auto-fill grid; the result count was an <code>&lt;h2&gt;</code>.</dd>
+      <dt>What we did</dt><dd>One-third filters (collapsible on mobile, always open on desktop) beside a two-thirds stacked list of NHS cards. Count is body text. The discovery page and resources index use NHS card groups.</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>E4. Forms and journeys used arbitrary max-widths</h4>
+    <div class="meta"><span class="tag tag--p2">P2</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>Forms in a two-thirds column; button groups spaced with NHS points.</dd>
+      <dt>What we had</dt><dd>Express-interest steps, supplier onboarding and supplier portal pages each wrapped in "max-w-2xl" / "max-w-3xl" (672 / 768px); a 96px gap above some button rows; a hand-styled blue notice panel.</dd>
+      <dt>What we did</dt><dd>Two-thirds column across all 32 journey and portal pages; 40px NHS spacing above button rows; the notice is NHS inset text; portal dashboard tiles are an NHS card group.</dd>
+    </dl>
+  </div>
+
+  <div class="finding two-thirds">
+    <h4>E5. Resource pages set their own widths and heading styles</h4>
+    <div class="meta"><span class="tag tag--p2">P2</span> <span class="tag tag--done">Done</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>Article in a two-thirds column with heading-xl; section indexes as lede plus a list.</dd>
+      <dt>What we had</dt><dd>Articles capped at 40rem inline; section indexes with hand-styled grey intros and bold 19px links; the resources index on a Tailwind card grid.</dd>
+      <dt>What we did</dt><dd>Articles in two-thirds; indexes use lede text and an NHS bulleted list of links; the resources index is an NHS card group of secondary cards.</dd>
+    </dl>
+  </div>
+
+  <h3>Theme F — Bespoke chrome with no NHS pattern</h3>
+
+  <div class="finding two-thirds">
+    <h4>F1. Floating "back to top" button, AI Advisor drawer, compare count badge, GOV.UK-styled tags</h4>
+    <div class="meta"><span class="tag tag--p3">P3</span> <span class="tag tag--decision">Needs decision</span></div>
+    <dl>
+      <dt>NHS expects</dt><dd>NHS has no floating action button, drawer or badge pattern. Its tag has its own look (coloured background, no border radius).</dd>
+      <dt>What we had</dt><dd>All four are bespoke and working. The tag has been restyled to look like the GOV.UK tag.</dd>
+      <dt>What we did</dt><dd>Nothing yet. Each is a product decision, not a styling fix — see "Needs your decision".</dd>
+    </dl>
+  </div>
+
+  <!-- ───────────────────────── PAGES ───────────────────────── -->
+  <h2 id="pages">Page by page, before and after</h2>
+  <div class="two-thirds">
+    <p>Desktop pairs are cropped to the top of the page so they sit side by side; mobile pairs follow. Use the "open full image" links to see whole pages. In the "before" images the page runs to 1280px; in the "after" images the grey space either side is the normal NHS 960px frame.</p>
+  </div>
+
+  <!-- HOME -->
+  <div class="page-block">
+    <h3>Home</h3>
+    <p class="two-thirds">Custom 1280px hero and full-bleed bands became the NHS hero, with every band inside the 960px container and cards in NHS card groups.</p>
+    <div class="compare">
+      <figure><figcaption>Before <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/home-desktop.png" alt="Home page before: custom hero and content running to 1280px wide"></div></figure>
+      <figure><figcaption>After <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/home-desktop.png" alt="Home page after: NHS hero with illustration and 960px content"></div></figure>
+    </div>
+    <div class="compare compare--mobile">
+      <figure><figcaption>Before <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/home-mobile.png" alt="Home page before, mobile"></div></figure>
+      <figure><figcaption>After <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/home-mobile.png" alt="Home page after, mobile"></div></figure>
+    </div>
+    <p class="shot-links small">Open full image: <a href="/nhs-audit/screenshots/before/home-desktop.png">before desktop</a> · <a href="/nhs-audit/screenshots/after/home-desktop.png">after desktop</a> · <a href="/nhs-audit/screenshots/before/home-mobile.png">before mobile</a> · <a href="/nhs-audit/screenshots/after/home-mobile.png">after mobile</a></p>
+  </div>
+
+  <!-- CATALOGUE DISCOVERY -->
+  <div class="page-block">
+    <h3>Product catalogue (discovery)</h3>
+    <p class="two-thirds">Intro into a two-thirds column, lede text, NHS card group for pathways, secondary cards for the roadmap.</p>
+    <p class="two-thirds small muted">Note: this "before" image was captured from the last committed version of the page rather than the working copy, because the first capture used a wrong address. The layout differences described are the same.</p>
+    <div class="compare">
+      <figure><figcaption>Before <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/catalogue-desktop.png" alt="Catalogue discovery before"></div></figure>
+      <figure><figcaption>After <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/catalogue-desktop.png" alt="Catalogue discovery after"></div></figure>
+    </div>
+    <div class="compare compare--mobile">
+      <figure><figcaption>Before <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/catalogue-mobile.png" alt="Catalogue discovery before, mobile"></div></figure>
+      <figure><figcaption>After <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/catalogue-mobile.png" alt="Catalogue discovery after, mobile"></div></figure>
+    </div>
+    <p class="shot-links small">Open full image: <a href="/nhs-audit/screenshots/before/catalogue-desktop.png">before desktop</a> · <a href="/nhs-audit/screenshots/after/catalogue-desktop.png">after desktop</a> · <a href="/nhs-audit/screenshots/before/catalogue-mobile.png">before mobile</a> · <a href="/nhs-audit/screenshots/after/catalogue-mobile.png">after mobile</a></p>
+  </div>
+
+  <!-- CATALOGUE LIST -->
+  <div class="page-block">
+    <h3>Product catalogue (filtered list)</h3>
+    <p class="two-thirds">Filter panel and auto-fill grid became one-third filters beside a two-thirds stacked list of NHS cards. Result count demoted from a heading to body text.</p>
+    <div class="compare">
+      <figure><figcaption>Before <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/catalogue-dtx-desktop.png" alt="Catalogue list before"></div></figure>
+      <figure><figcaption>After <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/catalogue-dtx-desktop.png" alt="Catalogue list after"></div></figure>
+    </div>
+    <div class="compare compare--mobile">
+      <figure><figcaption>Before <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/catalogue-dtx-mobile.png" alt="Catalogue list before, mobile"></div></figure>
+      <figure><figcaption>After <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/catalogue-dtx-mobile.png" alt="Catalogue list after, mobile"></div></figure>
+    </div>
+    <p class="shot-links small">Open full image: <a href="/nhs-audit/screenshots/before/catalogue-dtx-desktop.png">before desktop</a> · <a href="/nhs-audit/screenshots/after/catalogue-dtx-desktop.png">after desktop</a> · <a href="/nhs-audit/screenshots/before/catalogue-dtx-mobile.png">before mobile</a> · <a href="/nhs-audit/screenshots/after/catalogue-dtx-mobile.png">after mobile</a></p>
+  </div>
+
+  <!-- PDP OVERVIEW -->
+  <div class="page-block">
+    <h3>Product page — overview</h3>
+    <p class="two-thirds">Custom sidebar and 640px content became the NHS contents list (one-third) beside two-thirds content. Section titles are heading-l with NHS spacing; supplier name is a caption in the title.</p>
+    <div class="compare">
+      <figure><figcaption>Before <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/pdp-overview-desktop.png" alt="Product overview before"></div></figure>
+      <figure><figcaption>After <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/pdp-overview-desktop.png" alt="Product overview after"></div></figure>
+    </div>
+    <div class="compare compare--mobile">
+      <figure><figcaption>Before <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/pdp-overview-mobile.png" alt="Product overview before, mobile"></div></figure>
+      <figure><figcaption>After <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/pdp-overview-mobile.png" alt="Product overview after, mobile"></div></figure>
+    </div>
+    <p class="shot-links small">Open full image: <a href="/nhs-audit/screenshots/before/pdp-overview-desktop.png">before desktop</a> · <a href="/nhs-audit/screenshots/after/pdp-overview-desktop.png">after desktop</a> · <a href="/nhs-audit/screenshots/before/pdp-overview-mobile.png">before mobile</a> · <a href="/nhs-audit/screenshots/after/pdp-overview-mobile.png">after mobile</a></p>
+  </div>
+
+  <!-- PDP SECTION -->
+  <div class="page-block">
+    <h3>Product page — a section ("How it helps")</h3>
+    <p class="two-thirds">Same frame as the overview. The contents list marks the current section the NHS way; on mobile it now appears above the content instead of vanishing.</p>
+    <div class="compare">
+      <figure><figcaption>Before <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/pdp-section-desktop.png" alt="Product section before"></div></figure>
+      <figure><figcaption>After <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/pdp-section-desktop.png" alt="Product section after"></div></figure>
+    </div>
+    <div class="compare compare--mobile">
+      <figure><figcaption>Before <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/pdp-section-mobile.png" alt="Product section before, mobile"></div></figure>
+      <figure><figcaption>After <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/pdp-section-mobile.png" alt="Product section after, mobile"></div></figure>
+    </div>
+    <p class="shot-links small">Open full image: <a href="/nhs-audit/screenshots/before/pdp-section-desktop.png">before desktop</a> · <a href="/nhs-audit/screenshots/after/pdp-section-desktop.png">after desktop</a> · <a href="/nhs-audit/screenshots/before/pdp-section-mobile.png">before mobile</a> · <a href="/nhs-audit/screenshots/after/pdp-section-mobile.png">after mobile</a></p>
+  </div>
+
+  <!-- COMPARE -->
+  <div class="page-block">
+    <h3>Comparison tool</h3>
+    <p class="two-thirds">Intro into a two-thirds column; small 12px text in the decision snapshot raised to body-small. The comparison remembers your basket in the browser, so both captures show the empty state — the populated tables were checked by hand at 960px and are flagged under "Needs your decision".</p>
+    <div class="compare">
+      <figure><figcaption>Before <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/compare-desktop.png" alt="Compare before"></div></figure>
+      <figure><figcaption>After <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/compare-desktop.png" alt="Compare after"></div></figure>
+    </div>
+    <p class="shot-links small">Open full image: <a href="/nhs-audit/screenshots/before/compare-desktop.png">before desktop</a> · <a href="/nhs-audit/screenshots/after/compare-desktop.png">after desktop</a> · <a href="/nhs-audit/screenshots/before/compare-mobile.png">before mobile</a> · <a href="/nhs-audit/screenshots/after/compare-mobile.png">after mobile</a></p>
+  </div>
+
+  <!-- FUNDING -->
+  <div class="page-block">
+    <h3>Funding index</h3>
+    <p class="two-thirds">Rebuilt on the NHS frame: breadcrumb, small main wrapper, two-thirds column, lede text, NHS cards for each funding source.</p>
+    <div class="compare">
+      <figure><figcaption>Before <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/funding-desktop.png" alt="Funding before"></div></figure>
+      <figure><figcaption>After <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/funding-desktop.png" alt="Funding after"></div></figure>
+    </div>
+    <div class="compare compare--mobile">
+      <figure><figcaption>Before <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/funding-mobile.png" alt="Funding before, mobile"></div></figure>
+      <figure><figcaption>After <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/funding-mobile.png" alt="Funding after, mobile"></div></figure>
+    </div>
+    <p class="shot-links small">Open full image: <a href="/nhs-audit/screenshots/before/funding-desktop.png">before desktop</a> · <a href="/nhs-audit/screenshots/after/funding-desktop.png">after desktop</a> · <a href="/nhs-audit/screenshots/before/funding-mobile.png">before mobile</a> · <a href="/nhs-audit/screenshots/after/funding-mobile.png">after mobile</a></p>
+  </div>
+
+  <!-- RESOURCES -->
+  <div class="page-block">
+    <h3>Resource library</h3>
+    <p class="two-thirds">Lede text plus an NHS card group of secondary cards in one-third columns.</p>
+    <div class="compare">
+      <figure><figcaption>Before <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/resources-desktop.png" alt="Resources before"></div></figure>
+      <figure><figcaption>After <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/resources-desktop.png" alt="Resources after"></div></figure>
+    </div>
+    <div class="compare compare--mobile">
+      <figure><figcaption>Before <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/resources-mobile.png" alt="Resources before, mobile"></div></figure>
+      <figure><figcaption>After <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/resources-mobile.png" alt="Resources after, mobile"></div></figure>
+    </div>
+    <p class="shot-links small">Open full image: <a href="/nhs-audit/screenshots/before/resources-desktop.png">before desktop</a> · <a href="/nhs-audit/screenshots/after/resources-desktop.png">after desktop</a> · <a href="/nhs-audit/screenshots/before/resources-mobile.png">before mobile</a> · <a href="/nhs-audit/screenshots/after/resources-mobile.png">after mobile</a></p>
+  </div>
+
+  <!-- GUIDANCE ARTICLE -->
+  <div class="page-block">
+    <h3>Guidance article</h3>
+    <p class="two-thirds">Article in a two-thirds column under the NHS small main wrapper with heading-xl.</p>
+    <div class="compare">
+      <figure><figcaption>Before <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/guidance-article-desktop.png" alt="Guidance article before"></div></figure>
+      <figure><figcaption>After <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/guidance-article-desktop.png" alt="Guidance article after"></div></figure>
+    </div>
+    <p class="shot-links small">Open full image: <a href="/nhs-audit/screenshots/before/guidance-article-desktop.png">before desktop</a> · <a href="/nhs-audit/screenshots/after/guidance-article-desktop.png">after desktop</a> · <a href="/nhs-audit/screenshots/before/guidance-article-mobile.png">before mobile</a> · <a href="/nhs-audit/screenshots/after/guidance-article-mobile.png">after mobile</a></p>
+  </div>
+
+  <!-- EOI -->
+  <div class="page-block">
+    <h3>Express interest — "Your details" step</h3>
+    <p class="two-thirds">The form already used NHS fields; its wrapper was 672px. It is now the NHS two-thirds column, so it lines up with every other single-column page.</p>
+    <div class="compare">
+      <figure><figcaption>Before <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/eoi-details-desktop.png" alt="EOI details before"></div></figure>
+      <figure><figcaption>After <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/eoi-details-desktop.png" alt="EOI details after"></div></figure>
+    </div>
+    <p class="shot-links small">Open full image: <a href="/nhs-audit/screenshots/before/eoi-details-desktop.png">before desktop</a> · <a href="/nhs-audit/screenshots/after/eoi-details-desktop.png">after desktop</a> · <a href="/nhs-audit/screenshots/before/eoi-details-mobile.png">before mobile</a> · <a href="/nhs-audit/screenshots/after/eoi-details-mobile.png">after mobile</a></p>
+  </div>
+
+  <!-- SUPPLIER PORTAL -->
+  <div class="page-block">
+    <h3>Supplier portal — dashboard</h3>
+    <p class="two-thirds">Intro and attention list in a two-thirds column; section tiles are an NHS card group.</p>
+    <div class="compare">
+      <figure><figcaption>Before <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/supplier-portal-desktop.png" alt="Supplier portal before"></div></figure>
+      <figure><figcaption>After <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/supplier-portal-desktop.png" alt="Supplier portal after"></div></figure>
+    </div>
+    <div class="compare compare--mobile">
+      <figure><figcaption>Before <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/supplier-portal-mobile.png" alt="Supplier portal before, mobile"></div></figure>
+      <figure><figcaption>After <span>— mobile</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/supplier-portal-mobile.png" alt="Supplier portal after, mobile"></div></figure>
+    </div>
+    <p class="shot-links small">Open full image: <a href="/nhs-audit/screenshots/before/supplier-portal-desktop.png">before desktop</a> · <a href="/nhs-audit/screenshots/after/supplier-portal-desktop.png">after desktop</a> · <a href="/nhs-audit/screenshots/before/supplier-portal-mobile.png">before mobile</a> · <a href="/nhs-audit/screenshots/after/supplier-portal-mobile.png">after mobile</a></p>
+  </div>
+
+  <!-- SUPPLIER ONBOARD -->
+  <div class="page-block">
+    <h3>Supplier portal — product onboarding</h3>
+    <p class="two-thirds">768px wrapper replaced by the two-thirds column; intro as body-large.</p>
+    <div class="compare">
+      <figure><figcaption>Before <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/before/supplier-onboard-desktop.png" alt="Supplier onboarding before"></div></figure>
+      <figure><figcaption>After <span>— desktop</span></figcaption><div class="shot shot--crop"><img src="/nhs-audit/screenshots/after/supplier-onboard-desktop.png" alt="Supplier onboarding after"></div></figure>
+    </div>
+    <p class="shot-links small">Open full image: <a href="/nhs-audit/screenshots/before/supplier-onboard-desktop.png">before desktop</a> · <a href="/nhs-audit/screenshots/after/supplier-onboard-desktop.png">after desktop</a> · <a href="/nhs-audit/screenshots/before/supplier-onboard-mobile.png">before mobile</a> · <a href="/nhs-audit/screenshots/after/supplier-onboard-mobile.png">after mobile</a></p>
+  </div>
+
+  <!-- ───────────────────────── PLAN ───────────────────────── -->
+  <h2 id="plan">The prioritised plan and what was done</h2>
+  <div class="two-thirds">
+    <p>We ordered the work so that one systemic change moved many pages at once (P1) before relaying out page types (P2) and finishing with polish (P3). Everything marked "Done" is in this iteration.</p>
+  </div>
+
+  <table>
+    <thead><tr><th style="width:5rem">Priority</th><th>Fix</th><th style="width:9rem">Status</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag tag--p1">P1</span></td><td>Move every page to the NHS 960px width container and NHS main wrapper; header, navigation and Alpha banner follow the same width (A1, A2)</td><td><span class="tag tag--done">Done</span></td></tr>
+      <tr><td><span class="tag tag--p1">P1</span></td><td>Replace hand-styled page titles and section headings with NHS heading styles (C1)</td><td><span class="tag tag--done">Done</span></td></tr>
+      <tr><td><span class="tag tag--p1">P1</span></td><td>Remove uppercase letter-spaced labels (D1)</td><td><span class="tag tag--done">Done</span></td></tr>
+      <tr><td><span class="tag tag--p1">P1</span></td><td>Put reading content in two-thirds columns; use the NHS grid everywhere columns are needed (B1, B2)</td><td><span class="tag tag--done">Done</span></td></tr>
+      <tr><td><span class="tag tag--p2">P2</span></td><td>Lede text to the NHS 22px style; page intros use lede or body-large (C2)</td><td><span class="tag tag--done">Done</span></td></tr>
+      <tr><td><span class="tag tag--p2">P2</span></td><td>Fixed pixel sizes to NHS sizes; remove unused weights and the Light font (D3, D4)</td><td><span class="tag tag--done">Done</span></td></tr>
+      <tr><td><span class="tag tag--p2">P2</span></td><td>Home page onto NHS hero, width container and card groups (E1)</td><td><span class="tag tag--done">Done</span></td></tr>
+      <tr><td><span class="tag tag--p2">P2</span></td><td>Product pages: NHS contents list + two-thirds content, tiles on the NHS grid, summary lists and inset text (E2)</td><td><span class="tag tag--done">Done</span></td></tr>
+      <tr><td><span class="tag tag--p2">P2</span></td><td>Catalogue: one-third filters + two-thirds card list; card groups for discovery and resources (E3)</td><td><span class="tag tag--done">Done</span></td></tr>
+      <tr><td><span class="tag tag--p2">P2</span></td><td>Forms, journeys and supplier portal into two-thirds columns with NHS spacing (E4)</td><td><span class="tag tag--done">Done</span></td></tr>
+      <tr><td><span class="tag tag--p2">P2</span></td><td>Resource articles and indexes onto the NHS frame (E5)</td><td><span class="tag tag--done">Done</span></td></tr>
+      <tr><td><span class="tag tag--p2">P2</span></td><td>Breadcrumb placed above the main wrapper on shared frames (A3)</td><td><span class="tag tag--partial">Partly done</span></td></tr>
+      <tr><td><span class="tag tag--p2">P2</span></td><td>Promote small text used as body copy to body size (D2)</td><td><span class="tag tag--partial">Partly done</span></td></tr>
+      <tr><td><span class="tag tag--p3">P3</span></td><td>Links underlined at rest (D5); supplier caption in product title (C3); off-scale spacing sweep; 12px compare snapshot text</td><td><span class="tag tag--done">Done</span></td></tr>
+      <tr><td><span class="tag tag--p3">P3</span></td><td>Breadcrumb outside the <code>&lt;main&gt;</code> landmark (structural only)</td><td><span class="tag tag--deferred">Deferred</span></td></tr>
+      <tr><td><span class="tag tag--p3">P3</span></td><td>NHS pagination for the catalogue and resources</td><td><span class="tag tag--deferred">Deferred</span></td></tr>
+      <tr><td><span class="tag tag--p3">P3</span></td><td>Back-to-top button, AI Advisor drawer, compare badge, GOV.UK-style tag (F1); compare tables at 960px</td><td><span class="tag tag--decision">Needs decision</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ───────────────────────── DEFERRED ───────────────────────── -->
+  <h2 id="deferred">Left for a future iteration</h2>
+  <div class="two-thirds">
+    <p>Safe, well-understood changes that we did not make now because they are either invisible, add new behaviour, or are clean-up rather than alignment.</p>
+    <ol>
+      <li><strong>Breadcrumb outside <code>&lt;main&gt;</code>.</strong> Visually it is in the right place. Structurally the NHS template puts the breadcrumb before the main landmark, which helps screen-reader users skip straight to content. Needs a small change to how pages hand their breadcrumb to the shell.</li>
+      <li><strong>NHS pagination.</strong> The catalogue shows all products on one page and resource articles have no previous/next links. A pagination component already exists in the codebase but is unused. Adding it is new behaviour, so it should be designed, not just switched on.</li>
+      <li><strong>Remaining body-small text.</strong> About 105 uses remain, nearly all genuine labels, table cells and metadata. A content pass would catch the few that should be body size.</li>
+      <li><strong>Unused code.</strong> A pathway illustration component with 10–13px SVG text is no longer used; a handful of custom CSS classes (section title, card grid, pathway button) have no consumers; and there are duplicate files named "… 2.tsx" / "… 2.md" in the repository that are not imported. All candidates for deletion.</li>
+      <li><strong>The legacy page wrapper class.</strong> Our old wrapper class now simply mirrors the NHS container and nothing in the pages references it any more; it can be deleted from the stylesheet.</li>
+    </ol>
+  </div>
+
+  <!-- ───────────────────────── DECISIONS ───────────────────────── -->
+  <h2 id="decisions">Needs your decision before we act</h2>
+  <div class="two-thirds">
+    <p>These are product or design choices rather than alignment fixes. We have described the trade-off and a recommendation for each.</p>
+
+    <div class="card">
+      <h4>1. Comparison tables at 960px</h4>
+      <p>Four products side by side was designed for a 1280px page. At 960px the table columns are tighter and rely on the responsive stacking that already exists for mobile. Options: (a) accept it and tune the column content, (b) cap comparison at three products, (c) grant the compare page a documented exception to go wider. <strong>Recommendation:</strong> try (a) with real content first; NHS services generally do not make width exceptions.</p>
+    </div>
+
+    <div class="card">
+      <h4>2. Floating "back to top" button</h4>
+      <p>NHS has no floating action button pattern; long NHS pages use the contents list and a "back to top" link inline at the end of sections. Options: keep the button (familiar, works), or replace with inline links. <strong>Recommendation:</strong> replace with inline "Back to top" links under each long product section now that the contents list exists.</p>
+    </div>
+
+    <div class="card">
+      <h4>3. AI Advisor drawer</h4>
+      <p>A slide-out panel with its own typography and spacing. There is no NHS pattern for a chat drawer; the nearest is a full page or a card. Options: keep as a documented bespoke component but restyle its internals to NHS type and spacing (largely done in this iteration), or move the advisor to its own page. <strong>Recommendation:</strong> keep the drawer for the prototype; restyle is sufficient for now.</p>
+    </div>
+
+    <div class="card">
+      <h4>4. Compare count badge</h4>
+      <p>A small count bubble in the navigation. NHS has no badge pattern. Options: keep, or show the count as text in the link label ("Comparison tool (2)"). <strong>Recommendation:</strong> text in the label — simpler, accessible, and NHS-like.</p>
+    </div>
+
+    <div class="card">
+      <h4>5. Tag styling</h4>
+      <p>The NHS tag has been restyled to look like the GOV.UK tag (bordered, grey-blue). The native NHS tag is a solid colour chip. Options: revert to the NHS look, or keep the GOV.UK look as a deliberate gap-fill. <strong>Recommendation:</strong> revert to the NHS tag; it is an NHS component, so there is no gap to fill.</p>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── CORRECT ───────────────────────── -->
+  <h2 id="correct">What was already right</h2>
+  <div class="two-thirds">
+    <p>Worth saying, so nobody re-litigates it:</p>
+    <ul>
+      <li><strong>The type scale.</strong> Our size tokens exactly matched NHS Frontend v9 (64/48/36/26/22/19/16/14 desktop; 48/32/27/22/19/16/14/12 mobile) and NHS bold is weight 600, which we used. The deviations were in how text was applied, not the sizes.</li>
+      <li><strong>Forms.</strong> Inputs, radios, checkboxes, error summaries, buttons, back links and the check-your-answers summary lists already used NHS components.</li>
+      <li><strong>Header, footer, breadcrumb.</strong> NHS components throughout; only their width was wrong.</li>
+      <li><strong>Colour.</strong> NHS palette, including the recolouring of the GOV.UK gap-fill components (cookie banner, accordion, phase banner).</li>
+    </ul>
+    <p class="small muted">This page is reachable by URL only and is not linked from the site. A PDF copy sits alongside it at <a href="/nhs-audit/NHS-Audit.pdf">/nhs-audit/NHS-Audit.pdf</a>, and an editable Word version at <a href="/nhs-audit/NHS-Audit.docx">/nhs-audit/NHS-Audit.docx</a>.</p>
+  </div>
+
+</div>
+</main>
+
+<div class="footer">
+  <div class="container">
+    <p class="small">NHS HealthStore — NHS layout and typography audit, 16 October 2026. Measured against NHS Frontend 9.6.4.</p>
+  </div>
+</div>
+
+</body>
+</html>

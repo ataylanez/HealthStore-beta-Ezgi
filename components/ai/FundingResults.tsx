@@ -109,7 +109,7 @@ function ResultCard({ result, disabled }: { result: FundingResult; disabled?: bo
         type="button"
         onClick={() => setExpanded(v => !v)}
         disabled={disabled}
-        className="mt-4 flex items-center gap-1 hs-text-caption hs-font-normal transition-colors hover:underline disabled:opacity-40"
+        className="mt-4 flex items-center gap-1 hs-text-caption hs-font-normal transition-colors underline hover:no-underline disabled:opacity-40"
         style={{ color: 'var(--nhs-blue)', fontFamily: 'Frutiger, Arial, sans-serif' }}
       >
         {expanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
@@ -119,27 +119,27 @@ function ResultCard({ result, disabled }: { result: FundingResult; disabled?: bo
       {expanded && (
         <dl className="mt-4 space-y-2 border-t pt-4 hs-text-label" style={{ borderColor: 'var(--border)' }}>
           <div>
-            <dt className="hs-text-caption hs-font-bold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+            <dt className="hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>
               Eligibility
             </dt>
             <dd style={{ color: 'var(--text-primary)' }}>{result.eligibility_summary || '—'}</dd>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <dt className="hs-text-caption hs-font-bold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+              <dt className="hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>
                 Amount
               </dt>
               <dd style={{ color: 'var(--text-primary)' }}>{result.amount_range ?? 'Not specified'}</dd>
             </div>
             <div>
-              <dt className="hs-text-caption hs-font-bold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+              <dt className="hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>
                 Deadline
               </dt>
               <dd style={{ color: 'var(--text-primary)' }}>{result.deadline ?? 'Ongoing / unknown'}</dd>
             </div>
           </div>
           <div>
-            <dt className="hs-text-caption hs-font-bold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+            <dt className="hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>
               Why this matches
             </dt>
             <dd style={{ color: 'var(--text-primary)' }}>{result.match_rationale || '—'}</dd>
@@ -207,7 +207,7 @@ export default function FundingResults({
       {!empty && (
         <div className="mt-4">
           <p
-            className="mb-2 hs-text-caption hs-font-bold uppercase tracking-wide"
+            className="mb-2 hs-text-label hs-font-bold"
             style={{ color: 'var(--text-muted)', fontFamily: 'Frutiger, Arial, sans-serif' }}
           >
             Follow-up questions

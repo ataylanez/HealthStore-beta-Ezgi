@@ -89,77 +89,79 @@ function ProductFieldEditorInner({
   const errors = error ? [{ field: match.kind === 'document' ? `${fieldId}-file` : fieldId, message: error }] : []
 
   return (
-    <div className="hs-page">
-      <div className="max-w-2xl">
-        <BackLink href={backHref} />
-        <ErrorSummary errors={errors} />
-        <span className="nhsuk-caption-l">{product.name}</span>
-        <form
-          noValidate
-          onSubmit={(e) => {
-            e.preventDefault()
-            save()
-          }}
-        >
-          {match.kind === 'document' ? (
-            <>
-              <NhsFileUpload
-                id={`${fieldId}-file`}
-                labelAsPageHeading
-                label={match.field.label}
-                hint={
-                  current(fieldId)
-                    ? `Current version: ${current(fieldId)}, uploaded ${formatPortalDate(current(`${fieldId}${UPLOADED_ON_SUFFIX}`))}. Uploading a new file replaces it.`
-                    : undefined
-                }
-                error={error}
-                onFileChange={(f) => {
-                  setFile(f)
-                  if (f) setError(undefined)
-                }}
-              />
-            </>
-          ) : (
-            <div className="nhsuk-form-group">
-              <h1 className="nhsuk-label-wrapper">
-                <label className="nhsuk-label nhsuk-label--l" htmlFor={fieldId}>
-                  {match.field.label}
-                </label>
-              </h1>
-              {match.field.hint && (
-                <div className="nhsuk-hint" id={`${fieldId}-hint`}>
-                  {match.field.hint}
-                </div>
-              )}
-              {match.field.type === 'textarea' ? (
-                <Textarea
-                  id={fieldId}
-                  name={fieldId}
-                  rows={5}
-                  aria-describedby={match.field.hint ? `${fieldId}-hint` : undefined}
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <BackLink href={backHref} />
+          <ErrorSummary errors={errors} />
+          <span className="nhsuk-caption-l">{product.name}</span>
+          <form
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault()
+              save()
+            }}
+          >
+            {match.kind === 'document' ? (
+              <>
+                <NhsFileUpload
+                  id={`${fieldId}-file`}
+                  labelAsPageHeading
+                  label={match.field.label}
+                  hint={
+                    current(fieldId)
+                      ? `Current version: ${current(fieldId)}, uploaded ${formatPortalDate(current(`${fieldId}${UPLOADED_ON_SUFFIX}`))}. Uploading a new file replaces it.`
+                      : undefined
+                  }
+                  error={error}
+                  onFileChange={(f) => {
+                    setFile(f)
+                    if (f) setError(undefined)
+                  }}
                 />
-              ) : (
-                <TextInput
-                  id={fieldId}
-                  name={fieldId}
-                  className="nhsuk-input--width-30"
-                  aria-describedby={match.field.hint ? `${fieldId}-hint` : undefined}
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                />
-              )}
-            </div>
-          )}
+              </>
+            ) : (
+              <div className="nhsuk-form-group">
+                <h1 className="nhsuk-label-wrapper">
+                  <label className="nhsuk-label nhsuk-label--l" htmlFor={fieldId}>
+                    {match.field.label}
+                  </label>
+                </h1>
+                {match.field.hint && (
+                  <div className="nhsuk-hint" id={`${fieldId}-hint`}>
+                    {match.field.hint}
+                  </div>
+                )}
+                {match.field.type === 'textarea' ? (
+                  <Textarea
+                    id={fieldId}
+                    name={fieldId}
+                    rows={5}
+                    aria-describedby={match.field.hint ? `${fieldId}-hint` : undefined}
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                  />
+                ) : (
+                  <TextInput
+                    id={fieldId}
+                    name={fieldId}
+                    className="nhsuk-input--width-30"
+                    aria-describedby={match.field.hint ? `${fieldId}-hint` : undefined}
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                  />
+                )}
+              </div>
+            )}
 
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <Button type="submit">Save and exit</Button>
-            <Button type="button" variant="secondary" onClick={() => router.push(backHref)}>
-              Cancel and exit
-            </Button>
-          </div>
-        </form>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <Button type="submit">Save and exit</Button>
+              <Button type="button" variant="secondary" onClick={() => router.push(backHref)}>
+                Cancel and exit
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   )

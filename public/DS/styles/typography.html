@@ -14,94 +14,107 @@
       <h1 class="ds-page-title">Typography</h1>
     </div>
 
+    <div class="ds-note">
+      Text is set with the <strong>NHS type styles</strong> from <code>nhsuk-frontend</code> (<code>nhsuk-heading-*</code>, <code>nhsuk-body-*</code>,
+      <code>nhsuk-lede-text</code>, <code>nhsuk-caption-*</code>). Round 10 removed the hand-rolled heading classes
+      (<code>.page-title-h1</code>, <code>.hs-section-title</code>), the retired 24px lede, uppercase letter-spaced labels and the Frutiger Light face.
+    </div>
+
     <h2>Typeface</h2>
     <div class="ds-meta-grid">
       <div class="ds-meta"><div class="ds-meta__k">Family</div><div class="ds-meta__v">Frutiger, Arial, sans-serif</div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Body weight</div><div class="ds-meta__v">400 (Regular) — NHS</div></div>
-      <div class="ds-meta"><div class="ds-meta__k">Heading weight</div><div class="ds-meta__v">600 (Bold) — NHS</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Weights</div><div class="ds-meta__v">400 (Regular) and 600 (Bold) only &mdash; no Light, no 500/700</div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Case</div><div class="ds-meta__v">Sentence case everywhere; no <code>text-transform: uppercase</code> or letter-spacing</div></div>
       <div class="ds-meta"><div class="ds-meta__k">Tokens</div><div class="ds-meta__v">--font-display, --font-body</div></div>
     </div>
 
-    <h2>Type scale</h2>
-    <p>Matches the <strong>nhsuk-frontend responsive type scale</strong> (<code>core/settings/_typography.scss</code>). Sizes step up at the NHS tablet breakpoint (641px); the values shown are the desktop step. Resize the window to see the responsive step-down.</p>
+    <h2>Type styles</h2>
+    <p>Use the NHS classes directly. Sizes step up at the NHS tablet breakpoint (641px); the specimen shows the current viewport step.</p>
     <div class="ds-example">
-      <div class="ds-specimen"><span style="font-size:var(--text-hero);font-weight:600;line-height:1.1">Hero heading</span><span class="ds-specimen__meta">--text-hero &middot; 48→64px &middot; 600 &middot; NHS 64</span></div>
-      <div class="ds-specimen"><span style="font-size:var(--text-page-title);font-weight:600">Page title</span><span class="ds-specimen__meta">--text-page-title &middot; 32→48px &middot; 600 &middot; NHS 48 (heading-xl)</span></div>
-      <div class="ds-specimen"><span style="font-size:var(--text-section);font-weight:600">Section heading</span><span class="ds-specimen__meta">--text-section &middot; 27→36px &middot; 600 &middot; NHS 36 (heading-m)</span></div>
-      <div class="ds-specimen"><span style="font-size:var(--text-section-alt);font-weight:600">Section heading (alt)</span><span class="ds-specimen__meta">--text-section-alt &middot; 22→26px &middot; 600 &middot; NHS 26 (heading-s)</span></div>
-      <div class="ds-specimen"><span style="font-size:var(--text-lede);font-weight:400">Lede / intro</span><span class="ds-specimen__meta">--text-lede &middot; 20→24px &middot; 400 &middot; NHS 24 (body-l)</span></div>
-      <div class="ds-specimen"><span style="font-size:var(--text-card-title);font-weight:600">Card title</span><span class="ds-specimen__meta">--text-card-title &middot; 19→22px &middot; 600 &middot; NHS 22</span></div>
-      <div class="ds-specimen"><span style="font-size:var(--text-body);font-weight:400">Body text (default)</span><span class="ds-specimen__meta">--text-body &middot; 16→19px &middot; 400 &middot; NHS 19 (body)</span></div>
-      <div class="ds-specimen"><span style="font-size:var(--text-xs);font-weight:400">Small / label text</span><span class="ds-specimen__meta">--text-xs / --text-label &middot; 14→16px &middot; NHS 16 (body-s)</span></div>
-      <div class="ds-specimen"><span style="font-size:var(--text-caption);font-weight:400">Caption (smallest)</span><span class="ds-specimen__meta">--text-caption &middot; 12→14px &middot; NHS 14</span></div>
-      <div class="ds-specimen"><span style="font-size:var(--text-badge);font-weight:600">Badge text</span><span class="ds-specimen__meta">--text-badge &middot; 14→16px &middot; 600 &middot; NHS 16</span></div>
+      <div class="ds-specimen"><span class="nhsuk-heading-xl" style="margin:0">Page title</span><span class="ds-specimen__meta">nhsuk-heading-xl &middot; 32→48px &middot; 600 &middot; one per page</span></div>
+      <div class="ds-specimen"><span class="nhsuk-caption-xl" style="margin:0">Supplier name</span><span class="ds-specimen__meta">nhsuk-caption-xl &middot; 22→26px &middot; 400 &middot; context above a title, inside the h1</span></div>
+      <div class="ds-specimen"><span class="nhsuk-heading-l" style="margin:0">Section heading</span><span class="ds-specimen__meta">nhsuk-heading-l &middot; 27→36px &middot; 600 &middot; h2</span></div>
+      <div class="ds-specimen"><span class="nhsuk-heading-m" style="margin:0">Sub-section heading</span><span class="ds-specimen__meta">nhsuk-heading-m &middot; 22→26px &middot; 600 &middot; h3, card titles</span></div>
+      <div class="ds-specimen"><span class="nhsuk-heading-s" style="margin:0">Small heading</span><span class="ds-specimen__meta">nhsuk-heading-s &middot; 19→22px &middot; 600 &middot; h4, summary-list group titles</span></div>
+      <div class="ds-specimen"><span class="nhsuk-lede-text" style="margin:0">Intro text under a page title</span><span class="ds-specimen__meta">nhsuk-lede-text &middot; 22→26px &middot; 400 &middot; one paragraph, directly after the h1</span></div>
+      <div class="ds-specimen"><span class="nhsuk-body-l" style="margin:0">Large body</span><span class="ds-specimen__meta">nhsuk-body-l &middot; 20→24px &middot; 400 &middot; portal intros, compare intro</span></div>
+      <div class="ds-specimen"><span style="font-size:var(--text-body);font-weight:400">Body text (default)</span><span class="ds-specimen__meta">nhsuk-body-m / default &middot; 16→19px &middot; 400</span></div>
+      <div class="ds-specimen"><span class="nhsuk-body-s" style="margin:0">Small body &mdash; the smallest running text</span><span class="ds-specimen__meta">nhsuk-body-s &middot; 14→16px &middot; 400 &middot; meta, hints, table notes</span></div>
+      <div class="ds-specimen"><span style="font-size:var(--text-badge);font-weight:600">Tag text</span><span class="ds-specimen__meta">nhsuk-tag &middot; 14→16px &middot; 600</span></div>
     </div>
+
+    <h2>Page title with caption</h2>
+    <p>Where a title needs context (the supplier on a product page, the product on a portal edit page) the caption sits <em>inside</em> the <code>&lt;h1&gt;</code> so screen readers announce it with the title.</p>
+    <div class="ds-example">
+      <h1 class="nhsuk-heading-xl" style="margin:0"><span class="nhsuk-caption-xl">Luscii Healthtech</span>Luscii</h1>
+    </div>
+<pre class="ds-code"><code>&lt;h1 class="nhsuk-heading-xl"&gt;
+  &lt;span class="nhsuk-caption-xl"&gt;Luscii Healthtech&lt;/span&gt;
+  Luscii
+&lt;/h1&gt;
+&lt;p class="nhsuk-lede-text"&gt;Remote monitoring for long-term conditions&hellip;&lt;/p&gt;</code></pre>
 
     <h2>Heading colour</h2>
-    <p>All heading levels (H1–H3) default to <code>--text-primary</code> (NHS black, <code>#212B32</code>). NHS blue is not a heading accent — reserve it for links and interactive controls.</p>
+    <p>All heading levels default to <code>--text-primary</code> (NHS black, <code>#212B32</code>). NHS blue is not a heading accent &mdash; reserve it for links and interactive controls.</p>
 
-    <h2>Utility classes</h2>
-    <p>Use <code>.hs-text-*</code> and <code>.hs-font-*</code> utilities from <code>globals.css</code> instead of Tailwind <code>text-xs</code>/<code>text-sm</code>/<code>text-lg</code> etc. They bind to the responsive NHS tokens above.</p>
+    <h2>Links</h2>
+    <p>Links are underlined at rest and lose the underline on hover (<code>nhsuk-link</code> behaviour). The previous <code>hover:underline</code> pattern is retired.</p>
+
+    <h2>Token utilities still in use</h2>
+    <p>A small set of <code>.hs-text-*</code> utilities from <code>globals.css</code> remains for places where a bare token is clearer than an NHS class (badge internals, chart labels). They bind to the same responsive NHS scale.</p>
     <table class="ds-table">
-      <thead><tr><th>Class</th><th>Token</th><th>Replaces (Tailwind)</th></tr></thead>
+      <thead><tr><th>Class</th><th>Token</th><th>Size</th><th>NHS equivalent</th></tr></thead>
       <tbody>
-        <tr><td><code>.hs-text-caption</code></td><td><code>--text-caption</code></td><td><code>text-xs</code></td></tr>
-        <tr><td><code>.hs-text-label</code></td><td><code>--text-label</code></td><td><code>text-sm</code></td></tr>
-        <tr><td><code>.hs-text-body</code></td><td><code>--text-body</code></td><td><code>text-base</code></td></tr>
-        <tr><td><code>.hs-text-lede</code></td><td><code>--text-lede</code></td><td><code>text-xl</code></td></tr>
-        <tr><td><code>.hs-text-card-title-sm</code></td><td><code>--text-card-title-sm</code></td><td><code>text-lg</code></td></tr>
-        <tr><td><code>.hs-text-section-alt</code></td><td><code>--text-section-alt</code></td><td><code>text-2xl</code></td></tr>
-        <tr><td><code>.hs-text-section</code></td><td><code>--text-section</code></td><td><code>text-3xl</code> / <code>text-4xl</code></td></tr>
-        <tr><td><code>.hs-font-bold</code></td><td>weight 600</td><td><code>font-bold</code> / <code>font-semibold</code></td></tr>
-        <tr><td><code>.hs-font-normal</code></td><td>weight 400</td><td><code>font-medium</code> (body)</td></tr>
+        <tr><td><code>.hs-text-caption</code></td><td><code>--text-caption</code></td><td>12→14px</td><td>Smallest NHS size; chart axis labels only</td></tr>
+        <tr><td><code>.hs-text-label</code></td><td><code>--text-label</code></td><td>14→16px</td><td><code>nhsuk-body-s</code></td></tr>
+        <tr><td><code>.hs-text-body</code></td><td><code>--text-body</code></td><td>16→19px</td><td><code>nhsuk-body-m</code></td></tr>
+        <tr><td><code>.hs-text-lede</code></td><td><code>--text-lede</code></td><td>22→26px</td><td><code>nhsuk-lede-text</code></td></tr>
+        <tr><td><code>.hs-text-card-title-sm</code></td><td><code>--text-card-title-sm</code></td><td>16→19px</td><td><code>nhsuk-heading-xs</code></td></tr>
+        <tr><td><code>.hs-text-card-title</code></td><td><code>--text-card-title</code></td><td>19→22px</td><td><code>nhsuk-heading-s</code></td></tr>
+        <tr><td><code>.hs-text-section-alt</code></td><td><code>--text-section-alt</code></td><td>22→26px</td><td><code>nhsuk-heading-m</code></td></tr>
+        <tr><td><code>.hs-text-section</code></td><td><code>--text-section</code></td><td>27→36px</td><td><code>nhsuk-heading-l</code></td></tr>
+        <tr><td><code>.hs-font-bold</code> / <code>.hs-font-normal</code></td><td>&mdash;</td><td>600 / 400</td><td>NHS bold / regular</td></tr>
       </tbody>
     </table>
-
-    <h2>Page title class</h2>
-    <p>Use the semantic <code>.page-title-h1</code> utility (from <code>globals.css</code>) for in-app H1s.</p>
-    <div class="ds-example">
-      <h1 style="font-family:var(--font-display);font-size:var(--text-page-title);font-weight:600;margin:0;color:var(--text-primary)">Find the right digital health technology</h1>
-    </div>
-<pre class="ds-code"><code>&lt;h1 class="page-title-h1"&gt;Find the right digital health technology&lt;/h1&gt;</code></pre>
+    <p class="ds-note ds-note--source"><code>.hs-text-hero</code> and <code>.hs-text-page-title</code> are no longer used by any component and are listed on the Archived page as candidates for removal from <code>globals.css</code>.</p>
 
     <h2>Tokens</h2>
     <p>Each token maps to an NHS scale point and is responsive (mobile → tablet/desktop at 641px).</p>
     <table class="ds-table">
       <thead><tr><th>Token</th><th>Size (mobile → desktop)</th><th>NHS point</th><th>Use</th></tr></thead>
       <tbody>
-        <tr><td><code>--text-hero</code></td><td>48 → 64px</td><td>64</td><td>Marketing hero</td></tr>
-        <tr><td><code>--text-page-title</code></td><td>32 → 48px</td><td>48 (heading-xl)</td><td>In-app page H1</td></tr>
-        <tr><td><code>--text-section</code></td><td>27 → 36px</td><td>36 (heading-m)</td><td>Section H2</td></tr>
-        <tr><td><code>--text-section-alt</code></td><td>22 → 26px</td><td>26 (heading-s)</td><td>SectionHeader component</td></tr>
-        <tr><td><code>--text-lede</code></td><td>20 → 24px</td><td>24 (body-l)</td><td>Intro / lede paragraphs</td></tr>
-        <tr><td><code>--text-card-title</code></td><td>19 → 22px</td><td>22</td><td>Card titles</td></tr>
-        <tr><td><code>--text-body</code></td><td>16 → 19px</td><td>19 (body)</td><td>Body copy</td></tr>
-        <tr><td><code>--text-xs</code> / <code>--text-label</code></td><td>14 → 16px</td><td>16 (body-s)</td><td>Labels, meta, small print</td></tr>
-        <tr><td><code>--text-caption</code></td><td>12 → 14px</td><td>14</td><td>Smallest text (badges, meta chrome)</td></tr>
-        <tr><td><code>--text-badge</code></td><td>14 → 16px</td><td>16</td><td>Badges &amp; pills</td></tr>
+        <tr><td><code>--text-page-title</code></td><td>32 → 48px</td><td>48 (heading-xl)</td><td>Page h1</td></tr>
+        <tr><td><code>--text-section</code></td><td>27 → 36px</td><td>36 (heading-l)</td><td>Section h2</td></tr>
+        <tr><td><code>--text-section-alt</code></td><td>22 → 26px</td><td>26 (heading-m)</td><td>Sub-section h3, lede, caption-xl</td></tr>
+        <tr><td><code>--text-lede</code></td><td>22 → 26px</td><td>26 (lede-text)</td><td>Intro paragraph</td></tr>
+        <tr><td><code>--text-card-title</code></td><td>19 → 22px</td><td>22 (heading-s)</td><td>Card titles, h4</td></tr>
+        <tr><td><code>--text-body</code></td><td>16 → 19px</td><td>19 (body-m)</td><td>Body copy</td></tr>
+        <tr><td><code>--text-xs</code> / <code>--text-label</code></td><td>14 → 16px</td><td>16 (body-s)</td><td>Meta, hints, small print</td></tr>
+        <tr><td><code>--text-caption</code></td><td>12 → 14px</td><td>14</td><td>Chart labels only</td></tr>
+        <tr><td><code>--text-badge</code></td><td>14 → 16px</td><td>16</td><td>Tags</td></tr>
       </tbody>
     </table>
-
-    <div class="ds-note ds-note--source">DS site chrome (<code>.ds-sidenav</code>, code blocks, monospace meta) uses compact NHS token sizes where possible; monospace specimen meta remains fixed for layout stability.</div>
 
     <div class="ds-dosdonts">
       <div class="ds-panel ds-panel--do">
         <p class="ds-panel__head">Do</p>
         <ul>
-          <li>Use scale tokens rather than arbitrary <code>rem</code>/<code>px</code> sizes.</li>
-          <li>Keep one H1 per page; nest H2/H3 logically.</li>
+          <li>Use <code>nhsuk-heading-*</code> / <code>nhsuk-body-*</code> classes; keep one <code>nhsuk-heading-xl</code> per page.</li>
+          <li>Put context in a <code>nhsuk-caption-xl</code> inside the h1, not in a separate grey line above it.</li>
+          <li>Set the smallest running text at <code>nhsuk-body-s</code> (16px desktop).</li>
         </ul>
       </div>
       <div class="ds-panel ds-panel--dont">
         <p class="ds-panel__head">Don't</p>
         <ul>
-          <li>Hardcode font sizes inline (common in current pages).</li>
-          <li>Mix heading weight conventions across sections.</li>
+          <li>Use Tailwind <code>text-xs</code>/<code>text-sm</code> for labels or meta &mdash; they fall below the NHS scale.</li>
+          <li>Use uppercase + letter-spacing for labels or eyebrows.</li>
+          <li>Use weights other than 400 and 600.</li>
         </ul>
       </div>
     </div>
 
-    <div class="ds-note ds-note--source">Source: <code>app/globals.css</code> (<code>@font-face</code>, type scale tokens, <code>.page-title-h1</code>).</div>
+    <div class="ds-note ds-note--source">Source: <code>nhsuk-frontend</code> 9.6 <code>core/settings/_typography.scss</code>, <code>core/styles/_typography.scss</code>; <code>app/globals.css</code> (<code>@font-face</code>, scale tokens).</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

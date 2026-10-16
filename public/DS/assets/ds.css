@@ -60,7 +60,7 @@
   --text-page-title: 2rem;      /* 32 → 48 */
   --text-section: 1.6875rem;    /* 27 → 36 */
   --text-section-alt: 1.375rem; /* 22 → 26 */
-  --text-lede: 1.25rem;         /* 20 → 24 (NHS 24 / body-l) */
+  --text-lede: 1.375rem;        /* 22 → 26 (NHS nhsuk-lede-text; the 24 point is deprecated) */
   --text-card-title: 1.1875rem; /* 19 → 22 */
   --text-card-title-sm: 1rem;   /* 16 → 19 */
   --text-body: 1rem;            /* 16 → 19 */
@@ -71,7 +71,7 @@
   --leading-hero: 1.125;
   --leading-heading: 1.1875;
   --leading-heading-sm: 1.227;
-  --leading-lede: 1.4;
+  --leading-lede: 1.31818;      /* 29/22 (nhsuk-lede-text) */
   --leading-body: 1.5;
   --leading-caption: 1.66667;
 
@@ -112,7 +112,7 @@
     --text-page-title: 3rem;      /* 48 */
     --text-section: 2.25rem;      /* 36 */
     --text-section-alt: 1.625rem; /* 26 */
-    --text-lede: 1.5rem;          /* 24 */
+    --text-lede: 1.625rem;        /* 26 */
     --text-card-title: 1.375rem;  /* 22 */
     --text-card-title-sm: 1.1875rem; /* 19 */
     --text-body: 1.1875rem;       /* 19 */
@@ -120,7 +120,7 @@
     --text-caption: 0.875rem;     /* 14 */
     --text-badge: 1rem;           /* 16 */
     --leading-body: 1.47368;
-    --leading-lede: 1.29167;
+    --leading-lede: 1.23077;      /* 32/26 */
     --leading-caption: 1.71429;
   }
 }
@@ -134,17 +134,65 @@
 .hs-text-card-title { font-size: var(--text-card-title); line-height: var(--leading-heading-sm); }
 .hs-text-section-alt { font-size: var(--text-section-alt); line-height: var(--leading-heading-sm); }
 .hs-text-section { font-size: var(--text-section); line-height: var(--leading-heading); }
-.hs-text-page-title { font-size: var(--text-page-title); line-height: var(--leading-heading); }
-.hs-text-hero { font-size: var(--text-hero); line-height: var(--leading-hero); }
 .hs-font-normal { font-weight: 400; }
 .hs-font-bold { font-weight: 600; }
 
-/* NHS layout/spacing utilities (mirrors app/globals.css). */
-.hs-page { max-width: 80rem; margin-inline: auto; padding-inline: var(--gutter); padding-block: var(--section-gap); }
-.hs-page-narrow { max-width: 48rem; margin-inline: auto; padding-inline: var(--gutter); padding-block: var(--section-gap); }
+/* NHS layout/spacing utilities still in use (mirrors app/globals.css).
+   .hs-page / .hs-page-narrow / .hs-text-hero / .hs-text-page-title were retired
+   in Round 10 — pages now use nhsuk-width-container + nhsuk-main-wrapper. */
 .hs-measure { max-width: 66ch; }
 .hs-section { margin-bottom: var(--section-gap); }
-.hs-section-lg { margin-bottom: var(--section-gap-lg); }
+
+/* NHS layout primitives (mirrors nhsuk-frontend 9.6 — used in DS examples). */
+.nhsuk-width-container { margin: 0 16px; max-width: 960px; }
+@media (min-width: 48.0625em) { .nhsuk-width-container { margin: 0 32px; } }
+@media (min-width: 1024px) { .nhsuk-width-container { margin: 0 auto; } }
+.nhsuk-main-wrapper { display: block; padding-top: 24px; padding-bottom: 24px; }
+.nhsuk-main-wrapper--s { padding-top: 16px; padding-bottom: 16px; }
+@media (min-width: 40.0625em) {
+  .nhsuk-main-wrapper { padding-top: 48px; padding-bottom: 48px; }
+  .nhsuk-main-wrapper--s { padding-top: 24px; padding-bottom: 24px; }
+}
+.nhsuk-grid-row::after { content: ""; display: block; clear: both; }
+.nhsuk-grid-column-one-third, .nhsuk-grid-column-two-thirds, .nhsuk-grid-column-full { box-sizing: border-box; width: 100%; padding: 0 16px; }
+@media (min-width: 48.0625em) {
+  .nhsuk-grid-column-one-third { width: 33.3333%; float: left; }
+  .nhsuk-grid-column-two-thirds { width: 66.6667%; float: left; }
+}
+
+/* NHS type styles (mirrors nhsuk-frontend 9.6 — used in DS examples). */
+.nhsuk-heading-xl, .nhsuk-heading-l, .nhsuk-heading-s { display: block; font-weight: 600; margin-top: 0; font-family: var(--font-display); color: var(--text-primary); }
+.nhsuk-heading-xl { font-size: 2rem; line-height: 1.1875; margin-bottom: 40px; }
+.nhsuk-heading-l { font-size: 1.6875rem; line-height: 1.22222; margin-bottom: 24px; }
+.nhsuk-heading-s { font-size: 1.1875rem; line-height: 1.42105; margin-bottom: 16px; }
+.nhsuk-caption-xl { display: block; color: var(--text-secondary); margin-bottom: 4px; font-weight: 400; font-size: 1.375rem; line-height: 1.31818; }
+.nhsuk-lede-text { font-weight: 400; font-size: 1.375rem; line-height: 1.31818; margin-bottom: 32px; }
+.nhsuk-body-l { font-size: 1.25rem; line-height: 1.4; }
+.nhsuk-body-s { font-size: 0.875rem; line-height: 1.71429; }
+@media (min-width: 40.0625em) {
+  .nhsuk-heading-xl { font-size: 3rem; line-height: 1.125; margin-bottom: 48px; }
+  .nhsuk-heading-l { font-size: 2.25rem; line-height: 1.16667; margin-bottom: 32px; }
+  .nhsuk-heading-s { font-size: 1.375rem; line-height: 1.36364; margin-bottom: 24px; }
+  .nhsuk-caption-xl, .nhsuk-lede-text { font-size: 1.625rem; line-height: 1.23077; }
+  .nhsuk-lede-text { margin-bottom: 40px; }
+  .nhsuk-body-l { font-size: 1.5rem; line-height: 1.33333; }
+  .nhsuk-body-s { font-size: 1rem; line-height: 1.5; }
+}
+
+/* NHS contents list (PDP section navigation). */
+.nhsuk-contents-list { margin-bottom: 32px; }
+.nhsuk-contents-list__title { font-size: 1.1875rem; font-weight: 400; margin: 0 0 8px; }
+.nhsuk-contents-list__list { list-style: none; margin: 0; padding: 0; }
+.nhsuk-contents-list__item { position: relative; padding-left: 24px; margin-bottom: 8px; }
+.nhsuk-contents-list__item::before { content: ""; position: absolute; left: 0; top: 0.75em; width: 16px; height: 1px; background: #aeb7bd; }
+.nhsuk-contents-list__link { color: var(--nhs-blue); text-decoration: underline; }
+.nhsuk-contents-list__current { font-weight: 600; }
+
+/* Layout diagram helper used on the Spacing & layout page. */
+.ds-layout-demo { background: #fff; border: 1px solid var(--border); padding: 16px 0; }
+.ds-layout-demo .nhsuk-width-container { outline: 2px dashed var(--nhs-blue); outline-offset: -1px; }
+.ds-layout-demo__col { background: #E6F0FB; border: 1px solid #B9D5F1; padding: 12px; font-size: var(--text-xs); color: var(--nhs-dark); min-height: 56px; }
+.ds-layout-demo__label { display: block; font-size: var(--text-caption); color: var(--text-secondary); text-align: center; margin-bottom: 8px; }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -574,15 +622,26 @@ a { color: var(--nhs-blue); }
   margin: 0 -8px;
 }
 .nhsuk-heading-m {
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1.33333;
-  margin: 0 0 8px;
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1.31818;
+  margin: 0 0 16px;
+}
+@media (min-width: 40.0625em) {
+  .nhsuk-heading-m { font-size: 1.625rem; line-height: 1.23077; margin-bottom: 24px; }
 }
 
 
-/* Inset card — NHS inset-text treatment (8px blue keyline) on a white card.
-   [Provenance: NHS inset text] */
+/* =============================================================================
+   ARCHIVED PREVIEWS (Round 10). Everything from here to the button system is
+   no longer used by the app: .hs-inset-card, .card-evidence, .glass-card, PDP
+   tabs, the compare view toggle / lens, the decision snapshot strip (now the
+   nhsuk-summary-list snapshot), .hs-on-this-page and .hs-pdp-with-sidebar.
+   Kept ONLY so the older entries on "What's changed" still render. Do not use
+   in new DS examples — see /DS/archived.html.
+   ============================================================================= */
 .hs-inset-card {
   background: #fff;
   border-left: 8px solid var(--nhs-blue);
@@ -737,6 +796,8 @@ a { color: var(--nhs-blue); }
 .ds-u-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .ds-u-stack { display: flex; flex-direction: column; gap: 8px; }
 .ds-u-mt0 { margin-top: 0; }
+.ds-u-col { display: flex; flex-direction: column; }
+.ds-u-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 /* Responsive: collapse side-nav on small screens */
 @media (max-width: 880px) {

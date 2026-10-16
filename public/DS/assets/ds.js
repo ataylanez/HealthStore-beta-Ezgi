@@ -56,11 +56,9 @@
       items: [
         { key: 'badges-tags', label: 'Badges & tags', href: '/DS/components/badges-tags.html' },
         { key: 'buttons', label: 'Buttons', href: '/DS/components/buttons.html' },
-        { key: 'cards', label: 'Cards & surfaces', href: '/DS/components/cards.html' },
+        { key: 'cards', label: 'Cards', href: '/DS/components/cards.html' },
         { key: 'alerts', label: 'Alerts & notifications', href: '/DS/components/alerts.html' },
         { key: 'section-headers', label: 'Section headers', href: '/DS/components/section-headers.html' },
-        { key: 'collapsible', label: 'Collapsible sections', href: '/DS/components/collapsible.html' },
-        { key: 'tabs', label: 'Tabs', href: '/DS/components/tabs.html' },
         { key: 'navigation', label: 'Navigation', href: '/DS/components/navigation.html' },
         { key: 'forms', label: 'Forms & inputs', href: '/DS/components/forms.html' },
         { key: 'back-link', label: 'Back link', href: '/DS/components/back-link.html' },
@@ -68,7 +66,7 @@
         { key: 'summary-list', label: 'Summary list', href: '/DS/components/summary-list.html' },
         { key: 'panel', label: 'Confirmation panel', href: '/DS/components/panel.html' },
         { key: 'tables', label: 'Tables', href: '/DS/components/tables.html' },
-        { key: 'toggles', label: 'Toggles & segmented', href: '/DS/components/toggles.html' },
+        { key: 'toggles', label: 'Toggle buttons', href: '/DS/components/toggles.html' },
         { key: 'modals', label: 'Modals & dialogs', href: '/DS/components/modals.html' },
         { key: 'loading', label: 'Loading & skeletons', href: '/DS/components/loading.html' }
       ]
@@ -82,7 +80,7 @@
         { key: 'discovery', label: 'Discovery & catalogue', href: '/DS/patterns/discovery.html' },
         { key: 'compare', label: 'Comparison tool', href: '/DS/patterns/compare.html' },
         { key: 'multi-step-journey', label: 'Multi-step journey', href: '/DS/patterns/multi-step-journey.html' },
-        { key: 'dashboard', label: 'Dashboard', href: '/DS/patterns/dashboard.html' },
+        { key: 'supplier-portal', label: 'Supplier portal', href: '/DS/patterns/supplier-portal.html' },
         { key: 'consent', label: 'Cookie consent', href: '/DS/patterns/consent.html' },
         { key: 'ai-advisor', label: 'AI advisor', href: '/DS/patterns/ai-advisor.html' }
       ]

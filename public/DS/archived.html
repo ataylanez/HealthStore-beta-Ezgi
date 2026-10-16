@@ -18,6 +18,63 @@
       </p>
     </div>
 
+    <h2>Round 10 &mdash; NHS layout &amp; typography alignment <span class="ds-status ds-status--orphan">Archived R10</span></h2>
+    <p>The audit of 16 October 2026 moved every page onto the NHS 960px width container, the NHS grid and the NHS type styles. The following
+      HealthStore inventions were retired as a result. Where something is marked <em>still in <code>globals.css</code></em>, the CSS or component
+      file is present but nothing imports or uses it &mdash; removal is a safe follow-up.</p>
+
+    <h3>Layout</h3>
+    <table class="ds-table">
+      <thead><tr><th>Retired</th><th>Replaced by</th><th>State</th></tr></thead>
+      <tbody>
+        <tr><td><code>.hs-page</code> (80rem / 1280px canvas), <code>.hs-page-narrow</code> (48rem)</td><td><code>nhsuk-width-container</code> (960px) + <code>nhsuk-main-wrapper</code></td><td>Still in <code>globals.css</code>, unused</td></tr>
+        <tr><td><code>AppShell</code> 80rem header / nav / phase-banner overrides</td><td>Header, nav and banner share <code>nhsuk-width-container</code></td><td>Removed</td></tr>
+        <tr><td><code>.hs-pdp-with-sidebar*</code>, <code>.hs-on-this-page*</code>, <code>PdpOnThisPage.tsx</code>, <code>lib/pdpOnThisPage.ts</code> sticky sidebar</td><td><code>PdpFrame</code>: one-third <code>nhsuk-contents-list</code> (<code>PdpSectionNav</code>) + two-thirds</td><td>Removed</td></tr>
+        <tr><td>PDP <code>max-w-[640px]</code> main column; <code>PdpNarrativeSpine.tsx</code></td><td><code>nhsuk-grid-column-two-thirds</code>; overview summaries + section pages</td><td>Removed</td></tr>
+        <tr><td>Catalogue auto-fill card grid and GOV.UK-style filter bar</td><td>One-third filter panel + two-thirds stacked <code>nhsuk-card</code> list</td><td>Removed</td></tr>
+        <tr><td>Form / journey <code>max-w-2xl</code>, <code>max-w-3xl</code>, <code>mt-24</code></td><td><code>nhsuk-grid-column-two-thirds</code>, <code>nhsuk-u-margin-top-6</code></td><td>Removed (32 files)</td></tr>
+        <tr><td>Home full-bleed hero and bespoke band layout (<code>.hs-hero-grid</code>, <code>.hs-hero-visual</code>, <code>.hs-hero-actions</code>, <code>.hs-hero-sub</code>, <code>.hs-card-grid</code>, <code>.hs-vx-grid</code>, <code>.hs-section-lg</code>)</td><td><code>nhsuk-hero</code> + width container + <code>nhsuk-card-group</code></td><td>Still in <code>globals.css</code>, unused</td></tr>
+        <tr><td><code>CompareDecisionSnapshot</code> (compare page strip)</td><td>Narrative tables only</td><td>Orphan component</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Typography</h3>
+    <table class="ds-table">
+      <thead><tr><th>Retired</th><th>Replaced by</th><th>State</th></tr></thead>
+      <tbody>
+        <tr><td><code>.page-title-h1</code>, <code>.hs-section-title</code>, <code>.hs-text-page-title</code>, <code>.hs-text-hero</code></td><td><code>nhsuk-heading-xl</code> / <code>nhsuk-heading-l</code></td><td><code>.hs-section-title</code>, <code>.hs-text-*</code> still in <code>globals.css</code>, unused</td></tr>
+        <tr><td>24px lede (<code>--text-lede: 1.5rem</code>)</td><td><code>nhsuk-lede-text</code> 22&rarr;26px; token updated</td><td>Removed</td></tr>
+        <tr><td>Uppercase, letter-spaced labels and eyebrows (<code>uppercase tracking-wide</code>)</td><td>Sentence case, <code>nhsuk-body-s</code> or <code>nhsuk-caption-*</code></td><td>Removed</td></tr>
+        <tr><td>Frutiger Light <code>@font-face</code>; weights 500 / 700</td><td>400 and 600 only</td><td>Removed</td></tr>
+        <tr><td>Sub-16px running text (<code>text-xs</code> / fixed px) outside tags and chart labels</td><td><code>nhsuk-body-s</code></td><td>Removed</td></tr>
+        <tr><td>Links underlined on hover only</td><td>Underlined at rest, no underline on hover</td><td>Removed (9 components)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Components no longer rendered anywhere</h3>
+    <p>Each file still exists but has no importer. They are safe to delete; listed so nobody documents them as live.</p>
+    <table class="ds-table">
+      <thead><tr><th>Component</th><th>Was used for</th><th>Replaced by</th></tr></thead>
+      <tbody>
+        <tr><td><code>ui/WidgetShell</code></td><td>Dashboard widgets</td><td>&mdash; (dashboards removed)</td></tr>
+        <tr><td><code>home/HeroPathwayVisual</code>, <code>home/HomeHeroSearch</code>, <code>home/concept/ConceptColumns</code></td><td>Old home hero and concept band</td><td><code>nhsuk-hero</code>, <code>HomePublicContent</code></td></tr>
+        <tr><td><code>Collapsible</code>, <code>CollapsibleSection</code>, <code>ProductPageExpander</code></td><td>PDP expanders</td><td>Section pages; <code>nhsuk-details</code></td></tr>
+        <tr><td><code>PdpReadOnlySection</code>, <code>PdpSupplierContactCard</code>, <code>LiveSitesStructuredList</code></td><td>Old PDP sidebar and sections</td><td><code>PdpHowToBuy</code>, <code>PdpWhereLive</code></td></tr>
+        <tr><td><code>product/ProductHero</code>, <code>product/ImpactMetric</code>, <code>product/AssurancePassport</code>, <code>product/PathwayChangeMap</code>, <code>product/PdpFundingOpportunities</code>, <code>product/BenefitStack</code>, <code>product/ScenarioControls</code></td><td>Earlier PDP iterations</td><td><code>PdpAssurancePassport</code>, <code>PdpLocalValue</code>, <code>PdpWorthTiles</code>, <code>PdpFundingLevers</code></td></tr>
+        <tr><td><code>HealthIcons</code></td><td>Condition glyphs on the old home page</td><td>&mdash;</td></tr>
+        <tr><td><code>ai/FundingWizard</code>, <code>ai/ToolCallIndicator</code></td><td>Guided funding flow in the AI drawer</td><td>Chat + <code>FundingResults</code></td></tr>
+        <tr><td><code>compare/CompareDecisionSnapshot</code></td><td>Compare page summary strip</td><td><code>CompareNarrativeTables</code></td></tr>
+        <tr><td><code>storytelling/SegmentedToggle</code>, <code>RemovablePill</code>, <code>KpiTile</code>, <code>ChartPanel</code>, <code>ImpactBar</code>, <code>PathwayVisual</code>, <code>ProductHeroMedia</code>; <code>charts/CoverageSankey</code>, <code>CoverageFunnel</code>, <code>RetentionCurve</code>, <code>BenchmarkRange</code>, <code>MiniBarTrack</code></td><td>Storytelling / chart primitives from Rounds 8&ndash;9</td><td>Only <code>ProcessSteps</code>, <code>BeforeAfterImpact</code>, <code>HorizontalBarChart</code>, <code>InsightCallout</code>, <code>MycopdImpactCharts</code>, <code>LusciiImpactCharts</code> remain in use</td></tr>
+        <tr><td><code>Badges.tsx</code>: <code>NiceTypeBadge</code>; <code>SectionHeader</code> (only via <code>ProductVideosSection</code>)</td><td>NICE type tag; gradient-rule heading</td><td><code>nhsuk-tag</code>; <code>nhsuk-heading-l</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>CSS families defined in <code>globals.css</code> with zero uses</h3>
+    <p><code>hs-card-grid</code>, <code>hs-case-study-featured</code>, <code>hs-catalogue-layout</code>, <code>hs-evidence-note</code>, <code>hs-header-prototype</code>, <code>hs-hero-actions</code>, <code>hs-hero-grid</code>, <code>hs-hero-sub</code>, <code>hs-hero-visual</code>, <code>hs-impact-card</code>, <code>hs-impact-example</code>, <code>hs-impact-lens</code>, <code>hs-impact-lenses</code>, <code>hs-inset-card</code>, <code>hs-kpi-grid</code>, <code>hs-mini-kpi</code>, <code>hs-mini-kpi-grid</code>, <code>hs-page</code>, <code>hs-pathway-btn</code>, <code>hs-pathway-impact</code>, <code>hs-related-nav</code>, <code>hs-section-lg</code>, <code>hs-section-note</code>, <code>hs-section-title</code>, <code>hs-step-img-placeholder</code>, <code>hs-supported-pathways</code>, <code>hs-text-hero</code>, <code>hs-text-page-title</code>, <code>hs-vx-grid</code>; also <code>card-evidence*</code> and the <code>nhsuk-tabs</code> compiled CSS (no tabs rendered).</p>
+
+    <h3>DS pages archived in this round</h3>
+    <p><a href="/DS/patterns/dashboard.html">Dashboard pattern</a> (replaced by <a href="/DS/patterns/supplier-portal.html">Supplier portal</a>), <a href="/DS/components/tabs.html">Tabs</a> and <a href="/DS/components/collapsible.html">Collapsible sections</a>. The pages remain as stubs so older audit reports still resolve. <strong>Cards</strong> dropped WidgetShell, inset card, evidence card and auth card; <strong>Toggle buttons</strong> dropped Save toggle, lens and diff checkbox; <strong>Forms</strong> dropped AuthCard, login, select-entity, EOI modal and org-settings; <strong>Alerts</strong> dropped the tinted alert boxes and page banners.</p>
+
     <h2>Hand-rolled NHS tab CSS <span class="ds-status ds-status--orphan">Removed</span></h2>
     <p>
       During the NHS Design System migration the bespoke <code>.nhsuk-tabs*</code> rules in

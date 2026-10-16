@@ -10,7 +10,7 @@ import { splitPdpEvidence } from '@/lib/pdpEvidence'
  * Ports the matt_demo `#nhs-experience` idea onto the hybrid PDP, combining the
  * "where it's live" deployment register with case studies into one prominent
  * block. Reuses the richer DeploymentRegisterTable rather than matt_demo's
- * top-4 card summary. Rendered as the last spine slot (after "Making it work").
+ * top-4 card summary. Rendered on its own page at /apps/[slug]/nhs-experience.
  *
  * Real-world programme write-ups from `clinical_evidence_detailed` are folded in
  * as additional case-study cards (Assurance-and-evidence migration); entries
@@ -70,7 +70,7 @@ export default function PdpNhsExperience({ app }: { app: any }) {
             <strong>Commissioner note:</strong>{' '}
             Case studies and service evaluations are illustrative local reports and may not meet the same
             standard as peer-reviewed trials. See the formal record in the{' '}
-            <a href="#assurance" className="hs-font-bold underline" style={{ color: '#003087' }}>Assurance and evidence</a> section.
+            <a href={`/apps/${app.slug}/assurance`} className="hs-font-bold underline" style={{ color: '#003087' }}>Assurance and evidence</a> page.
           </p>
           <CaseStudyCards caseStudies={caseStudies} />
         </div>

@@ -71,7 +71,7 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
           type="button"
           onClick={onCancel}
           disabled={disabled}
-          className="flex flex-shrink-0 items-center gap-1 hs-text-caption hs-font-normal transition-colors hover:underline disabled:opacity-40"
+          className="flex flex-shrink-0 items-center gap-1 hs-text-caption hs-font-normal transition-colors underline hover:no-underline disabled:opacity-40"
           style={{ color: 'var(--text-secondary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
         >
           <X className="h-3.5 w-3.5" />
@@ -118,7 +118,7 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
               setRegion('')
             }}
             disabled={disabled}
-            className="mb-4 flex items-center gap-1 hs-text-caption hs-font-normal transition-colors hover:underline disabled:opacity-40"
+            className="mb-4 flex items-center gap-1 hs-text-caption hs-font-normal transition-colors underline hover:no-underline disabled:opacity-40"
             style={{ color: 'var(--text-secondary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -176,7 +176,7 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
               setSelection('')
             }}
             disabled={disabled}
-            className="mb-4 flex items-center gap-1 hs-text-caption hs-font-normal transition-colors hover:underline disabled:opacity-40"
+            className="mb-4 flex items-center gap-1 hs-text-caption hs-font-normal transition-colors underline hover:no-underline disabled:opacity-40"
             style={{ color: 'var(--text-secondary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -223,7 +223,7 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
               setSelection('')
             }}
             disabled={disabled}
-            className="mb-4 flex items-center gap-1 hs-text-caption hs-font-normal transition-colors hover:underline disabled:opacity-40"
+            className="mb-4 flex items-center gap-1 hs-text-caption hs-font-normal transition-colors underline hover:no-underline disabled:opacity-40"
             style={{ color: 'var(--text-secondary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -234,7 +234,7 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
             style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
           >
             <div
-              className="mb-2 hs-text-caption hs-font-bold uppercase tracking-wide"
+              className="mb-2 hs-text-label hs-font-bold"
               style={{ color: 'var(--text-muted)', fontFamily: 'Frutiger, Arial, sans-serif' }}
             >
               Search parameters

@@ -13,29 +13,40 @@
       <p class="ds-eyebrow">Components</p>
       <h1 class="ds-page-title">Loading &amp; skeletons</h1>
       <p class="ds-lede">
-        Placeholder UI shown while content loads (catalogue and comparison routes use Suspense skeletons). Skeletons
-        preserve layout and reduce perceived wait, with a subtle shimmer that respects reduced-motion.
+        Placeholder UI shown while content loads (catalogue, comparison and supplier portal routes use Suspense skeletons).
+        A skeleton reproduces the <strong>same NHS layout</strong> as the page it stands in for &mdash; width container, main wrapper,
+        grid columns &mdash; so nothing moves when data arrives. Shimmer respects reduced-motion.
       </p>
     </div>
 
     <div class="ds-meta-grid">
-      <div class="ds-meta"><div class="ds-meta__k">Components</div><div class="ds-meta__v"><code>CatalogueSkeleton</code>, <code>CompareSkeleton</code></div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Components</div><div class="ds-meta__v"><code>CatalogueSkeleton</code>, <code>CompareSkeleton</code>, <code>PortalSkeletonPage</code></div></div>
+      <div class="ds-meta"><div class="ds-meta__k">Semantics</div><div class="ds-meta__v"><code>role="status" aria-busy="true"</code> on the wrapper, visually hidden &ldquo;Loading&hellip;&rdquo; text, skeleton shapes <code>aria-hidden</code></div></div>
     </div>
 
-    <h2>Catalogue card skeleton</h2>
-    <div class="ds-example ds-example--surface">
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">
-        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px">
-          <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px"><div class="ds-skeleton" style="width:40px;height:40px;border-radius:8px"></div><div style="flex:1"><div class="ds-skeleton" style="height:12px;width:70%;margin-bottom:8px"></div><div class="ds-skeleton" style="height:10px;width:45%"></div></div></div>
-          <div class="ds-skeleton" style="height:10px;width:100%;margin-bottom:8px"></div>
-          <div class="ds-skeleton" style="height:10px;width:85%;margin-bottom:16px"></div>
-          <div class="ds-u-row"><div class="ds-skeleton" style="height:22px;width:70px;border-radius:9999px"></div><div class="ds-skeleton" style="height:22px;width:90px;border-radius:9999px"></div></div>
-        </div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px">
-          <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px"><div class="ds-skeleton" style="width:40px;height:40px;border-radius:8px"></div><div style="flex:1"><div class="ds-skeleton" style="height:12px;width:60%;margin-bottom:8px"></div><div class="ds-skeleton" style="height:10px;width:40%"></div></div></div>
-          <div class="ds-skeleton" style="height:10px;width:100%;margin-bottom:8px"></div>
-          <div class="ds-skeleton" style="height:10px;width:75%;margin-bottom:16px"></div>
-          <div class="ds-u-row"><div class="ds-skeleton" style="height:22px;width:80px;border-radius:9999px"></div><div class="ds-skeleton" style="height:22px;width:60px;border-radius:9999px"></div></div>
+    <h2>Catalogue skeleton (one-third / two-thirds)</h2>
+    <p>Mirrors the product list: a filter-panel block in the one-third column and stacked card shapes in the two-thirds column.</p>
+    <div class="ds-example ds-layout-demo">
+      <div class="nhsuk-width-container">
+        <div class="nhsuk-grid-row">
+          <div class="nhsuk-grid-column-one-third">
+            <div style="background:#fff;border:1px solid var(--border);padding:16px">
+              <div class="ds-skeleton" style="height:14px;width:40%;margin-bottom:16px"></div>
+              <div class="ds-skeleton" style="height:10px;width:80%;margin-bottom:8px"></div>
+              <div class="ds-skeleton" style="height:10px;width:70%;margin-bottom:8px"></div>
+              <div class="ds-skeleton" style="height:10px;width:60%"></div>
+            </div>
+          </div>
+          <div class="nhsuk-grid-column-two-thirds">
+            <div class="ds-skeleton" style="height:12px;width:30%;margin-bottom:16px"></div>
+            <div style="background:#fff;border:1px solid var(--border);padding:24px;margin-bottom:16px">
+              <div class="ds-skeleton" style="height:16px;width:40%;margin-bottom:8px"></div>
+              <div class="ds-skeleton" style="height:10px;width:25%;margin-bottom:16px"></div>
+              <div class="ds-skeleton" style="height:10px;width:100%;margin-bottom:8px"></div>
+              <div class="ds-skeleton" style="height:10px;width:85%;margin-bottom:16px"></div>
+              <div class="ds-u-row"><div class="ds-skeleton" style="height:44px;width:180px"></div><div class="ds-skeleton" style="height:44px;width:150px"></div></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -61,7 +72,7 @@
       <li>Skeleton shapes are decorative and should not be announced individually.</li>
     </ul>
 
-    <div class="ds-note ds-note--source">Source: <code>app/apps/CatalogueSkeleton.tsx</code>, <code>app/compare/page.tsx</code> (<code>CompareSkeleton</code>). Shimmer: <code>.ds-skeleton</code> in this DS.</div>
+    <div class="ds-note ds-note--source">Source: <code>app/apps/CatalogueSkeleton.tsx</code>, <code>app/compare/page.tsx</code> (<code>CompareSkeleton</code>), <code>components/supplier-portal/PortalSkeletonPage.tsx</code>. Shimmer: <code>.ds-skeleton</code> in this DS.</div>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

@@ -6,10 +6,11 @@ import type { IcbReferenceData } from '@/lib/content/productModel'
 /**
  * Single source of truth for PDP narrative-spine section titles.
  *
- * Both the rendered sections (PdpNarrativeSpine, PdpLocalValue, PdpFundingLevers,
- * PdpAssurancePassport, PdpImplementation, PdpNhsExperience, PdpResources) and the
- * left-hand "On this page" nav (lib/pdpOnThisPage.ts) read titles from here, so a
+ * Both the rendered sections (PdpProblem, PdpHowItHelps, PdpLocalValue, PdpFundingLevers,
+ * PdpAssurancePassport, PdpImplementation, PdpNhsExperience, PdpHowToBuy, PdpResources)
+ * and the left-hand section nav (lib/pdpOnThisPage.ts) read titles from here, so a
  * title change on the page automatically flows through to the nav label.
+ * Each id is also the URL segment of that section's page: /apps/[slug]/[id].
  */
 
 export type PdpSectionId =
@@ -23,6 +24,20 @@ export type PdpSectionId =
   | 'nhs-experience'
   | 'how-to-buy'
   | 'resources'
+
+/** Every section id, in reading order. Also the set of valid /apps/[slug]/[section] segments. */
+export const PDP_SECTION_IDS: readonly PdpSectionId[] = [
+  'the-problem',
+  'how-it-helps',
+  'local-impact',
+  'local-value-worth',
+  'funding-levers',
+  'assurance',
+  'implementation',
+  'nhs-experience',
+  'how-to-buy',
+  'resources',
+]
 
 export type PdpSectionTitleContext = {
   /** Product name, for titles that interpolate it (e.g. "How {app} changes a treatment pathway"). */

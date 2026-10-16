@@ -33,10 +33,11 @@ export default function ScenarioControls({
               textAlign: 'left',
             }}
           >
-            <span style={{ display: 'block', fontSize: 14, fontWeight: active ? 600 : 500, color: active ? '#005eb8' : '#212b32' }}>
+            {/* NHS type: body-s (14→16px) label, weight 400/600 only; hint at body-s too (14px minimum). */}
+            <span className="hs-text-label" style={{ display: 'block', fontWeight: active ? 600 : 400, color: active ? '#005eb8' : '#212b32' }}>
               {o.label}
             </span>
-            <span style={{ display: 'block', fontSize: 12, color: '#4c6272', marginTop: 2 }}>
+            <span className="hs-text-label" style={{ display: 'block', color: '#4c6272', marginTop: 4 }}>
               {o.hint}
             </span>
           </button>

@@ -64,7 +64,7 @@ export function NewsListConcept({
         {seeAllHref && (
           <Link
             href={seeAllHref}
-            className="shrink-0 hs-text-label hs-font-bold text-[var(--nhs-blue)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="shrink-0 hs-text-label hs-font-bold text-[var(--nhs-blue)] underline hover:no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             style={{ outlineColor: 'var(--nhs-blue)' }}
           >
             See all news →
@@ -116,7 +116,7 @@ export function CampaignsColumnConcept({
         {seeAllHref && (
           <Link
             href={seeAllHref}
-            className="shrink-0 hs-text-label hs-font-bold text-[var(--nhs-blue)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="shrink-0 hs-text-label hs-font-bold text-[var(--nhs-blue)] underline hover:no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             style={{ outlineColor: 'var(--nhs-blue)' }}
           >
             See all campaigns →

@@ -81,7 +81,7 @@ export default function AppShell({
       <BackToTop />
       <NhsFrontendInit />
       {/* [Provenance: NHS] Official NHS Footer markup. Grows to fill remaining viewport. */}
-      <footer role="contentinfo" className="hs-app-shell__footer mt-16">
+      <footer role="contentinfo" className="hs-app-shell__footer">
         <div className="nhsuk-footer-container">
           <div className="nhsuk-width-container">
             <h2 className="nhsuk-u-visually-hidden">Support links</h2>

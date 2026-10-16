@@ -26,21 +26,23 @@ export default async function PublishedProductPage({ params }: { params: Params 
   const product = findManagedProduct((await params).productId)
   if (!product) notFound()
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
       <PortalBreadcrumb items={[{ label: 'Published pages', href: PORTAL_PATHS.published }, { label: product.name }]} />
-      <div className="max-w-3xl">
-        <PublishedPageEditor
-          pageId={product.id}
-          caption="Product page"
-          title={product.name}
-          fields={PRODUCT_PAGE_FIELDS}
-          defaults={{}}
-          readOnlyHeading="Information from product onboarding"
-          readOnlyIntro="This information comes from your product onboarding form and cannot be changed here. To update it, go to Manage products."
-          readOnly={productPageReadOnly(product)}
-          viewHref={`/apps/${product.appSlug}`}
-          checkAnswersHref={publishedProductCheckAnswersHref(product.id)}
-        />
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <PublishedPageEditor
+            pageId={product.id}
+            caption="Product page"
+            title={product.name}
+            fields={PRODUCT_PAGE_FIELDS}
+            defaults={{}}
+            readOnlyHeading="Information from product onboarding"
+            readOnlyIntro="This information comes from your product onboarding form and cannot be changed here. To update it, go to Manage products."
+            readOnly={productPageReadOnly(product)}
+            viewHref={`/apps/${product.appSlug}`}
+            checkAnswersHref={publishedProductCheckAnswersHref(product.id)}
+          />
+        </div>
       </div>
     </div>
   )

@@ -14,7 +14,7 @@ export function GuidanceArticle({
   children: ReactNode
 }) {
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container">
       <PageBreadcrumb
         items={[
           { label: 'Resource library', href: '/resources' },
@@ -22,10 +22,14 @@ export function GuidanceArticle({
           { label: title },
         ]}
       />
-      <article className="hs-measure" style={{ maxWidth: '40rem' }}>
-        <h1 className="page-title-h1">{title}</h1>
-        {children}
-      </article>
+      <div className="nhsuk-main-wrapper nhsuk-main-wrapper--s">
+        <div className="nhsuk-grid-row">
+          <article className="nhsuk-grid-column-two-thirds">
+            <h1 className="nhsuk-heading-xl">{title}</h1>
+            {children}
+          </article>
+        </div>
+      </div>
     </div>
   )
 }

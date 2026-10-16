@@ -23,20 +23,22 @@ export default function TaskStubPage({
   const taskListHref = formBasePath(formId)
 
   return (
-    <div className="hs-page">
-      <div className="max-w-2xl">
-        <BackLink href={taskListHref} />
-        <span className="nhsuk-caption-l">{section.title}</span>
-        <h1 className="page-title-h1">{task.title}</h1>
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <BackLink href={taskListHref} />
+          <span className="nhsuk-caption-l">{section.title}</span>
+          <h1 className="nhsuk-heading-xl">{task.title}</h1>
 
-        <div className="nhsuk-inset-text">
-          <span className="nhsuk-u-visually-hidden">Information: </span>
-          <p>Questions for this task will be added here.</p>
+          <div className="nhsuk-inset-text">
+            <span className="nhsuk-u-visually-hidden">Information: </span>
+            <p>Questions for this task will be added here.</p>
+          </div>
+
+          <Button type="button" variant="secondary" onClick={() => router.push(taskListHref)}>
+            Cancel
+          </Button>
         </div>
-
-        <Button type="button" variant="secondary" onClick={() => router.push(taskListHref)}>
-          Cancel
-        </Button>
       </div>
     </div>
   )

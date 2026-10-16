@@ -20,6 +20,9 @@ const nextConfig: NextConfig = {
       // The sitemap lives at /sitemap, outside the design-system reference.
       { source: "/sitemap", destination: "/sitemap/index.html" },
       { source: "/sitemap/", destination: "/sitemap/index.html" },
+      // NHS layout & typography audit (public/nhs-audit). Reachable by URL only — not linked from any navigation.
+      { source: "/nhs-audit", destination: "/nhs-audit/index.html" },
+      { source: "/nhs-audit/", destination: "/nhs-audit/index.html" },
     ];
   },
   async redirects() {

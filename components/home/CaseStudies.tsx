@@ -38,7 +38,7 @@ function ExternalOrInternalLink({
  */
 export function CaseStudyCard({ study, href }: { study: CaseStudy; href?: string }) {
   const Title = (
-    <span className="hs-text-body hs-font-bold leading-snug md:hs-text-card-title-sm" style={{ ...fr, color: 'var(--text-primary)' }}>
+    <span className="nhsuk-heading-s nhsuk-u-margin-bottom-0" style={{ ...fr, color: 'var(--text-primary)' }}>
       {study.title}
     </span>
   )
@@ -64,7 +64,7 @@ export function CaseStudyCard({ study, href }: { study: CaseStudy; href?: string
           <div className="flex items-end justify-between gap-4">{Title}</div>
         )}
         {study.description ? (
-          <p className="mt-2 mb-0 hs-text-label leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+          <p className="nhsuk-body-s nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-secondary)' }}>
             {study.description}
           </p>
         ) : null}
@@ -109,11 +109,11 @@ function FeaturedCaseStudyCard({ study }: { study: CaseStudy }) {
       </div>
       <div className="shrink-0 bg-white px-6 py-6">
         <span className="badge badge-blue mb-2 inline-block">Featured</span>
-        <h3 className="hs-text-lede hs-font-bold leading-snug md:hs-text-section-alt" style={{ ...fr, color: 'var(--text-primary)' }}>
+        <h3 className="nhsuk-heading-m nhsuk-u-margin-bottom-2" style={{ ...fr, color: 'var(--text-primary)' }}>
           {study.title}
         </h3>
         {study.description ? (
-          <p className="mt-2 mb-0 hs-text-label leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+          <p className="nhsuk-body-m nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-secondary)' }}>
             {study.description}
           </p>
         ) : null}
@@ -139,43 +139,37 @@ function CompactCaseStudyCard({ study }: { study: CaseStudy }) {
   )
 }
 
-/** Full-width "Case studies" band for the public home — featured app card plus smaller previews, links to /case-studies. */
+/**
+ * "Case studies" section for the public home — featured card in a two-thirds
+ * column, compact previews in the one-third column. Sits inside the page's NHS
+ * width container (no full-bleed band), with a heading-l title and a lede.
+ */
 export function HomeCaseStudiesBand({ caseStudies }: { caseStudies: CaseStudy[] }) {
   const featured = caseStudies.find((c) => c.id === 'featured-app') ?? caseStudies[0]
   const others = caseStudies.filter((c) => c !== featured).slice(0, 3)
   return (
-    <section
-      className="relative overflow-x-clip py-12 md:py-16"
-      style={{ background: 'var(--nhs-blue)' }}
-      aria-labelledby="case-studies-heading"
-    >
-      <div className="mx-auto max-w-7xl px-4 md:px-8">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-2xl">
-            <h2 id="case-studies-heading" className="hs-text-section-alt hs-font-bold leading-tight text-white md:hs-text-section" style={fr}>
-              Case studies
-            </h2>
-            <p className="mt-4 mb-0 hs-text-body leading-relaxed text-white/85">
-              Real-world examples of how NHS systems are commissioning and scaling digital therapeutics.
-            </p>
-          </div>
-          <Link
-            href="/resources"
-            className="inline-flex shrink-0 items-center gap-1 hs-text-label hs-font-bold text-white underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-          >
-            See all case studies
-            <ChevronRight className="h-4 w-4" aria-hidden />
-          </Link>
+    <section aria-labelledby="case-studies-heading">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <h2 id="case-studies-heading" className="nhsuk-heading-l">
+            Case studies
+          </h2>
+          <p className="nhsuk-body-m">
+            Real-world examples of how NHS systems are commissioning and scaling digital therapeutics.
+          </p>
+          <p className="nhsuk-body-m">
+            <Link href="/resources">See all case studies</Link>
+          </p>
         </div>
-        <div className="grid gap-6 lg:grid-cols-3 lg:items-stretch">
-          <div className="lg:col-span-2">
-            <FeaturedCaseStudyCard study={featured} />
-          </div>
-          <div className="flex flex-col gap-4">
-            {others.map((study) => (
-              <CompactCaseStudyCard key={study.id} study={study} />
-            ))}
-          </div>
+      </div>
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds nhsuk-u-margin-bottom-4">
+          <FeaturedCaseStudyCard study={featured} />
+        </div>
+        <div className="nhsuk-grid-column-one-third">
+          {others.map((study) => (
+            <CompactCaseStudyCard key={study.id} study={study} />
+          ))}
         </div>
       </div>
     </section>

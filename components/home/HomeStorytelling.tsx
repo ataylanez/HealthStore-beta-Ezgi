@@ -79,61 +79,75 @@ const PATHWAYS = [
 ]
 
 /**
- * Storytelling intro for the public home — adopts matt_demo's proposition layout
- * (what we do / how it works / pathways) rendered through the NHS-tokenised
- * storytelling classes and the ProcessSteps gap component.
+ * Storytelling intro for the public home (what we do / how it works / pathways).
+ * Laid out on the NHS grid: `.nhsuk-heading-l` section titles, lede intros in a
+ * two-thirds column, and `.nhsuk-card-group` one-third card columns.
+ * [Provenance: NHS] cards, card group, grid; ProcessSteps is the one bespoke part.
  */
 export function HomeStorytelling() {
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-12 md:pt-14">
-        <section className="hs-section">
-          <h2 className="hs-section-title" style={{ fontSize: 'var(--text-section)' }}>What the NHS HealthStore addresses</h2>
-          <p className="hs-section-note" style={{ fontSize: 'var(--text-body)' }}>
-            It reduces the burden on local teams by bringing supplier evidence, NICE recommendations and commercial
-            support together in one place. Commissioners retain all commissioning, clinical safety, assurance and
-            deployment accountability.
-          </p>
-          <div className="hs-card-grid">
-            {WHAT_WE_DO.map((item) => (
-              <div key={item.title} className="hs-card" style={{ borderRadius: 'var(--radius-card)' }}>
-                <h3 style={{ fontSize: 'var(--text-section-alt)' }}>{item.title}</h3>
-                <p style={{ fontSize: 'var(--text-body)' }}>{item.body}</p>
-              </div>
-            ))}
+      <section aria-labelledby="home-what-heading" className="nhsuk-u-margin-bottom-7">
+        <div className="nhsuk-grid-row">
+          <div className="nhsuk-grid-column-two-thirds">
+            <h2 id="home-what-heading" className="nhsuk-heading-l">What the NHS HealthStore addresses</h2>
+            <p className="nhsuk-body-m">
+              It reduces the burden on local teams by bringing supplier evidence, NICE recommendations and commercial
+              support together in one place. Commissioners retain all commissioning, clinical safety, assurance and
+              deployment accountability.
+            </p>
           </div>
-        </section>
-      </div>
-
-      <section className="hs-section bg-white py-12 md:py-14">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h2 className="hs-section-title" style={{ fontSize: 'var(--text-section)' }}>How it works</h2>
-          <ProcessSteps steps={HOW_IT_WORKS} className="hs-steps-grid--vertical" />
         </div>
+        <ul className="nhsuk-grid-row nhsuk-card-group">
+          {WHAT_WE_DO.map((item) => (
+            <li key={item.title} className="nhsuk-grid-column-one-third nhsuk-card-group__item">
+              <div className="nhsuk-card">
+                <div className="nhsuk-card__content">
+                  <h3 className="nhsuk-card__heading nhsuk-heading-m">{item.title}</h3>
+                  <p className="nhsuk-card__description">{item.body}</p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-12 md:pt-14">
-        <section className="hs-section">
-          <h2 className="hs-section-title" style={{ fontSize: 'var(--text-section)' }}>Conditions and pathways we currently support</h2>
-          <p className="hs-section-note hs-measure">
-            Condition pathways with NICE Health Technology Guidance, verified supplier evidence and full local
-            opportunity data.
-          </p>
-          <div className="hs-supported-pathways">
-            {PATHWAYS.map((p) => (
-              <Link key={p.href} href={p.href} className="hs-pathway-btn">
-                <strong>{p.title}</strong>
-                <span>{p.detail}</span>
-                <span className="mt-1 flex flex-wrap gap-1">
-                  {p.tags.map((tag) => (
-                    <span key={tag} className="nhsuk-tag nhsuk-tag--blue">{tag}</span>
-                  ))}
-                </span>
-              </Link>
-            ))}
+      <section aria-labelledby="home-how-heading" className="nhsuk-u-margin-bottom-7">
+        <h2 id="home-how-heading" className="nhsuk-heading-l">How it works</h2>
+        <ProcessSteps steps={HOW_IT_WORKS} className="hs-steps-grid--vertical" />
+      </section>
+
+      <section aria-labelledby="home-pathways-heading" className="nhsuk-u-margin-bottom-7">
+        <div className="nhsuk-grid-row">
+          <div className="nhsuk-grid-column-two-thirds">
+            <h2 id="home-pathways-heading" className="nhsuk-heading-l">Conditions and pathways we currently support</h2>
+            <p className="nhsuk-body-m">
+              Condition pathways with NICE Health Technology Guidance, verified supplier evidence and full local
+              opportunity data.
+            </p>
           </div>
-        </section>
-      </div>
+        </div>
+        {/* [Provenance: NHS] Clickable cards in a card group. */}
+        <ul className="nhsuk-grid-row nhsuk-card-group">
+          {PATHWAYS.map((p) => (
+            <li key={p.href} className="nhsuk-grid-column-one-third nhsuk-card-group__item">
+              <div className="nhsuk-card nhsuk-card--clickable">
+                <div className="nhsuk-card__content">
+                  <h3 className="nhsuk-card__heading nhsuk-heading-m">
+                    <Link className="nhsuk-card__link" href={p.href}>{p.title}</Link>
+                  </h3>
+                  <p className="nhsuk-card__description">{p.detail}</p>
+                  <p className="nhsuk-u-margin-bottom-0 flex flex-wrap gap-1">
+                    {p.tags.map((tag) => (
+                      <span key={tag} className="nhsuk-tag nhsuk-tag--blue">{tag}</span>
+                    ))}
+                  </p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
     </>
   )
 }

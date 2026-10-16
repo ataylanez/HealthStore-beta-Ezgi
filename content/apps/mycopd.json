@@ -38,6 +38,10 @@
     }
   ],
   "one_line_value_proposition": "A digital discharge bundle — patients get structured self-management, inhaler training and a 6-week home pulmonary rehab programme through the app.",
+  "overview": [
+    "myCOPD is a self-management app for adults with chronic obstructive pulmonary disease (COPD). Patients use it to complete a digital discharge checklist, practise inhaler technique and follow a 6-week pulmonary rehabilitation programme at home. An optional Pro tier lets clinicians review patients' progress on a dashboard. It's used in primary care, community services and hospital outpatient clinics.",
+    "To use it, you'll need a respiratory clinical lead and an agreed place for it in your pathway. The Pro tier also needs clinician time to check the dashboard; it is not a 24-hour monitored service. NICE recommends myCOPD while more evidence is collected, and 2 randomised controlled trials and several NHS evaluations support it. It's live in several NHS areas, including Dorset and Grampian. Pricing is on a national framework. Its DTAC assessment needs refreshing, so ask the supplier for the current form."
+  ],
   "why_it_matters_locally": "myCOPD gives patients a structured self-management toolkit, including a 6-week home PR programme, without requiring face-to-face PR capacity. The Pro tier adds a clinician dashboard for remote monitoring at population scale.",
   "target_problem_statement": "Unplanned COPD admissions, low PR uptake, poor inhaler technique and inadequate post-exacerbation support between appointments.",
   "nice_guidance_refs": [

@@ -20,3 +20,4 @@ components/compare/CompareLensControl.tsx
 components/compare/CompareWorkspaceView.tsx
 components/compare/compareRowRenderers.tsx
 lib/compareConfig.ts
+.env*

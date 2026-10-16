@@ -2,12 +2,12 @@ import { ClickableChevronCard } from '@/components/ui/ClickableChevronCard'
 
 export type PortalCard = { href: string; title: string; description: string }
 
-/** Clickable NHS cards in the same grid as the catalogue condition cards. */
+/** Clickable NHS cards in an NHS card group (one-third columns), as on the catalogue. */
 export function PortalCardGrid({ cards }: { cards: PortalCard[] }) {
   return (
-    <ul className="m-0 grid list-none grid-cols-1 gap-6 p-0 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="nhsuk-grid-row nhsuk-card-group">
       {cards.map((card) => (
-        <li key={card.href} className="flex min-h-0">
+        <li key={card.href} className="nhsuk-grid-column-one-third nhsuk-card-group__item">
           <ClickableChevronCard
             variant="primary"
             href={card.href}

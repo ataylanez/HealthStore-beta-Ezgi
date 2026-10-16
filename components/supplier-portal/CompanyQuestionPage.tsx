@@ -151,44 +151,46 @@ function QuestionForm({
   const errors = error ? [{ field: errorField, message: error }] : []
 
   return (
-    <div className="hs-page">
-      <div className="max-w-2xl">
-        <BackLink href={backHref} />
-        <ErrorSummary errors={errors} />
-        {/* Caption gives chapter context, the questionnaire reference (e.g. A1) and
-            the position in the chapter — the same as an onboarding task page. */}
-        <span className="nhsuk-caption-l">
-          {section.title}
-          {question.code ? ` — ${question.code}` : ''}
-          {!singleEdit && total > 1 && position > 0 ? ` — question ${position} of ${total}` : ''}
-        </span>
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <BackLink href={backHref} />
+          <ErrorSummary errors={errors} />
+          {/* Caption gives chapter context, the questionnaire reference (e.g. A1) and
+              the position in the chapter — the same as an onboarding task page. */}
+          <span className="nhsuk-caption-l">
+            {section.title}
+            {question.code ? ` — ${question.code}` : ''}
+            {!singleEdit && total > 1 && position > 0 ? ` — question ${position} of ${total}` : ''}
+          </span>
 
-        <form
-          noValidate
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (singleEdit) saveAndExit()
-            else saveAndContinue()
-          }}
-        >
-          <QuestionField question={question} draft={draft} patch={patch} commit={commit} />
+          <form
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (singleEdit) saveAndExit()
+              else saveAndContinue()
+            }}
+          >
+            <QuestionField question={question} draft={draft} patch={patch} commit={commit} />
 
-          <div className="mt-24 flex flex-wrap items-center gap-4">
-            {singleEdit ? (
-              <Button type="submit">Save and exit</Button>
-            ) : (
-              <>
-                <Button type="submit">Save and continue</Button>
-                <Button type="button" variant="secondary" onClick={saveAndExit}>
-                  Save and exit
-                </Button>
-              </>
-            )}
-            <Button type="button" variant="secondary" onClick={() => router.push(exitHref)}>
-              Cancel and exit
-            </Button>
-          </div>
-        </form>
+            <div className="nhsuk-u-margin-top-6 flex flex-wrap items-center gap-4">
+              {singleEdit ? (
+                <Button type="submit">Save and exit</Button>
+              ) : (
+                <>
+                  <Button type="submit">Save and continue</Button>
+                  <Button type="button" variant="secondary" onClick={saveAndExit}>
+                    Save and exit
+                  </Button>
+                </>
+              )}
+              <Button type="button" variant="secondary" onClick={() => router.push(exitHref)}>
+                Cancel and exit
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   )

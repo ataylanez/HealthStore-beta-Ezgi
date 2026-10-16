@@ -226,7 +226,7 @@ function AiAdvisorChat({ profile }: { profile: AiAdvisorClientProfile }) {
                 {profile.region ? ` · ${profile.region}` : ''}
               </p>
               <p
-                className="mb-8 max-w-md text-center hs-text-label leading-relaxed"
+                className="mb-8 max-w-md text-center leading-relaxed"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 I can help you explore digital health options, model costs for your
@@ -238,7 +238,7 @@ function AiAdvisorChat({ profile }: { profile: AiAdvisorClientProfile }) {
                   type="button"
                   onClick={startFundingConversation}
                   disabled={isLoading}
-                  className="group flex w-full items-start gap-2 rounded-xl border px-4 py-4 text-left hs-text-label transition-colors disabled:opacity-40"
+                  className="group flex w-full items-start gap-2 rounded-xl border px-4 py-4 text-left transition-colors disabled:opacity-40"
                   style={{
                     borderColor: 'var(--border)',
                     background: 'var(--card)',
@@ -289,7 +289,7 @@ function AiAdvisorChat({ profile }: { profile: AiAdvisorClientProfile }) {
               ))}
               {error && (
                 <div
-                  className="rounded-lg border px-4 py-4 hs-text-label"
+                  className="rounded-lg border px-4 py-4"
                   style={{
                     borderColor: 'var(--nhs-red)',
                     background: '#FEF2F2',
@@ -376,7 +376,7 @@ export default function AiAdvisorPanel({ open, onClose, profile }: Props) {
             <button
               type="button"
               onClick={() => setIsFullScreen(prev => !prev)}
-              className="hidden flex-shrink-0 hs-text-label hs-font-normal transition-colors hover:underline md:block"
+              className="hidden flex-shrink-0 hs-text-label hs-font-normal transition-colors underline hover:no-underline md:block"
               style={{ color: 'var(--text-secondary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
             >
               {isFullScreen ? 'Exit full screen view' : 'Full screen view'}

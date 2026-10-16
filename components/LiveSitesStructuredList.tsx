@@ -59,7 +59,7 @@ export function NamedSitesStructuredList({ rows }: { rows: NamedSiteRow[] }) {
                       }}
                     >
                       <div
-                        className="mb-1 hs-text-caption hs-font-bold uppercase tracking-wide"
+                        className="mb-1 hs-text-label hs-font-bold"
                         style={{ color: 'var(--text-muted)' }}
                       >
                         Contact

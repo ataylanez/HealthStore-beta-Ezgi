@@ -6,18 +6,20 @@ import { PortalBreadcrumb } from './PortalBreadcrumb'
  */
 export function PortalSkeletonPage({ title, lede }: { title: string; lede: string }) {
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
       <PortalBreadcrumb items={[{ label: title }]} />
-      <div className="max-w-3xl">
-        <div className="hs-section">
-          <h1 className="page-title-h1">{title}</h1>
-          <p className="m-0 hs-measure leading-relaxed" style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}>
-            {lede}
-          </p>
-        </div>
-        <div className="nhsuk-inset-text">
-          <span className="nhsuk-u-visually-hidden">Information: </span>
-          <p>This section is not available yet.</p>
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <div className="hs-section">
+            <h1 className="nhsuk-heading-xl">{title}</h1>
+            <p className="nhsuk-body-l hs-measure">
+              {lede}
+            </p>
+          </div>
+          <div className="nhsuk-inset-text">
+            <span className="nhsuk-u-visually-hidden">Information: </span>
+            <p>This section is not available yet.</p>
+          </div>
         </div>
       </div>
     </div>

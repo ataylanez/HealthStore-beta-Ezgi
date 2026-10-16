@@ -14,49 +14,40 @@ export default function FundingPage() {
   const closed = funding.filter(f => f.status === 'closed' || f.status === 'closed_confirm')
 
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container">
       <PageBreadcrumb items={[{ label: 'Funding index' }]} />
-      <div className="hs-section">
-        <h1 className="page-title-h1">Funding index</h1>
-        <p
-          className="m-0 leading-relaxed"
-          style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}
-        >
-          This Funding Index provides information on funding opportunities and integration support for NHS commissioners purchasing digital therapeutics (DTx). We encourage commissioners to confirm the availability of funding opportunities before submitting a business case applying for funding.
-        </p>
+      <div className="nhsuk-main-wrapper nhsuk-main-wrapper--s">
+        <div className="nhsuk-grid-row">
+          <div className="nhsuk-grid-column-two-thirds">
+            <h1 className="nhsuk-heading-xl">Funding index</h1>
+            <p className="nhsuk-lede-text">
+              This Funding Index provides information on funding opportunities and integration support for NHS commissioners purchasing digital therapeutics (DTx). We encourage commissioners to confirm the availability of funding opportunities before submitting a business case applying for funding.
+            </p>
+
+            {active.length > 0 && (
+              <section className="nhsuk-u-margin-bottom-7" aria-label="Funding opportunities">
+                {active.map(f => (
+                  <FundingDirectoryCard key={f.id} f={f} />
+                ))}
+              </section>
+            )}
+
+            {closed.length > 0 && (
+              <section aria-labelledby="funding-section-closed">
+                <h2 id="funding-section-closed" className="nhsuk-heading-m">
+                  Closed (confirm current status)
+                  <span className="badge nhsuk-u-margin-left-2" style={{ background: '#7A480022', color: '#7A4800', verticalAlign: 'middle' }}>
+                    {closed.length}
+                  </span>
+                </h2>
+                {closed.map(f => (
+                  <FundingDirectoryCard key={f.id} f={f} />
+                ))}
+              </section>
+            )}
+          </div>
+        </div>
       </div>
-
-      {active.length > 0 && (
-        <section className="hs-section-lg" aria-label="Funding opportunities">
-          <div className="flex flex-col gap-6">
-            {active.map(f => (
-              <FundingDirectoryCard key={f.id} f={f} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {closed.length > 0 && (
-        <section className="hs-section-lg" aria-labelledby="funding-section-closed">
-          <div className="mb-6 flex items-center gap-4">
-            <h2
-              id="funding-section-closed"
-              className="hs-text-section-alt hs-font-bold"
-              style={{ fontFamily: 'Frutiger, Arial, sans-serif', color: 'var(--text-primary)' }}
-            >
-              Closed (confirm current status)
-            </h2>
-            <span className="badge" style={{ background: '#7A480022', color: '#7A4800' }}>
-              {closed.length}
-            </span>
-          </div>
-          <div className="flex flex-col gap-6">
-            {closed.map(f => (
-              <FundingDirectoryCard key={f.id} f={f} />
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   )
 }

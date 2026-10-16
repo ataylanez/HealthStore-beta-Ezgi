@@ -4,90 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>Dashboard — HealthStore Design System</title>
+  <title>Dashboard (archived) — HealthStore Design System</title>
   <link rel="stylesheet" href="/DS/assets/ds.css">
 </head>
 <body>
-  <div id="ds-root" data-ds-page="dashboard" data-ds-provenance="Bespoke">
+  <div id="ds-root" data-ds-page="archived" data-ds-provenance="Bespoke">
     <div class="ds-page-header">
-      <p class="ds-eyebrow">Patterns</p>
-      <h1 class="ds-page-title">Dashboard</h1>
-      <p class="ds-lede">
-        The signed-in home (<code>DashboardV4</code>, a bento layout): a welcome header, clickable stat tiles, and a set
-        of activity widgets (saved apps, expressions of interest, commissioned apps).
-      </p>
+      <p class="ds-eyebrow">Patterns &middot; Archived</p>
+      <h1 class="ds-page-title">Dashboard (archived)</h1>
     </div>
-
-    <h2>Welcome header</h2>
-    <div class="ds-example ds-example--surface">
-      <div>
-        <h2 class="ds-u-mt0" style="margin:0">Good morning</h2>
-        <p class="ds-u-muted ds-u-mt0" style="margin:2px 0 0">NHS Example ICB &middot; Commissioning lead</p>
-      </div>
+    <div class="ds-note">
+      <strong>This page is kept only so older audit reports still resolve.</strong> The commissioner <strong>Dashboard</strong> pattern (<code>DashboardV4</code>, <code>DashboardWelcome</code>, bento widget grid, <code>WidgetShell</code>) documented here was removed from the product when sign-in and saved apps were retired. The only dashboard that exists now is the supplier portal dashboard.
     </div>
-
-    <h2>Stat tiles</h2>
-    <p>Clickable summary tiles with a tinted blue surface (<code>DashboardStatTiles</code>).</p>
-    <div class="ds-example ds-example--surface">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
-        <a href="#ds-main" style="text-decoration:none;display:block;padding:18px;border-radius:0;background:rgba(0,94,184,0.1);color:var(--nhs-dark)"><div style="font-size:1.8rem;font-weight:700">12</div><div style="font-size:.85rem">Saved apps</div></a>
-        <a href="#ds-main" style="text-decoration:none;display:block;padding:18px;border-radius:0;background:rgba(0,94,184,0.1);color:var(--nhs-dark)"><div style="font-size:1.8rem;font-weight:700">4</div><div style="font-size:.85rem">Expressions of interest</div></a>
-        <a href="#ds-main" style="text-decoration:none;display:block;padding:18px;border-radius:0;background:rgba(0,94,184,0.1);color:var(--nhs-dark)"><div style="font-size:1.8rem;font-weight:700">2</div><div style="font-size:.85rem">In comparison</div></a>
-      </div>
-    </div>
-
-    <h2>Activity widgets</h2>
-    <p>Activity widgets share <code>WidgetShell</code> (see <a href="/DS/components/cards.html">Cards</a>).</p>
-    <div class="ds-example ds-example--surface">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
-        <section class="hs-surface-card" style="background:#fff;border:1px solid var(--border);border-radius:0;padding:20px">
-          <h3 class="ds-u-mt0" style="margin-top:0;font-size:1.05rem">Saved apps</h3>
-          <ul class="ds-u-mt0" style="font-size:.9rem;color:var(--text-secondary);padding-left:18px"><li>Clinitouch</li><li>COPD Hub</li></ul>
-          <a href="#ds-main" style="font-size:.85rem;font-weight:600">View all saved apps &rarr;</a>
-        </section>
-        <section class="hs-surface-card" style="background:#fff;border:1px solid var(--border);border-radius:0;padding:20px">
-          <h3 class="ds-u-mt0" style="margin-top:0;font-size:1.05rem">Recent interest</h3>
-          <ul class="ds-u-mt0" style="font-size:.9rem;color:var(--text-secondary);padding-left:18px"><li>Activate Your Heart &middot; 2 days ago</li></ul>
-          <a href="#ds-main" style="font-size:.85rem;font-weight:600">View EOI record &rarr;</a>
-        </section>
-      </div>
-    </div>
-
-    <h2>Widget states</h2>
-    <p>
-      Widgets fetch through <code>BookmarkProvider</code> / <code>EoiProvider</code>, which expose
-      <code>status: 'loading' | 'ready' | 'error'</code>. Each widget branches on <code>status</code> so a failed fetch never
-      reads as a genuinely empty list. <code>WidgetShell</code> ships <code>WidgetMessage</code> (loading / empty) and
-      <code>WidgetError</code> (an assertive alert + a &ldquo;Try again&rdquo; <code>Button</code> bound to the provider&rsquo;s
-      <code>refresh()</code>).
-    </p>
-    <div class="ds-example ds-example--surface">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
-        <section class="hs-surface-card" style="background:#fff;border:1px solid var(--border);border-radius:0;padding:20px">
-          <h3 class="ds-u-mt0" style="margin-top:0;font-size:1.05rem">Loading</h3>
-          <p class="ds-u-muted" style="font-size:.85rem;margin:0">Loading&hellip;</p>
-        </section>
-        <section class="hs-surface-card" style="background:#fff;border:1px solid var(--border);border-radius:0;padding:20px">
-          <h3 class="ds-u-mt0" style="margin-top:0;font-size:1.05rem">Empty (genuine)</h3>
-          <p class="ds-u-muted" style="font-size:.85rem;margin:0">You have not saved any apps yet.</p>
-        </section>
-        <section class="hs-surface-card" style="background:#fff;border:1px solid var(--border);border-radius:0;padding:20px">
-          <h3 class="ds-u-mt0" style="margin-top:0;font-size:1.05rem">Error</h3>
-          <div role="alert" style="display:flex;gap:8px;background:#FDECEA;border-radius:8px;padding:8px 10px;font-size:.82rem;color:#7A1210"><span aria-hidden style="font-weight:700">!</span><span>Couldn&rsquo;t load your saved apps.</span></div>
-          <button class="ds-btn ds-btn--secondary ds-btn--sm" type="button" style="margin-top:10px">Try again</button>
-        </section>
-      </div>
-    </div>
-    <p>
-      Stat tiles show a skeleton bar while loading and a muted &ldquo;&mdash;&rdquo; (with an sr-only &ldquo;couldn&rsquo;t load&rdquo;)
-      on error, so <code>0</code> only ever means a genuine zero. A <code>401</code> surfaces a soft &ldquo;your session may have
-      expired&rdquo; notice (<code>DashboardSessionNotice</code>) rather than blank widgets.
-    </p>
-
-    <h2>Components used</h2>
-    <p><a href="/DS/components/cards.html">Stat tiles &amp; widget shells</a> &middot; <a href="/DS/components/alerts.html">Toasts</a> &middot; <a href="/DS/components/badges-tags.html">Badges</a> &middot; <a href="/DS/components/buttons.html">Footer links</a></p>
-
-    <div class="ds-note ds-note--source">Source: <code>components/home/dashboard/DashboardV4.tsx</code>, <code>components/home/dashboard/widgets/*</code>, <code>components/home/dashboard/DashboardWelcome.tsx</code>.</div>
+    <h2>Use instead</h2>
+    <p><a href="/DS/patterns/supplier-portal.html">Supplier portal</a> pattern.</p>
+    <p>The full list of retired components and classes, with reasons, is on the <a href="/DS/archived.html">Archived</a> page.</p>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>

@@ -13,7 +13,8 @@
       <p class="ds-eyebrow">Templates &middot; T5</p>
       <h1 class="ds-page-title">Product listing</h1>
       <p class="ds-lede">
-        The searchable, filterable catalogue results page. Mostly rendered from product records.
+        The filterable catalogue results page. A one-third filter panel beside a two-thirds stack of product cards.
+        Mostly rendered from product records.
       </p>
     </div>
 
@@ -21,7 +22,7 @@
     <table class="ds-table">
       <thead><tr><th>Route</th><th>H1</th></tr></thead>
       <tbody>
-        <tr><td><code>/catalogue/digital-therapeutics</code> (+ filter query)</td><td>Digital therapeutics</td></tr>
+        <tr><td><code>/catalogue/digital-therapeutics</code> (plus filter query)</td><td>Digital therapeutics</td></tr>
       </tbody>
     </table>
 
@@ -29,20 +30,18 @@
     <table class="ds-table">
       <thead><tr><th style="width:26%">Region</th><th>Content</th><th style="width:20%">Who edits</th></tr></thead>
       <tbody>
-        <tr><td>Breadcrumb + page header</td><td>H1 + intro line.</td><td><span class="badge badge-green">CMS editor</span> (intro copy only)</td></tr>
-        <tr><td>Filter panel</td><td>Condition, evidence, and other filters; active filter pills; result count announced to screen readers.</td><td><span class="badge badge-amber">Site functionality</span></td></tr>
-        <tr><td>Result cards</td><td>Product cards: logo, name, supplier, product proposition, condition tags, badges, &ldquo;View product details&rdquo; button, compare toggle.</td><td><span class="badge badge-blue">Product records</span></td></tr>
-        <tr><td>Empty state</td><td>&ldquo;No apps match your filters&rdquo; card.</td><td><span class="badge badge-amber">Site functionality</span></td></tr>
-        <tr><td>(<strong>TBC</strong>) Related content sidenav</td><td>Related-navigation list.</td><td><span class="badge badge-green">CMS editor</span> (link list)</td></tr>
+        <tr><td>Breadcrumb and page header</td><td>Extra-large title. Breadcrumb above the main area.</td><td><span class="badge badge-green">CMS editor</span> (title only)</td></tr>
+        <tr><td>Filter panel</td><td>One-third column. Condition as a single choice, supervision model as multiple choices, then Apply and a clear link. On a phone the panel sits behind a Filter button. Chosen filters show as removable pills above the results. The result count is announced to screen readers.</td><td><span class="badge badge-amber">Site functionality</span></td></tr>
+        <tr><td>Result cards</td><td>Two-thirds column. One NHS card per product, stacked: logo, name, supplier, short description, condition and supervision tags, &ldquo;View product details&rdquo; and &ldquo;Add to compare&rdquo;.</td><td><span class="badge badge-blue">Product records</span></td></tr>
+        <tr><td>Empty state</td><td>NHS inset text: &ldquo;No apps match your filters&rdquo;, with a line suggesting the filters are widened.</td><td><span class="badge badge-amber">Site functionality</span></td></tr>
       </tbody>
     </table>
 
     <h2>Notes</h2>
     <p>
       <strong>Wagtail consideration note:</strong> In a Wagtail build this is a routable index page over the product
-      page type (T6), with filtering handled in the view. The editable surface is small: intro copy and the
-      related-content link list. Everything else derives from product data, so no Back Office authoring
-      happens here.
+      page type (T6), with filtering handled in the view. The editable surface is the page title.
+      Everything else derives from product data, so no Back Office authoring happens in the list itself.
     </p>
   </div>
   <script src="/DS/assets/ds.js" defer></script>

@@ -30,14 +30,16 @@ export default function CompareClient({ allApps }: Props) {
   const sharedTags = useMemo(() => sharedConditionTags(selected), [selected])
 
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
       <PageBreadcrumb items={[{ label: 'Comparison tool' }]} />
 
-      <div className="mb-8">
-        <h1 className="page-title-h1">Comparison tool</h1>
-        <p style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}>
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+        <h1 className="nhsuk-heading-xl">Comparison tool</h1>
+        <p className="nhsuk-body-l">
           Select up to four digital therapeutics from the same condition area in the catalogue, then choose ‘add to compare’. The NHS HealthStore compares your selection side by side — what each product is, the evidence behind it, assurance, what it takes to work locally, NHS experience, and cost.
         </p>
+        </div>
       </div>
 
       <div className="hs-compare-toolbar flex flex-wrap items-baseline gap-x-4 gap-y-2 mb-6">

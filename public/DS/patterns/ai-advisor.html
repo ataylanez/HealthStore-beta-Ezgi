@@ -13,7 +13,7 @@
       <p class="ds-eyebrow">Patterns</p>
       <h1 class="ds-page-title">AI advisor</h1>
       <p class="ds-lede">
-        A slide-over assistant panel for signed-in users: a chat conversation, suggestion prompts, a structured funding
+        A slide-over assistant panel opened from the header &ldquo;AI Advisor&rdquo; link: a chat conversation, suggestion prompts, a structured funding
         wizard, and tool-call indicators. Opened from the header.
       </p>
     </div>
@@ -58,8 +58,9 @@
     </div>
 
     <div class="ds-note">
-      <strong>Open issue.</strong> The advisor drawer lacks a focus trap and the background scrim is excluded from the tab
-      order, so focus can escape behind it. Adopt the shared <a href="/DS/components/modals.html">Modal</a> primitive's trap.
+      <strong>Resolved.</strong> The drawer now runs on the shared <a href="/DS/components/modals.html">Modal</a> primitive
+      (<code>variant="drawer"</code>, <code>keepMounted</code>) so it has a focus trap, Escape and focus restore. The guided funding
+      wizard (<code>FundingWizard</code>) and <code>ToolCallIndicator</code> are no longer mounted anywhere &mdash; listed on <a href="/DS/archived.html">Archived</a>.
     </div>
 
     <h2>Components used</h2>

@@ -4,7 +4,7 @@ import { ExpressInterestWhiteButton } from '@/components/ExpressInterestWhiteBut
 export default function PdpExpressInterestCallout({ accent, slug }: { accent: string; slug: string }) {
   return (
     <div className="mt-4 rounded-lg overflow-hidden" style={{ background: accent }}>
-      <div style={{ padding: '20px 24px' }}>
+      <div style={{ padding: 'var(--space-3) var(--space-4)' }}>
         <div style={{ fontWeight: 600, fontSize: 'var(--text-section-alt)', color: '#fff', marginBottom: 8 }}>
           Want to find out more?
         </div>

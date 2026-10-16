@@ -13,7 +13,7 @@
       <p class="ds-eyebrow">Templates &middot; T8</p>
       <h1 class="ds-page-title">Comparison tool</h1>
       <p class="ds-lede">
-        Compare products page.
+        Compare up to four products from the same condition area. Title and introduction in a two-thirds column, then NHS tables.
       </p>
     </div>
 
@@ -21,7 +21,7 @@
     <table class="ds-table">
       <thead><tr><th>Route</th><th>H1</th><th>Notes</th></tr></thead>
       <tbody>
-        <tr><td><code>/compare</code></td><td>Comparison tool</td><td>Client-side basket of products; empty state CTA or side-by-side narrative comparison tables.</td></tr>
+        <tr><td><code>/compare</code></td><td>Comparison tool</td><td>Basket of products held in the browser. Empty state, or narrative comparison tables.</td></tr>
       </tbody>
     </table>
 
@@ -29,15 +29,17 @@
     <table class="ds-table">
       <thead><tr><th style="width:26%">Region</th><th>Content</th><th style="width:20%">Who edits</th></tr></thead>
       <tbody>
-        <tr><td>Compare tables</td><td>Narrative comparison rows generated from the selected products&rsquo; records.</td><td><span class="badge badge-blue">Product records</span></td></tr>
-        <tr><td>Empty / instructional states</td><td>Copy blocks explaining how to add products to compare.</td><td><span class="badge badge-amber">Site functionality</span></td></tr>
+        <tr><td>Breadcrumb, title and introduction</td><td>Breadcrumb above the main area. Extra-large title and a large-body introduction in the two-thirds column, explaining the four-product, same-condition rule.</td><td><span class="badge badge-amber">Site functionality</span> (wording can be a CMS string)</td></tr>
+        <tr><td>Toolbar</td><td>The condition being compared, and a Clear all control when the basket has products.</td><td><span class="badge badge-amber">Site functionality</span></td></tr>
+        <tr><td>Compare tables</td><td>Up to six NHS tables: what it is, evidence and expected impact, assurance, what it takes to work locally, NHS experience, cost and commercial route. Products are columns; the first column names the question. On a phone each cell repeats the product name so the table stacks. Missing values read &ldquo;Check with supplier&rdquo;.</td><td><span class="badge badge-blue">Product records</span></td></tr>
+        <tr><td>Empty state</td><td>A sentence explaining that nothing is selected, and a link to the product catalogue.</td><td><span class="badge badge-amber">Site functionality</span></td></tr>
       </tbody>
     </table>
 
     <h2>Notes</h2>
     <p>
       The comparison tool is site functionality over the product content model: the tables render from the same product
-      records that drive the product detail pages, so there is no separate content to author or maintain.
+      records that drive the product detail pages, so there is no separate content to author. Products are added from the catalogue and the product page with &ldquo;Add to compare&rdquo;.
     </p>
   </div>
   <script src="/DS/assets/ds.js" defer></script>

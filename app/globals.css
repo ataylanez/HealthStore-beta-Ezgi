@@ -30,12 +30,8 @@
   --color-blue-tint-25: #5694CA; /* GOV.UK Blue tint-25 — KPI metric text */
 }
 
-@font-face {
-  font-family: 'Frutiger';
-  src: url('/fonts/Frutiger-Light.ttf') format('truetype');
-  font-weight: 300;
-  font-style: normal;
-}
+/* NHS Frontend ships two weights only: Regular (400) and Bold (600/700). The
+   Light (300) face is intentionally not loaded. */
 @font-face {
   font-family: 'Frutiger';
   src: url('/fonts/Frutiger-Regular.ttf') format('truetype');
@@ -100,7 +96,7 @@
     --text-page-title: 2rem;      /* 32px → 48px  (NHS 48) */
     --text-section: 1.6875rem;    /* 27px → 36px  (NHS 36) */
     --text-section-alt: 1.375rem; /* 22px → 26px  (NHS 26) */
-    --text-lede: 1.25rem;         /* 20px → 24px  (NHS 24 / body-l) */
+    --text-lede: 1.375rem;        /* 22px → 26px  (NHS lede text / body-l; the 24 point is deprecated) */
     --text-card-title: 1.1875rem; /* 19px → 22px  (NHS 22) */
     --text-card-title-sm: 1rem;   /* 16px → 19px  (NHS 19) */
     --text-body: 1rem;            /* 16px → 19px  (NHS 19) */
@@ -112,7 +108,7 @@
     --leading-hero: 1.125;        /* 54/48 → 70/64 ≈ 1.09 */
     --leading-heading: 1.1875;    /* l: 38/32 → 54/48 = 1.125 */
     --leading-heading-sm: 1.227;  /* s: 29/22 → 32/26 ≈ 1.23 */
-    --leading-lede: 1.4;          /* 28/20 → 31/24 */
+    --leading-lede: 1.31818;      /* 29/22 → 32/26 (nhsuk-lede-text) */
     --leading-body: 1.5;          /* 24/16 → 28/19 ≈ 1.47 */
     --leading-caption: 1.66667;   /* 20/12 → 24/14 */
 
@@ -144,7 +140,7 @@
       --text-page-title: 3rem;      /* 48px */
       --text-section: 2.25rem;      /* 36px */
       --text-section-alt: 1.625rem; /* 26px */
-      --text-lede: 1.5rem;          /* 24px */
+      --text-lede: 1.625rem;        /* 26px */
       --text-card-title: 1.375rem;  /* 22px */
       --text-card-title-sm: 1.1875rem; /* 19px */
       --text-body: 1.1875rem;       /* 19px */
@@ -152,7 +148,7 @@
       --text-caption: 0.875rem;     /* 14px */
       --text-badge: 1rem;           /* 16px */
       --leading-body: 1.47368;      /* 28/19 */
-      --leading-lede: 1.29167;      /* 31/24 */
+      --leading-lede: 1.23077;      /* 32/26 */
       --leading-caption: 1.71429;   /* 24/14 */
     }
   }
@@ -196,18 +192,13 @@
 }
 
 @layer components {
-  /** Standard in-app page title (h1) — use with semantic <h1 className="page-title-h1"> */
-  .page-title-h1 {
-    font-family: var(--font-display);
-    font-size: var(--text-page-title);
-    font-weight: 600;
-    line-height: var(--leading-heading);
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
-  }
+  /* Page titles use the official `.nhsuk-heading-xl` (the former `.page-title-h1`
+     alias has been retired). Section headings: `.nhsuk-heading-l` / `-m` / `-s`. */
 
   /**
-   * NHS token typography utilities — use instead of Tailwind text-xs/sm/lg/xl/2xl etc.
+   * NHS token typography utilities for non-heading runs of text where an
+   * official class does not fit. Headings should use `.nhsuk-heading-*`, body
+   * copy `.nhsuk-body-m` / `.nhsuk-body-s`, intros `.nhsuk-lede-text`.
    * Sizes are responsive via the --text-* custom properties in :root.
    */
   .hs-text-caption { font-size: var(--text-caption); line-height: var(--leading-caption); }
@@ -248,36 +239,54 @@
   }
 
   /**
-   * NHS layout: canonical page container. Keeps the app's wider ~1280px canvas
-   * but applies NHS gutters (16px mobile → 32px desktop) and centres content.
-   * Replaces the repeated `max-w-7xl mx-auto px-4 sm:px-6 py-10` wrapper.
+   * NHS layout: canonical page container.
+   * `.hs-page` is a thin alias for the official NHS page template —
+   * `.nhsuk-width-container` (960px, 16→32px side margins, centred from
+   * 1024px) combined with `.nhsuk-main-wrapper` (24→48px vertical padding).
+   * Prefer the real NHS classes in new code; the alias exists so legacy call
+   * sites inherit NHS geometry without a markup change.
+   * [Provenance: NHS] service-manual.nhs.uk/design-system/styles/layout
    */
   .hs-page {
-    max-width: 80rem;
-    margin-inline: auto;
-    padding-inline: var(--gutter);
-    padding-block: var(--section-gap);
+    max-width: 960px;
+    margin: 0 16px;
+    padding-top: 24px;
+    padding-bottom: 24px;
   }
-  /** Narrow content/reading page (news, campaigns) — same NHS gutters, tighter column. */
-  .hs-page-narrow {
-    max-width: 48rem;
-    margin-inline: auto;
-    padding-inline: var(--gutter);
-    padding-block: var(--section-gap);
+  @media (min-width: 40.0625em) {
+    .hs-page {
+      margin: 0 32px;
+      padding-top: 48px;
+      padding-bottom: 48px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .hs-page { margin: 0 auto; }
   }
   /**
-   * Breadcrumb at the top of a page: cancel the page's top padding so the
-   * breadcrumb sits at the NHS distance below the header (its own 16→24px
-   * padding-top only).
+   * Breadcrumb at the top of a page. NHS places the breadcrumb *before* the
+   * main wrapper, so only its own 16→24px padding-top separates it from the
+   * header, and the main wrapper that follows uses the small (--s) 16→24px
+   * padding. Reproduce that rhythm when a breadcrumb is the first child.
    */
   .hs-page > .nhsuk-breadcrumb:first-child,
-  .hs-page-narrow > .nhsuk-breadcrumb:first-child,
-  .hs-page > :first-child > .nhsuk-breadcrumb:first-child {
-    margin-top: calc(var(--section-gap) * -1);
-    margin-bottom: var(--space-5);
+  .hs-page > :first-child > .nhsuk-breadcrumb:first-child,
+  .nhsuk-main-wrapper > .nhsuk-breadcrumb:first-child,
+  .nhsuk-main-wrapper > :first-child > .nhsuk-breadcrumb:first-child {
+    margin-top: -24px;
+    margin-bottom: 16px;
   }
-  /** Reading measure for prose blocks (~66ch), replaces ad-hoc max-w-2xl/3xl on copy. */
-  .hs-measure { max-width: 66ch; }
+  @media (min-width: 40.0625em) {
+    .hs-page > .nhsuk-breadcrumb:first-child,
+    .hs-page > :first-child > .nhsuk-breadcrumb:first-child,
+    .nhsuk-main-wrapper > .nhsuk-breadcrumb:first-child,
+    .nhsuk-main-wrapper > :first-child > .nhsuk-breadcrumb:first-child {
+      margin-top: -48px;
+      margin-bottom: 24px;
+    }
+  }
+  /** Reading measure for prose blocks: matches the NHS two-thirds column (~613px at 960). */
+  .hs-measure { max-width: 613px; }
   /** Responsive vertical section rhythm (steps up at tablet, like NHS). */
   .hs-section { margin-bottom: var(--section-gap); }
   .hs-section-lg { margin-bottom: var(--section-gap-lg); }
@@ -338,6 +347,30 @@
   .badge-prototype { background: #cecece; color: #0b0c0c; }
   .badge-blue-solid { background: var(--nhs-blue); color: #fff; }
 
+  /* Home hero — official `.nhsuk-hero`; the illustration sits in the one-third
+     column, bottom-aligned so it meets the hero's lower edge.
+     [Provenance: NHS] service-manual.nhs.uk/design-system/components/hero */
+  .hs-home-hero .nhsuk-grid-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+  .hs-home-hero .nhsuk-grid-row::after { display: none; }
+  .hs-home-hero__media {
+    display: none;
+  }
+  @media (min-width: 48.0625em) {
+    .hs-home-hero__media {
+      display: block;
+      padding-top: var(--space-5);
+    }
+    .hs-home-hero__media img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+
   /* NHS header — HealthStore additions on top of nhsuk-frontend Header.
      [Provenance: NHS] service-manual.nhs.uk/design-system/components/header */
   .nhsuk-header__content {
@@ -348,33 +381,18 @@
   .hs-header-prototype {
     align-self: center;
   }
-  /* Phase banner — full-bleed white bar; content aligns with header (80rem).
+  /* Phase banner — full-bleed white bar; its content sits in the NHS width
+     container (same 960px column as the header and page content).
      [Provenance: GOV.UK] design-system.service.gov.uk/components/phase-banner */
   .hs-phase-banner {
     background-color: #fff;
     width: 100%;
   }
   .hs-phase-banner__inner {
-    max-width: 80rem;
-    margin-inline: auto;
-    padding-inline: var(--gutter);
-    box-sizing: border-box;
     border-bottom: 0; /* outer bar owns the edge against page content */
   }
-  /*
-   * Match header/nav geometry to the page canvas (.hs-page): same 80rem
-   * border-box with the NHS gutter as padding. The NHS theme positions these
-   * with side margins (16/32px) that collapse to `margin: 0 auto` at 1024px,
-   * which made the header content sit flush with the 80rem edge — 32px wider
-   * than page content. Auto margins + gutter padding keeps them aligned at
-   * every viewport width.
-   */
-  .nhsuk-header__container,
-  .nhsuk-navigation {
-    max-width: 80rem;
-    margin-inline: auto;
-    padding-inline: var(--gutter);
-  }
+  /* Header and nav geometry: the NHS theme's own width-container rules apply
+     (16→32px margins, centred at 1024px) — no override. */
   /* Sign out / AI Advisor use the same nav link styles as anchors. */
   button.nhsuk-header__navigation-link {
     background: transparent;
@@ -577,7 +595,7 @@
     border-radius: 9999px;
     background: var(--nhs-dark);
     color: #fff;
-    font-size: 0.75rem;
+    font-size: var(--text-xs); /* 14→16px, NHS minimum */
     font-weight: 700;
     line-height: 1;
     text-align: center;
@@ -820,23 +838,25 @@
    * Content: expands vertically; nested details sections; Apply submits draft.
    * [Provenance: GOV.UK filter-panel pattern]
    */
+  /* Filter panel — sits in a one-third NHS grid column. Collapsible behind a
+     "Filter" toggle on small screens; always open from tablet. */
   .hs-filter-panel {
-    padding-top: 15px;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-5);
   }
   .hs-filter-panel__header {
     display: flex;
     flex-wrap: wrap;
     place-content: space-between;
     align-items: baseline;
-    gap: 10px;
+    gap: var(--space-2);
   }
-  .hs-filter-panel__count {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: var(--text-body);
-    font-weight: 400;
-    line-height: 1.25;
+  .hs-filter-panel__title {
+    display: none;
+    margin: 0 0 var(--space-3);
+  }
+  @media (min-width: 48.0625em) {
+    .hs-filter-panel__button { display: none; }
+    .hs-filter-panel__title { display: block; }
   }
   .hs-filter-panel__button {
     background: transparent;
@@ -873,10 +893,14 @@
     text-underline-offset: 0.1578em;
   }
   .hs-filter-panel__content {
+    display: none;
     background-color: var(--surface);
-    padding: 0 15px;
-    margin-top: 10px;
-    margin-bottom: 5px;
+    padding: 0 var(--space-3);
+    margin-top: var(--space-2);
+  }
+  .hs-filter-panel__content--open { display: block; }
+  @media (min-width: 48.0625em) {
+    .hs-filter-panel__content { display: block; margin-top: 0; }
   }
   /* White control faces on the grey surface, matching GOV.UK's treatment. */
   .hs-filter-panel__content .nhsuk-checkboxes__label::before,
@@ -887,15 +911,14 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 15px;
-    padding: 20px 0;
+    gap: var(--space-3);
+    padding: var(--space-4) 0;
   }
   @media (max-width: 639px) {
     .hs-filter-panel__actions {
       flex-direction: column;
       align-items: stretch;
       gap: var(--space-2);
-      padding: 20px 0;
     }
   }
   .hs-filter-panel__clear {
@@ -1046,85 +1069,18 @@
   width: 100%;
   margin-top: 0.75rem;
 }
-.hs-on-this-page {
-  padding: 1rem 1.25rem;
-  border-radius: var(--radius-card);
-  background: #f0f4f5;
-}
-.hs-on-this-page__title {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: var(--text-label);
-  font-weight: 600;
-  color: var(--text-primary);
-}
-.hs-on-this-page__list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.hs-on-this-page__link {
-  display: block;
-  padding: 0.25rem 0 0.25rem 0.75rem;
-  border-left: 5px solid transparent;
-  font-size: var(--text-label);
-  font-weight: 400;
-  line-height: 1.4;
-  color: var(--nhs-blue);
-  text-decoration: none;
-}
-.hs-on-this-page__link:hover {
-  text-decoration: underline;
-}
-.hs-on-this-page__link--active {
-  font-weight: 700;
-  border-left-color: var(--nhs-blue);
-  color: var(--text-primary);
-  text-decoration: none;
-}
-.hs-on-this-page__link--active:hover {
-  text-decoration: underline;
-}
-.hs-pdp-with-sidebar {
-  display: grid;
-  gap: 1.5rem 2rem;
-  align-items: start;
-}
-@media (max-width: 639px) {
-  .hs-pdp-with-sidebar__aside {
-    display: none;
-  }
-}
-@media (min-width: 1024px) {
-  .hs-pdp-with-sidebar {
-    grid-template-columns: 14rem minmax(0, 1fr);
-  }
-  .hs-pdp-with-sidebar__aside {
-    position: sticky;
-    top: 1rem;
-  }
-}
-.hs-pdp-with-sidebar__main {
-  min-width: 0;
-}
-
 /**
- * PDP top band — full-viewport white behind breadcrumb, hero, alerts, and
- * commissioning snapshot. Content stays in .hs-page inside the band.
+ * PDP page layout — official NHS grid: contents list (`.nhsuk-contents-list`)
+ * in a one-third column, page content in a two-thirds column. The contents
+ * list stays visible on small screens (it stacks above the content).
  */
-.hs-pdp-top {
-  background: #fff;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: var(--space-6);
+.hs-pdp-aside .nhsuk-contents-list { margin-bottom: var(--space-5); }
+@media (min-width: 48.0625em) {
+  .hs-pdp-aside .nhsuk-contents-list { margin-bottom: 0; }
 }
-.hs-pdp-top > .hs-page {
-  padding-bottom: 0;
-}
+.hs-pdp-main { min-width: 0; }
 
-/* Cookie banner — white to match the PDP top band / page chrome */
+/* Cookie banner — white to match the page chrome */
 .govuk-cookie-banner {
   background-color: #fff;
 }
@@ -1144,44 +1100,51 @@
 .hs-pdp .hs-snapshot-strip__segment--link:hover .hs-snapshot-strip__heading--linked {
   color: var(--nhs-dark);
 }
+/* Section H2s are `.nhsuk-heading-l`; this marker only adds the NHS "space
+   above a new section" (responsive 40→48px). */
 .hs-pdp .hs-pdp-heading {
-  margin-top: var(--space-7); /* 48px */
+  margin-top: var(--space-6);
   color: var(--text-primary);
+}
+@media (min-width: 40.0625em) {
+  .hs-pdp .hs-pdp-heading { margin-top: var(--space-7); }
+}
+/* Summary overview blocks: spacing between blocks is carried by the action link so
+   the gap sits below the link; the last block on the page has none. */
+.hs-pdp .hs-pdp-summary-block .hs-pdp-summary-block__link {
+  margin-bottom: var(--space-8); /* 56px — NHS spacing point 8 */
+}
+.hs-pdp .hs-pdp-summary-block:last-child .hs-pdp-summary-block__link {
+  margin-bottom: 0;
 }
 .hs-pdp h3,
 .hs-pdp .hs-pdp-subheading {
   color: var(--text-primary);
 }
-.hs-pdp .nhsuk-tabs__panel > *:first-child .hs-pdp-heading,
-.hs-pdp .hs-pdp-with-sidebar__main > *:first-child .hs-pdp-heading,
-.hs-pdp .hs-pdp-spine > *:first-child .hs-pdp-heading {
+.hs-pdp .hs-pdp-main > *:first-child .hs-pdp-heading,
+.hs-pdp .hs-pdp-main > *:first-child > *:first-child .hs-pdp-heading {
   margin-top: 0;
 }
 
-/**
- * PDP narrative spine — horizontal rule between narrative sections.
- * Sections carry mb-14 (56px) below their content; the divider then gets the
- * section gap above the next title. [Provenance: GOV.UK] section break pattern.
- */
-.hs-pdp-spine > * + * {
-  border-top: 2px solid var(--border);
-  padding-top: var(--section-gap);
-}
-/* Same divider between sub-sections rendered inside a single spine slot
-   (e.g. PdpLocalValue: projected impact + economics). The optional context
-   <p> is skipped — only the second PdpSection wrapper (div + div) gets a rule. */
+/* Divider between sub-sections rendered on a single section page
+   (PdpLocalValue: projected impact + economics). The optional context
+   <p> is skipped — only the second PdpSection wrapper (div + div) gets a rule.
+   [Provenance: GOV.UK] section break pattern. */
 .hs-pdp-spine-group > div + div {
   border-top: 2px solid var(--border);
   padding-top: var(--section-gap);
 }
 
 /**
- * PDP content subheading (H3) — extra space above so blocks breathe.
- * Prefer this over ad-hoc mt-* on wrappers. Zero when it is the first
- * content under a section title/description (PdpSection wraps children in a div).
+ * PDP content subheading (H3, `.nhsuk-heading-s`) — extra space above so
+ * blocks breathe (NHS spacing point 5/6). Zero when it is the first content
+ * under a section title/description (PdpSection wraps children in a div).
  */
 .hs-pdp-subheading {
-  margin-top: var(--space-6); /* 40px */
+  margin-top: var(--space-5);
+}
+@media (min-width: 40.0625em) {
+  .hs-pdp-subheading { margin-top: var(--space-6); }
 }
 section > div > .hs-pdp-subheading:first-child,
 section > div > *:first-child > .hs-pdp-subheading:first-child {
@@ -1209,7 +1172,7 @@ section > div > *:first-child > .hs-pdp-subheading:first-child {
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  padding: 1rem 1.25rem;
+  padding: var(--space-3) var(--space-4); /* NHS points 3 / 4 (16 / 24px) */
   border-radius: var(--radius-card);
   background: var(--card);
   border: 1px solid var(--border);
@@ -1229,9 +1192,9 @@ a.hs-snapshot-strip__segment--link {
   flex-shrink: 0;
   margin: 0;
   font-family: var(--font-display);
-  font-size: 0.875rem;
+  font-size: var(--text-xs); /* NHS body-s */
   font-weight: 600;
-  line-height: 1.35;
+  line-height: var(--leading-body);
   color: var(--text-primary);
 }
 .hs-snapshot-strip__heading--linked,
@@ -1593,7 +1556,7 @@ a.hs-snapshot-strip__segment--link {
   padding: 0;
 }
 .hs-steps-grid--vertical .hs-step:has(.hs-step__media) {
-  grid-template-columns: 40px minmax(0, 1fr) 484px;
+  grid-template-columns: 40px minmax(0, 1fr) 280px; /* text + one-third-ish media inside the 960px NHS container */
 }
 .hs-steps-grid--vertical .hs-step-num {
   grid-row: 1 / span 2;
@@ -1622,9 +1585,7 @@ a.hs-snapshot-strip__segment--link {
   max-width: 100%;
   height: auto;
   max-height: 230px;
-  padding-left: var(--space-5);
-  padding-right: 64px;
-  padding-bottom: var(--space-5);
+  padding: 0 0 var(--space-4) var(--space-4);
   box-sizing: content-box;
 }
 .hs-step-img-placeholder {
@@ -1715,11 +1676,9 @@ a.hs-snapshot-strip__segment--link {
   padding: var(--space-3);
 }
 .hs-pathway-heading {
-  font-size: var(--text-caption);
+  font-size: var(--text-xs); /* NHS body-s; sentence case, no tracking */
   font-weight: 600;
   margin: 0 0 var(--space-3);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 .hs-pathway-current .hs-pathway-heading { color: var(--text-secondary); }
 .hs-pathway-future .hs-pathway-heading { color: var(--text-primary); }
@@ -2264,10 +2223,8 @@ a.hs-snapshot-strip__segment--link {
 }
 .hs-before-after__tile--with { background: #fff; border-color: var(--nhs-blue); }
 .hs-before-after__tile-label {
-  font-size: var(--text-caption);
+  font-size: var(--text-xs); /* NHS body-s; sentence case, no tracking */
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
   color: var(--text-muted);
   margin-bottom: var(--space-1);
 }

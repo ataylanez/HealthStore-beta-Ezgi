@@ -14,7 +14,7 @@ export default function PhaseBanner({
 }) {
   return (
     <div className="hs-phase-banner">
-      <div className="govuk-phase-banner hs-phase-banner__inner">
+      <div className="govuk-phase-banner hs-phase-banner__inner nhsuk-width-container">
         <p className="govuk-phase-banner__content">
           <strong className="govuk-tag govuk-phase-banner__content__tag">{tag}</strong>
           <span className="govuk-phase-banner__text">

@@ -28,32 +28,31 @@ const DURING_LINKS = [
 
 export default function DuringAppointmentPage() {
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container">
       <PageBreadcrumb
         items={[{ label: 'Resource library', href: '/resources' }, { label: 'During the appointment' }]}
       />
-      <h1 className="page-title-h1">During the appointment</h1>
-      <p
-        className="hs-measure"
-        style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)', marginBottom: 40 }}
-      >
+      <div className="nhsuk-main-wrapper nhsuk-main-wrapper--s">
+      <div className="nhsuk-grid-row">
+      <div className="nhsuk-grid-column-two-thirds">
+      <h1 className="nhsuk-heading-xl">During the appointment</h1>
+      <p className="nhsuk-lede-text">
         What to cover in the consultation — the case for digital therapeutics, what to expect of patients, how the
         recommendation reaches them, and how to work around the barriers they may face.
       </p>
 
-      <ul className="nhsuk-list" style={{ maxWidth: '40rem' }}>
+      <ul className="nhsuk-list nhsuk-list--bullet">
         {DURING_LINKS.map(item => (
-          <li key={item.title} style={{ marginBottom: '1rem' }}>
-            <Link
-              href={item.href}
-              className="nhsuk-link"
-              style={{ fontSize: 'var(--text-body)', fontWeight: 600 }}
-            >
+          <li key={item.title}>
+            <Link href={item.href}>
               {item.title}
             </Link>
           </li>
         ))}
       </ul>
+      </div>
+      </div>
+      </div>
     </div>
   )
 }

@@ -64,53 +64,55 @@ export default function CompanyInformationPage() {
   const submitted = COMPANY_SECTIONS.filter((s) => companySectionSubmitted(s.id, values))
 
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
       <PortalBreadcrumb items={[{ label: COMPANY_TITLE }]} />
-      <div className="max-w-3xl">
-        <div className="hs-section">
-          <span className="nhsuk-caption-l">{companyName}</span>
-          <h1 className="page-title-h1">{COMPANY_TITLE}</h1>
-          <p className="m-0 hs-measure leading-relaxed" style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}>
-            {outstanding.length === 0
-              ? 'The company and key contact details we hold for your organisation.'
-              : 'Tell us about your company and the key contact for your organisation. Complete and submit each section below in any order. We use this to verify your organisation and to contact you about your products.'}
-          </p>
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <div className="hs-section">
+            <span className="nhsuk-caption-l">{companyName}</span>
+            <h1 className="nhsuk-heading-xl">{COMPANY_TITLE}</h1>
+            <p className="nhsuk-body-l hs-measure">
+              {outstanding.length === 0
+                ? 'The company and key contact details we hold for your organisation.'
+                : 'Tell us about your company and the key contact for your organisation. Complete and submit each section below in any order. We use this to verify your organisation and to contact you about your products.'}
+            </p>
+          </div>
+
+          {!hydrated ? null : (
+            <>
+              {outstanding.length === 0 && (
+                <ReviewStatusSummary
+                  status={status}
+                  lastUpdated={company.lastUpdated}
+                  draftMessage="You have changes that have not been submitted. They are marked below. Submit them from the section's Check your answers, or discard them."
+                  onSimulateApproval={() => undefined}
+                />
+              )}
+
+              {outstanding.length > 0 && (
+                <OutstandingSections
+                  sections={outstanding}
+                  answers={merged}
+                  showHeading={submitted.length > 0}
+                  hasDraft={hasDraft}
+                  onFillSamples={() => saveCompanyDraft(COMPANY_SAMPLE_ANSWERS)}
+                  onClear={() => discardCompanyDraft()}
+                />
+              )}
+
+              {submitted.map((section) => (
+                <SubmittedSection
+                  key={section.id}
+                  section={section}
+                  values={values}
+                  draft={draft}
+                  onChange={() => router.push(companyQuestionHref(companySectionFirstStep(section.id, merged)))}
+                  onDiscard={() => discardCompanyDraft(section.id)}
+                />
+              ))}
+            </>
+          )}
         </div>
-
-        {!hydrated ? null : (
-          <>
-            {outstanding.length === 0 && (
-              <ReviewStatusSummary
-                status={status}
-                lastUpdated={company.lastUpdated}
-                draftMessage="You have changes that have not been submitted. They are marked below. Submit them from the section's Check your answers, or discard them."
-                onSimulateApproval={() => undefined}
-              />
-            )}
-
-            {outstanding.length > 0 && (
-              <OutstandingSections
-                sections={outstanding}
-                answers={merged}
-                showHeading={submitted.length > 0}
-                hasDraft={hasDraft}
-                onFillSamples={() => saveCompanyDraft(COMPANY_SAMPLE_ANSWERS)}
-                onClear={() => discardCompanyDraft()}
-              />
-            )}
-
-            {submitted.map((section) => (
-              <SubmittedSection
-                key={section.id}
-                section={section}
-                values={values}
-                draft={draft}
-                onChange={() => router.push(companyQuestionHref(companySectionFirstStep(section.id, merged)))}
-                onDiscard={() => discardCompanyDraft(section.id)}
-              />
-            ))}
-          </>
-        )}
       </div>
     </div>
   )

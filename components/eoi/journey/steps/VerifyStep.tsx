@@ -59,59 +59,61 @@ export default function VerifyStep() {
   }
 
   return (
-    <div className="hs-page">
-      <div className="max-w-2xl">
-        <BackLink href={`${basePath}/details`} />
-        <ErrorSummary errors={errors} />
-        <h1 ref={headingRef} tabIndex={-1} className="page-title-h1 outline-none">
-          Verify your email
-        </h1>
-        <div className="nhsuk-inset-text">
-          <span className="nhsuk-u-visually-hidden">Information: </span>
-          <p>
-            Prototype: enter code <strong>{PROTOTYPE_OTP}</strong>. In a live service we would
-            email a one-time code to {data.email.trim() || 'your NHS work email address'}.
-          </p>
-        </div>
-        <form noValidate onSubmit={handleVerify}>
-          <FormField id="eoi-otp" label="One-time code" required error={errors[0]?.message}>
-            {(field) => (
-              <TextInput
-                {...field}
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                spellCheck={false}
-                className="nhsuk-input--width-5"
-              />
-            )}
-          </FormField>
-          <Button type="submit">Continue</Button>
-        </form>
-        <details className="nhsuk-details mt-6">
-          <summary className="nhsuk-details__summary">
-            <span className="nhsuk-details__summary-text">I did not receive an email</span>
-          </summary>
-          <div className="nhsuk-details__text">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <BackLink href={`${basePath}/details`} />
+          <ErrorSummary errors={errors} />
+          <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
+            Verify your email
+          </h1>
+          <div className="nhsuk-inset-text">
+            <span className="nhsuk-u-visually-hidden">Information: </span>
             <p>
-              It can take a few minutes for the email to arrive. You need to wait 30 seconds
-              before a new code can be sent.
+              Prototype: enter code <strong>{PROTOTYPE_OTP}</strong>. In a live service we would
+              email a one-time code to {data.email.trim() || 'your NHS work email address'}.
             </p>
-            <p>
-              Check your junk or spam folder — emails from the NHS HealthStore can sometimes end
-              up there.
-            </p>
-            <Button variant="secondary" onClick={handleResendCode} disabled={resendCooldown > 0}>
-              {resendCooldown > 0 ? `Resend code (${resendCooldown}s)` : 'Resend code'}
-            </Button>
-            {resendConfirmation ? (
-              <p role="status" style={{ marginTop: 8 }}>
-                {resendConfirmation}
-              </p>
-            ) : null}
           </div>
-        </details>
+          <form noValidate onSubmit={handleVerify}>
+            <FormField id="eoi-otp" label="One-time code" required error={errors[0]?.message}>
+              {(field) => (
+                <TextInput
+                  {...field}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  spellCheck={false}
+                  className="nhsuk-input--width-5"
+                />
+              )}
+            </FormField>
+            <Button type="submit">Continue</Button>
+          </form>
+          <details className="nhsuk-details mt-6">
+            <summary className="nhsuk-details__summary">
+              <span className="nhsuk-details__summary-text">I did not receive an email</span>
+            </summary>
+            <div className="nhsuk-details__text">
+              <p>
+                It can take a few minutes for the email to arrive. You need to wait 30 seconds
+                before a new code can be sent.
+              </p>
+              <p>
+                Check your junk or spam folder — emails from the NHS HealthStore can sometimes end
+                up there.
+              </p>
+              <Button variant="secondary" onClick={handleResendCode} disabled={resendCooldown > 0}>
+                {resendCooldown > 0 ? `Resend code (${resendCooldown}s)` : 'Resend code'}
+              </Button>
+              {resendConfirmation ? (
+                <p role="status" style={{ marginTop: 8 }}>
+                  {resendConfirmation}
+                </p>
+              ) : null}
+            </div>
+          </details>
+        </div>
       </div>
     </div>
   )

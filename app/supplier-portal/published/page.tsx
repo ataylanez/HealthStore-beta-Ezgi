@@ -6,17 +6,19 @@ export const metadata = { title: `Published pages — ${PORTAL_SERVICE_NAME}` }
 
 export default function PublishedPagesPage() {
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
       <PortalBreadcrumb items={[{ label: 'Published pages' }]} />
-      <div className="max-w-3xl">
-        <div className="hs-section">
-          <h1 className="page-title-h1">Published pages</h1>
-          <p className="m-0 hs-measure leading-relaxed" style={{ fontSize: 'var(--text-body)', color: 'var(--text-muted)' }}>
-            These are the pages commissioners see on the NHS Commissioning Store. Some content comes from your product
-            onboarding and cannot be changed here.
-          </p>
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <div className="hs-section">
+            <h1 className="nhsuk-heading-xl">Published pages</h1>
+            <p className="nhsuk-body-l hs-measure">
+              These are the pages commissioners see on the NHS Commissioning Store. Some content comes from your product
+              onboarding and cannot be changed here.
+            </p>
+          </div>
+          <PublishedPagesTable />
         </div>
-        <PublishedPagesTable />
       </div>
     </div>
   )

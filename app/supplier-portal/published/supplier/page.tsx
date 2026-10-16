@@ -17,21 +17,23 @@ export const metadata = { title: `Supplier page — ${PORTAL_SERVICE_NAME}` }
 
 export default function PublishedSupplierPage() {
   return (
-    <div className="hs-page">
+    <div className="nhsuk-width-container nhsuk-main-wrapper">
       <PortalBreadcrumb items={[{ label: 'Published pages', href: PORTAL_PATHS.published }, { label: 'Supplier page' }]} />
-      <div className="max-w-3xl">
-        <PublishedPageEditor
-          pageId={SUPPLIER_PAGE_ID}
-          caption="Supplier page"
-          title={SAMPLE_SUPPLIER.name}
-          fields={SUPPLIER_PAGE_FIELDS}
-          defaults={SUPPLIER_PAGE_DEFAULTS}
-          readOnlyHeading="Information from supplier onboarding"
-          readOnlyIntro="This information comes from your supplier and product onboarding and cannot be changed here."
-          readOnly={supplierPageReadOnly(MANAGED_PRODUCTS.map((p) => p.name))}
-          viewHref={SUPPLIER_STORE_PAGE_HREF}
-          checkAnswersHref={publishedSupplierCheckAnswersHref()}
-        />
+      <div className="nhsuk-grid-row">
+        <div className="nhsuk-grid-column-two-thirds">
+          <PublishedPageEditor
+            pageId={SUPPLIER_PAGE_ID}
+            caption="Supplier page"
+            title={SAMPLE_SUPPLIER.name}
+            fields={SUPPLIER_PAGE_FIELDS}
+            defaults={SUPPLIER_PAGE_DEFAULTS}
+            readOnlyHeading="Information from supplier onboarding"
+            readOnlyIntro="This information comes from your supplier and product onboarding and cannot be changed here."
+            readOnly={supplierPageReadOnly(MANAGED_PRODUCTS.map((p) => p.name))}
+            viewHref={SUPPLIER_STORE_PAGE_HREF}
+            checkAnswersHref={publishedSupplierCheckAnswersHref()}
+          />
+        </div>
       </div>
     </div>
   )
