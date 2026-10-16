@@ -13,72 +13,69 @@
       <p class="ds-eyebrow">Templates</p>
       <h1 class="ds-page-title">What changed in the templates</h1>
       <p class="ds-lede">
-        The template set was last written on 5 August 2026. Since then every public page moved onto NHS page layouts.
-        The eight templates are the same. What each one contains, and a few routes that were missing from the map, are not.
+        There are still eight templates. Every public page now uses the same NHS layout.
+        A few pages were missing from the August map.
       </p>
     </div>
 
     <p>
-      This note is for people designing pages and for the Wagtail handover. It says what the August descriptions got wrong,
-      and what the template pages say now. The
-      <a href="/templates/index.html">template overview</a> and each template page have been updated to match.
+      The <a href="/templates/index.html">template overview</a> and each template page have been updated.
     </p>
 
     <h2>What stayed the same</h2>
     <ul>
-      <li>There are still eight templates: Home, Content page, Hub, Directory, Product listing, Product detail, EOI, Comparison tool.</li>
-      <li>Five are still CMS content (Home, Content page, Hub, Directory, Product detail). Three are still driven by product data or site functionality (Product listing, EOI, Comparison tool).</li>
-      <li>The supplier portal is still not a CMS template. It uses the same question-page layout as the expression of interest, and is described on the <a href="/DS/patterns/supplier-portal.html">Supplier portal</a> pattern.</li>
+      <li>Eight templates: Home, Content page, Hub, Directory, Product listing, Product detail, Expression of interest, Comparison tool.</li>
+      <li>Five are edited in the CMS: Home, Content page, Hub, Directory, Product detail. Three are built from product data or site code: Product listing, Expression of interest, Comparison tool.</li>
+      <li>The supplier portal is not a CMS template. It uses the same question pages as the expression of interest. See the <a href="/DS/patterns/supplier-portal.html">Supplier portal</a> pattern.</li>
     </ul>
 
-    <h2>The frame every template now shares</h2>
-    <p>August pages were drawn as if each template chose its own width and its own heading style. They do not. Every template now sits in the same NHS frame:</p>
+    <h2>Layout used by every template</h2>
     <ul>
       <li>The page is <strong>960 pixels</strong> wide, the same width as the header, the navigation and the &ldquo;Alpha&rdquo; banner.</li>
-      <li>The breadcrumb, or the back link on a form, sits <strong>above</strong> the main area, so the gap to the title is the same on every page.</li>
-      <li>The page title is the NHS extra-large heading. The sentence under it is NHS lede text (the larger intro style), in sentence case.</li>
-      <li>Reading text, forms and the funding list sit in a <strong>two-thirds column</strong>. Side-by-side layouts use a one-third column beside it.</li>
+      <li>The breadcrumb, or the back link on a form, sits <strong>above</strong> the main content.</li>
+      <li>The page title is the large NHS heading. The sentence under it is the larger NHS intro, in sentence case.</li>
+      <li>Body text, forms and the funding list sit in a <strong>two-thirds column</strong>. Pages with a side column use a one-third column next to it.</li>
     </ul>
 
-    <h2>Template by template</h2>
+    <h2>Each template</h2>
 
     <h3><a href="/templates/home.html">T1 &middot; Home</a></h3>
-    <p>The hero is the NHS hero, inside the 960px width, with the headline in the two-thirds column and the illustration beside it. It is no longer a band that runs to the edges of the screen. &ldquo;What the NHS HealthStore addresses&rdquo;, &ldquo;How it works&rdquo; and the pathway cards are NHS card groups: equal-height cards in three columns that stack on a phone. The case-studies band is still marked as to be confirmed.</p>
+    <p>The hero sits inside the 960px width. The headline is in the two-thirds column, with the picture beside it. The cards for what the service addresses, how it works, and the pathways are equal height, in three columns, and stack on a phone. Case studies are still to be confirmed.</p>
 
     <h3><a href="/templates/content-page.html">T2 &middot; Content page</a></h3>
-    <p>About and Cookies are unchanged as a type: title, lede, then sections of prose, all in the two-thirds column. The intro is lede text, not a small grey paragraph.</p>
-    <p>The August map missed the resource library&rsquo;s inner pages. They are the same template:</p>
+    <p>About and Cookies are a title, an intro, then sections of text, in the two-thirds column.</p>
+    <p>Resource pages use the same template:</p>
     <ul>
-      <li>Section indexes &mdash; Training and guidance, Preparing to recommend a DTx, Prior to patient appointment, During patient appointment, After a patient appointment. Each is a title, a lede, and a list of links.</li>
-      <li>The articles those lists point at. Each is a title and prose in the two-thirds column.</li>
+      <li>Section pages: Training and guidance, Preparing to recommend a DTx, Prior to patient appointment, During the appointment, After a patient appointment. Each is a title, an intro, and a list of links.</li>
+      <li>Articles are a title and text in the two-thirds column.</li>
     </ul>
-    <p>&ldquo;Long-term management of a DTx&rdquo; is a card on the resource library, but it does not have a page yet.</p>
+    <p>&ldquo;Long-term management of a DTx&rdquo; is a card on the resource library. It has no page yet.</p>
 
     <h3><a href="/templates/hub.html">T3 &middot; Hub</a></h3>
-    <p>The catalogue and the resource library keep a title and lede in the two-thirds column, then an NHS card group. Cards are one-third wide and equal height. On the catalogue, pathways that are not available yet are secondary cards (a quieter style), in the same group as the live ones. The resource library has six cards, not four.</p>
+    <p>The catalogue and the resource library have a title and intro in the two-thirds column, then equal-height cards. Catalogue pathways that are not live yet are quieter cards in the same group. The resource library has six cards.</p>
 
     <h3><a href="/templates/directory.html">T4 &middot; Directory</a></h3>
-    <p>The funding index lists clickable funding cards down the two-thirds column. Open, upcoming and periodic opportunities share one list. Closed opportunities sit under their own &ldquo;Closed (confirm current status)&rdquo; heading. Editors still maintain the records one by one.</p>
+    <p>Funding is a list of cards in the two-thirds column. Open, upcoming and periodic items share one list. Closed items sit under &ldquo;Closed (confirm current status)&rdquo;. Editors still update each record on its own.</p>
 
     <h3><a href="/templates/product-listing.html">T5 &middot; Product listing</a></h3>
-    <p>Filters sit in a one-third column: condition as a single choice, supervision model as multiple choices, then an Apply button. Results are full-width NHS cards stacked in the two-thirds column, each with &ldquo;View product details&rdquo; and &ldquo;Add to compare&rdquo;. When nothing matches, the page shows NHS inset text (&ldquo;No apps match your filters&rdquo;), not an empty card. The related-content side list marked &ldquo;to be confirmed&rdquo; in August was never built, so it has been removed from the template. The filter panel is the side column.</p>
+    <p>Filters sit in a one-third column: condition (pick one), supervision model (pick any), then Apply. Results are stacked cards in the two-thirds column, each with &ldquo;View product details&rdquo; and &ldquo;Add to compare&rdquo;. If nothing matches, the page says &ldquo;No apps match your filters&rdquo;. The filters are the side column.</p>
 
     <h3><a href="/templates/product-detail.html">T6 &middot; Product detail</a></h3>
-    <p>A product is no longer one long page with a sticky &ldquo;On this page&rdquo; sidebar. It is a small set of pages that share one frame:</p>
+    <p>A product is a set of pages, not one long page:</p>
     <ul>
       <li>An overview at <code>/apps/[slug]</code>.</li>
-      <li>One page per section at <code>/apps/[slug]/[section]</code> &mdash; the problem, how it helps, local impact, what it could be worth, funding levers, assurance, implementation, NHS experience, how to buy, and resources.</li>
+      <li>One page for each section at <code>/apps/[slug]/[section]</code>: the problem, how it helps, local impact, what it could be worth, funding levers, assurance, implementation, NHS experience, how to buy, and resources.</li>
     </ul>
-    <p>The left-hand column is an NHS contents list. The page you are on is bold text; the others are links. The supplier&rsquo;s name is a caption inside the product title. &ldquo;Add to compare&rdquo; sits with the title. &ldquo;Express interest&rdquo; stays at the bottom of the column. Section titles still come from one list, so the contents list and the headings cannot drift apart. The local-value model is still site functionality, not CMS copy.</p>
+    <p>The left column is a contents list. The current page is bold. The others are links. The supplier name sits in the product title. &ldquo;Add to compare&rdquo; sits with the title. &ldquo;Express interest&rdquo; stays at the bottom. Section titles come from one list, so the contents list and the headings stay in step. The local-value model is site code, not CMS copy.</p>
 
-    <h3><a href="/templates/eoi-form.html">T7 &middot; EOI</a></h3>
-    <p>This was already one web address per step. Each step now uses the shared frame: a back link, the question as the page title, NHS form fields, and a two-thirds column. If the answer fails checks, an error summary appears at the top and the field is marked. Check your answers is an NHS summary list. Confirmation is the green NHS panel. Question wording stays editable; the flow itself stays in site code. Supplier onboarding asks questions the same way, and stays out of this template set.</p>
+    <h3><a href="/templates/eoi-form.html">T7 &middot; Expression of interest</a></h3>
+    <p>Each step is its own page: a back link, the question as the title, form fields, and a two-thirds column. If an answer fails a check, the errors are listed at the top and the field is marked. Check your answers is a summary list. Confirmation is the green panel. Question wording can be edited. The steps stay in site code. Supplier onboarding uses the same question pages and is not part of this set.</p>
 
     <h3><a href="/templates/utility.html">T8 &middot; Comparison tool</a></h3>
-    <p>The title and a short introduction sit in the two-thirds column. Below that, up to six NHS tables compare the chosen products, with products as columns. On a phone each cell is labelled with the product name, so the table does not scroll sideways. With nothing selected, the page shows a sentence and a link to the catalogue. There is no &ldquo;compare by&rdquo; switch and no &ldquo;only differences&rdquo; checkbox.</p>
+    <p>The title and a short intro sit in the two-thirds column. Below that, up to six tables compare the chosen products, with products as columns. On a phone each cell is labelled with the product name. With nothing selected, the page shows a sentence and a link to the catalogue. There is no &ldquo;compare by&rdquo; switch and no &ldquo;only differences&rdquo; checkbox.</p>
 
-    <h2>Where to read the detail</h2>
-    <p>Each template page now describes the layout above. The design-system pages for <a href="/DS/styles/spacing.html">spacing and layout</a>, <a href="/DS/styles/typography.html">typography</a>, <a href="/DS/patterns/product-detail.html">product detail</a>, <a href="/DS/patterns/discovery.html">discovery</a> and <a href="/DS/patterns/compare.html">comparison</a> show the same patterns with the component names.</p>
+    <h2>Where to read more</h2>
+    <p>Each template page describes its layout. The design system pages for <a href="/DS/styles/spacing.html">spacing and layout</a>, <a href="/DS/styles/typography.html">typography</a>, <a href="/DS/patterns/product-detail.html">product detail</a>, <a href="/DS/patterns/discovery.html">discovery</a> and <a href="/DS/patterns/compare.html">comparison</a> show the same patterns.</p>
   </div>
   <script src="/DS/assets/ds.js" defer></script>
 </body>
