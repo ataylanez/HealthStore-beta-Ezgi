@@ -112,7 +112,7 @@ export default function SupportStep() {
                           <div className="nhsuk-checkboxes__conditional" id="conditional-eoi-help-other">
                             <FormField
                               id="eoi-help-other-details"
-                              label="Give more details"
+                              label="Give details"
                               required
                               error={errorFor('eoi-help-other-details')}
                             >

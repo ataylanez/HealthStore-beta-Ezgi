@@ -501,26 +501,6 @@
     fill: var(--nhs-blue);
   }
 
-  /*
-   * A content field or document the review sent back: 4px NHS red line, the
-   * same weight and colour as the error summary border. On larger screens the
-   * summary list row is a table row, so the line sits on the label cell.
-   */
-  .nhsuk-summary-list__row.hs-action-needed {
-    border-left: 4px solid var(--nhs-red);
-    padding-left: 16px;
-  }
-  @media (min-width: 40.0625em) {
-    .nhsuk-summary-list__row.hs-action-needed {
-      border-left: 0;
-      padding-left: 0;
-    }
-    .nhsuk-summary-list__row.hs-action-needed > .nhsuk-summary-list__key {
-      border-left: 4px solid var(--nhs-red);
-      padding-left: 16px;
-    }
-  }
-
   @media (max-width: 639px) {
     /* Service name beside the NHS logo (NHS stacks it below 990px). */
     .nhsuk-header__logo {

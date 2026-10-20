@@ -58,7 +58,7 @@ export function FundingDirectoryCard({ f }: { f: FundingDirectoryRecord; apps?: 
           </p>
         )}
 
-        <p className="nhsuk-body-m" style={{ color: 'var(--text-secondary)' }}>
+        <p className="nhsuk-body-m">
           {f.description}
         </p>
 
@@ -75,14 +75,14 @@ export function FundingDirectoryCard({ f }: { f: FundingDirectoryRecord; apps?: 
         </div>
 
         {f.notes ? (
-          <p className="nhsuk-body-s" style={{ color: 'var(--text-secondary)' }}>
+          <p className="nhsuk-body-m">
             {f.notes}
           </p>
         ) : null}
 
         {f.external_url ? (
           <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">
-            <a href={f.external_url}>{f.external_url_label ?? 'More information'}</a>
+            <a href={f.external_url}>{f.external_url_label ?? `More information about ${f.title}`}</a>
           </p>
         ) : null}
       </div>

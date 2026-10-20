@@ -69,15 +69,15 @@ export function publishedSupplierConfirmationHref(): string {
 /** Prototype dummy answers for published page fields (fill shortcut). */
 export const PUBLISHED_PAGE_DUMMY_ANSWERS: Record<string, string> = {
   overview:
-    'myHeart is a digital therapeutic that supports people with heart failure to self-manage their condition between appointments, including symptom tracking and guided education.',
+    'Respira CBT is a clinician-supported digital cognitive behavioural therapy programme for adults with generalised anxiety disorder, delivered over 12 weeks with weekly asynchronous therapist review.',
   why_it_matters:
-    'Supports local pathway goals for remote monitoring and reduced unplanned admissions for heart failure patients.',
-  contact_name: 'Sam Patel',
-  contact_email: 'sam.patel@mymhealth.example',
+    'Supports local Talking Therapies pathway goals for faster access to treatment and higher reliable recovery rates for adults with mild to moderate anxiety.',
+  contact_name: 'Brandson Sanderson',
+  contact_email: 'brandson.sanderson@aurora-health.example',
   about:
-    'my mhealth develops evidence-based digital therapeutics for long-term conditions, used by NHS organisations across England to support self-management and remote care.',
-  website: 'https://mymhealth.com',
-  enquiries_email: 'nhs@mymhealth.example',
+    'Aurora Health develops clinician-supported digital therapeutics for common mental health conditions, used by NHS Talking Therapies services to extend capacity between face-to-face appointments.',
+  website: 'https://www.aurora-health.example',
+  enquiries_email: 'nhs@aurora-health.example',
 }
 
 /** True for every page in the portal, including sign-in. */
@@ -123,29 +123,22 @@ export function isPortalFocusedPath(pathname: string | null | undefined): boolea
 /* Statuses                                                                  */
 /* ------------------------------------------------------------------------ */
 
-/** Onboarding form statuses (working names from the IA). */
-export type OnboardingFormStatus = 'incomplete' | 'submitted' | 'action_needed'
-
-/** Onboarded product statuses. The IA marks these TBC — placeholders. */
-export type ManagedProductStatus = 'up_to_date' | 'draft_changes' | 'in_review' | 'action_needed'
-
-/**
- * Why a product field needs the supplier's attention. Drives the error summary
- * wording. Expiry is reserved for later document-expiry work.
+/*
+ * Submissions are accepted as soon as they are made, so there are no review
+ * statuses (in review, action needed).
  */
-export type ActionNeededReason = 'review_rejection' | 'expired'
+
+/** Onboarding form statuses. */
+export type OnboardingFormStatus = 'incomplete' | 'submitted'
+
+/** Onboarded product statuses. */
+export type ManagedProductStatus = 'up_to_date' | 'draft_changes'
 
 /**
  * Commissioning Store page statuses. A page starts Unpublished; edits saved to a
  * page that has been published become Unpublished changes until submitted.
- * Action needed is set when a review is rejected.
  */
-export type PublishedPageStatus =
-  | 'published'
-  | 'unpublished'
-  | 'unpublished_changes'
-  | 'in_review'
-  | 'action_needed'
+export type PublishedPageStatus = 'published' | 'unpublished' | 'unpublished_changes'
 
 export type PortalStatus = OnboardingFormStatus | ManagedProductStatus | PublishedPageStatus
 
@@ -154,13 +147,13 @@ export type PortalStatus = OnboardingFormStatus | ManagedProductStatus | Publish
 /* ------------------------------------------------------------------------ */
 
 export const SAMPLE_SUPPLIER = {
-  name: 'my mhealth Limited',
+  name: 'Aurora Health Limited',
   contactName: 'Brandson Sanderson',
-  email: 'sam.patel@mymhealth.example',
+  email: 'brandson.sanderson@aurora-health.example',
   /** Supplier information held from supplier onboarding (read-only on the Supplier page). */
-  registeredAddress: 'Unit 4, Bournemouth Business Park, Bournemouth BH8 8EZ',
-  companyNumber: '07614236',
-  icoRegistration: 'ZA000000',
+  registeredAddress: '14 Canal Wharf, Leeds LS1 4DY',
+  companyNumber: '14285736',
+  icoRegistration: 'ZA987654',
 }
 
 /* ------------------------------------------------------------------------ */
@@ -173,16 +166,11 @@ export type OnboardingForm = {
   productName: string
   /** ISO date the form was started (shown until the supplier saves something). */
   startedOn: string
-  /**
-   * Back office outcome on a previous submission. Shows "Action needed" until the
-   * supplier submits the form again.
-   */
-  actionNeeded?: string
 }
 
 /** Products awaiting onboarding. */
 export const ONBOARDING_FORMS: OnboardingForm[] = [
-  { id: 'mycopd', productName: 'myCOPD', startedOn: '2026-09-02' },
+  { id: 'respira-cbt', productName: 'Respira CBT', startedOn: '2026-09-02' },
 ]
 
 export function findOnboardingForm(formId: string): OnboardingForm | undefined {
@@ -233,19 +221,10 @@ export type ManagedProduct = {
   /** Catalogue slug in content/apps (source of the starting content). */
   appSlug: string
   name: string
-  /** ISO date of the last approved update. */
+  /** ISO date of the last update. */
   lastUpdated: string
   /** Starting status before the supplier changes anything. */
   status: ManagedProductStatus
-  /** Back office note shown when status is action_needed. */
-  actionNeeded?: string
-  /**
-   * Content and document field ids the back office has asked the supplier to
-   * change. The red line on the product page is drawn from these.
-   */
-  actionNeededFields?: string[]
-  /** Why those fields need attention. Defaults to a review rejection when omitted. */
-  actionNeededReason?: ActionNeededReason
   /** Document file names currently held, keyed by DocumentField id. */
   documents: Record<string, { fileName: string; uploadedOn: string }>
 }
@@ -255,8 +234,8 @@ function docs(prefix: string, overrides: ManagedProduct['documents'] = {}): Mana
     paq: { fileName: `${prefix}-PAQ-v1.0.pdf`, uploadedOn: '2026-01-14' },
     dcb0129: { fileName: `${prefix}-DCB0129-safety-case-v3.2.pdf`, uploadedOn: '2026-03-09' },
     hazard_log: { fileName: `${prefix}-DCB0129-hazard-log-v3.2.xlsx`, uploadedOn: '2026-03-09' },
-    ico: { fileName: 'my-mhealth-ICO-registration-2026.pdf', uploadedOn: '2026-05-14' },
-    cyber_essentials: { fileName: 'my-mhealth-Cyber-Essentials-2025.pdf', uploadedOn: '2025-11-30' },
+    ico: { fileName: 'Aurora-Health-ICO-registration-2026.pdf', uploadedOn: '2026-05-14' },
+    cyber_essentials: { fileName: 'Aurora-Health-Cyber-Essentials-2025.pdf', uploadedOn: '2025-11-30' },
     pen_test: { fileName: `${prefix}-pen-test-summary-Feb-2026.pdf`, uploadedOn: '2026-02-12' },
     wcag: { fileName: `${prefix}-WCAG-2.2-AA-audit.pdf`, uploadedOn: '2026-01-20' },
     dtac: { fileName: `${prefix}-DTAC-v2.0.pdf`, uploadedOn: '2026-02-26' },
@@ -266,12 +245,13 @@ function docs(prefix: string, overrides: ManagedProduct['documents'] = {}): Mana
 
 export const MANAGED_PRODUCTS: ManagedProduct[] = [
   {
-    id: 'myheart',
-    appSlug: 'myheart',
-    name: 'myHeart',
+    id: 'respira-cbt',
+    /** Fictional catalogue slug — portal defaults supply content when no app JSON exists. */
+    appSlug: 'respira-cbt',
+    name: 'Respira CBT',
     lastUpdated: '2026-06-03',
     status: 'up_to_date',
-    documents: docs('myHeart'),
+    documents: docs('Respira-CBT'),
   },
 ]
 
@@ -315,13 +295,13 @@ export const SUPPLIER_PAGE_ID = 'supplier'
  * Prototype public Commissioning Store URL for the supplier page.
  * Used for Store link and Preview changes (opens in a new window).
  */
-export const SUPPLIER_STORE_PAGE_HREF = '/suppliers/my-mhealth'
+export const SUPPLIER_STORE_PAGE_HREF = '/suppliers/aurora-health'
 
 export const SUPPLIER_PAGE_DEFAULTS: Record<string, string> = {
   about:
-    'my mhealth develops evidence-based digital therapeutics for long-term conditions, used by NHS organisations across England to support self-management and remote care.',
-  website: 'https://mymhealth.com',
-  enquiries_email: 'nhs@mymhealth.example',
+    'Aurora Health develops clinician-supported digital therapeutics for common mental health conditions, used by NHS Talking Therapies services to extend capacity between face-to-face appointments.',
+  website: 'https://www.aurora-health.example',
+  enquiries_email: 'nhs@aurora-health.example',
 }
 
 /** ISO date the published pages were last updated (starting value). */

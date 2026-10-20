@@ -9,8 +9,8 @@ import { FormField, TextInput } from '@/components/ui/FormField'
 import { PORTAL_BASE_PATH, PORTAL_PATHS } from '@/lib/supplierPortal'
 import { useSupplierPortal } from './useSupplierPortal'
 
-/** Demo credentials for Brandson Sanderson (sample supplier contact). Any values still work. */
-const DEMO_EMAIL = 'brandson.sanderson@mymhealth.example'
+/** Demo credentials for Brandson Sanderson (sample Aurora Health contact). Any values still work. */
+const DEMO_EMAIL = 'brandson.sanderson@aurora-health.example'
 const DEMO_PASSWORD = 'Password1!'
 
 /**

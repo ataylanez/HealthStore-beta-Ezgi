@@ -42,7 +42,7 @@ export default function PdpResources({ app }: { app: App }) {
             </h3>
           )}
           {showSubheads && (
-            <p className="m-0 mb-4 hs-text-label" style={{ color: 'var(--text-muted)' }}>
+            <p className="nhsuk-body-m nhsuk-u-margin-bottom-4">
               Try the product or request a configured demonstration from the supplier.
             </p>
           )}

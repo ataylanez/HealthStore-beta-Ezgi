@@ -7,7 +7,7 @@ import {
   SUPPLIER_PAGE_ID,
   publishedProductHref,
 } from '@/lib/supplierPortal'
-import { publishedPageStatus, publishedPageStatuses } from './portalStatus'
+import { publishedPageStatus } from './portalStatus'
 import { StatusTable, type StatusTableRow } from './StatusTable'
 import { useSupplierPortal } from './useSupplierPortal'
 
@@ -18,14 +18,12 @@ export default function PublishedPagesTable() {
 
   const row = (id: string, name: string, detail: string, href: string): StatusTableRow => {
     const record = getRecord('pages', id)
-    const statuses = publishedPageStatuses(record)
     return {
       id,
       name,
       detail,
       href,
       status: publishedPageStatus(record),
-      statuses,
       date: record.lastUpdated,
     }
   }

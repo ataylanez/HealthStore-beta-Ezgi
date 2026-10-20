@@ -69,8 +69,8 @@ export default function PdpLocalValue({
     <div className="hs-pdp-spine-group mb-6 space-y-4">
       {/* R2-1: context line showing which area the projections apply to */}
       {!isExample ? (
-        <p className="hs-text-caption" style={{ color: 'var(--text-muted)', margin: 0 }}>
-          Showing projected figures for <strong style={{ color: 'var(--text-secondary)' }}>{areaLabel}</strong>.
+        <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">
+          Showing projected figures for <strong>{areaLabel}</strong>.
         </p>
       ) : null}
 
@@ -110,7 +110,7 @@ export default function PdpLocalValue({
               />
             </PdpTileRow>
             <div className="mt-4">
-              <p className="nhsuk-body" style={{ margin: 0, color: 'var(--text-secondary)' }}>
+              <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">
                 <strong className="nhsuk-u-font-weight-bold" style={{ display: 'block', marginBottom: 6, color: 'var(--text-primary)' }}>
                   What this means
                 </strong>
@@ -138,7 +138,7 @@ export default function PdpLocalValue({
               <Tile value={`${aeLow.toLocaleString()}–${aeHigh.toLocaleString()}`} label="A&E avoided / yr" />
             </PdpTileRow>
             <div className="mt-4">
-              <p className="nhsuk-body" style={{ margin: 0, color: 'var(--text-secondary)' }}>
+              <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">
                 <strong className="nhsuk-u-font-weight-bold" style={{ display: 'block', marginBottom: 6, color: 'var(--text-primary)' }}>
                   What this means
                 </strong>

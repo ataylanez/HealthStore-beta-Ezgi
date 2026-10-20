@@ -3,10 +3,10 @@ import type { ProductNarrative } from '@/lib/content/productModel'
 import { PdpSection } from '@/components/PdpSection'
 import { pdpSectionTitle } from '@/lib/pdpSections'
 import { deriveAssuranceDomains } from '@/lib/content/assuranceDomains'
+import { isMarketPreview } from '@/lib/marketPreview'
 import { splitPdpEvidence } from '@/lib/pdpEvidence'
 import PdpClinicalPublications from '@/components/product/PdpClinicalPublications'
 import PdpRegulatoryPosition from '@/components/product/PdpRegulatoryPosition'
-import { STORE_ACCENT } from '@/lib/storeAccent'
 
 /**
  * Round 3 content migration — assurance passport for the hybrid PDP.
@@ -65,14 +65,18 @@ export default function PdpAssurancePassport({
       id="assurance"
       shareKey="narrative-assurance"
       title={pdpSectionTitle('assurance')}
-      description="Your local team retains responsibility for due diligence — we make that faster by providing access to source documents in your workspace once verified."
+      description={
+        isMarketPreview(app)
+          ? 'These are the assurance items a commissioner would expect to review. They are not held for this product.'
+          : 'Your local team retains responsibility for due diligence — we make that faster by providing access to source documents in your workspace once verified.'
+      }
     >
       {speedNote && (
         <div className="mb-4">
           <div className="hs-font-bold hs-text-label mb-1" style={{ color: 'var(--text-primary)' }}>
             How we support your local assurance
           </div>
-          <p className="hs-text-label" style={{ color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
+          <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">
             {speedNote}
           </p>
         </div>
@@ -88,7 +92,7 @@ export default function PdpAssurancePassport({
           <div className="hs-font-bold hs-text-label mb-1" style={{ color: '#7A1210' }}>
             Material assurance gaps
           </div>
-          <ul className="hs-text-label" style={{ color: '#5A1010', margin: 0, paddingLeft: 20, lineHeight: 1.6 }}>
+          <ul className="nhsuk-body-m" style={{ color: '#5A1010', margin: 0, paddingLeft: 20 }}>
             {material.map((d) => (
               <li key={d.domain}>
                 <strong>{d.domain}:</strong> {d.summary}
@@ -127,8 +131,7 @@ export default function PdpAssurancePassport({
                 )}
                 {items.length > 0 && (
                   <dl
-                    className="hs-text-label"
-                    style={{ margin: '8px 0 0', color: 'var(--text-secondary)', lineHeight: 1.5 }}
+                    className="nhsuk-body-m nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0"
                     aria-label={`${d.domain} evidence held`}
                   >
                     {items.map((item) => (
@@ -155,7 +158,7 @@ export default function PdpAssurancePassport({
           <div className="hs-font-bold hs-text-label mb-1" style={{ color: 'var(--text-primary)' }}>
             {interopDomain.domain}
           </div>
-          <p className="hs-text-label" style={{ color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
+          <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">
             {interopDomain.summary}
           </p>
         </div>
@@ -172,8 +175,8 @@ export default function PdpAssurancePassport({
           </h3>
           <div className="space-y-2">
             {niceRefs.map((r: any) => (
-              <p key={r.ref} className="m-0 hs-text-body" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                <a href={r.url} className="underline hover:no-underline" style={{ color: STORE_ACCENT }}>
+              <p key={r.ref} className="nhsuk-body-m nhsuk-u-margin-bottom-2">
+                <a href={r.url}>
                   {r.ref}
                 </a>
                 {[r.type, r.date, r.note].filter(Boolean).length > 0 ? (
@@ -185,9 +188,9 @@ export default function PdpAssurancePassport({
               </p>
             ))}
             {niceEvidence.map((s: any, i: number) => (
-              <p key={s.id ?? i} className="m-0 hs-text-body" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              <p key={s.id ?? i} className="nhsuk-body-m nhsuk-u-margin-bottom-2">
                 {s.url_full_text ? (
-                  <a href={s.url_full_text} className="underline hover:no-underline" style={{ color: STORE_ACCENT }}>
+                  <a href={s.url_full_text}>
                     {s.ref}
                   </a>
                 ) : (

@@ -7,6 +7,7 @@ import { getPdpPageModel, pdpBasePath, type PdpSearchParams } from '@/lib/pdpPag
 import { buildPdpSectionLinks, getPdpSection } from '@/lib/pdpOnThisPage'
 import { PDP_SECTION_IDS, type PdpSectionId } from '@/lib/pdpSections'
 import { getProductNarrative, resolveProductNarrative } from '@/lib/content/productNarratives'
+import { isMarketPreview } from '@/lib/marketPreview'
 import { STORE_ACCENT } from '@/lib/storeAccent'
 import PdpFrame from '@/components/product/PdpFrame'
 import { PdpSectionHeadingProvider } from '@/components/PdpSection'
@@ -45,8 +46,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }) 
     app,
     narrative: resolveProductNarrative(slug, app),
     showNarrativeSpine: true,
-    showLocalValue: app.condition_tags?.includes('copd') ?? false,
-    hasLinkedFunding: (app.linked_funding_ids ?? app.funding_ids ?? []).length > 0,
+    showLocalValue: !isMarketPreview(app) && (app.condition_tags?.includes('copd') ?? false),
+    hasLinkedFunding: !isMarketPreview(app) && (app.linked_funding_ids ?? app.funding_ids ?? []).length > 0,
   })
   const match = getPdpSection(links, section)
   return { title: match ? `${match.label} — ${app.app_name} — NHS HealthStore` : 'Not found' }

@@ -6,12 +6,11 @@ import {
   MANAGED_PRODUCTS,
   PORTAL_PATHS,
   SUPPLIER_PAGE_ID,
-  managedProductHref,
   publishedProductHref,
   type PortalStatus,
 } from '@/lib/supplierPortal'
 import { PortalStatusTags } from './PortalStatusTag'
-import { companyStatus, managedProductStatuses, publishedPageStatuses, useOnboardingFormSummaries } from './portalStatus'
+import { companyStatus, publishedPageStatus, useOnboardingFormSummaries } from './portalStatus'
 import { useSupplierPortal } from './useSupplierPortal'
 
 /** Portal section an item belongs to. Items with no group (e.g. Company information) are listed first. */
@@ -30,13 +29,13 @@ export default function DashboardAttentionList() {
   const { hydrated, getRecord, company } = useSupplierPortal()
   if (!formsReady || !hydrated) return null
 
-  // Incomplete, Unpublished and Action needed only — not drafts, unpublished changes or in review.
+  // Incomplete and Unpublished only — not drafts or unpublished changes.
   const items: Item[] = []
   if (companyStatus(company) === 'incomplete') {
     items.push({ id: 'company', label: 'Company information', href: PORTAL_PATHS.company, statuses: ['incomplete'] })
   }
   for (const s of summaries) {
-    if (s.status !== 'incomplete' && s.status !== 'action_needed') continue
+    if (s.status !== 'incomplete') continue
     items.push({
       id: `form-${s.form.id}`,
       label: `${s.form.productName} onboarding form`,
@@ -46,36 +45,22 @@ export default function DashboardAttentionList() {
     })
   }
   for (const p of MANAGED_PRODUCTS) {
-    const statuses = managedProductStatuses(p, getRecord('products', p.id))
-    if (statuses[0] === 'action_needed') {
-      items.push({
-        id: `product-${p.id}`,
-        label: `${p.name} documents and content`,
-        href: managedProductHref(p.id),
-        statuses,
-        group: 'Product management',
-      })
-    }
-  }
-  for (const p of MANAGED_PRODUCTS) {
-    const statuses = publishedPageStatuses(getRecord('pages', p.id))
-    if (statuses[0] === 'unpublished' || statuses[0] === 'action_needed') {
+    if (publishedPageStatus(getRecord('pages', p.id)) === 'unpublished') {
       items.push({
         id: `page-${p.id}`,
         label: `${p.name} product page`,
         href: publishedProductHref(p.id),
-        statuses,
+        statuses: ['unpublished'],
         group: 'Published pages',
       })
     }
   }
-  const supplierStatuses = publishedPageStatuses(getRecord('pages', SUPPLIER_PAGE_ID))
-  if (supplierStatuses[0] === 'unpublished' || supplierStatuses[0] === 'action_needed') {
+  if (publishedPageStatus(getRecord('pages', SUPPLIER_PAGE_ID)) === 'unpublished') {
     items.push({
       id: 'page-supplier',
       label: 'Supplier page',
       href: PORTAL_PATHS.supplierPage,
-      statuses: supplierStatuses,
+      statuses: ['unpublished'],
       group: 'Published pages',
     })
   }

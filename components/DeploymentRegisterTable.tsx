@@ -53,7 +53,7 @@ export function DeploymentRegisterTable({ rows }: { rows: DeploymentRow[] }) {
 
   if (rows.length === 0) {
     return (
-      <p className="hs-text-label" style={{ color: 'var(--text-muted)' }}>
+      <p className="nhsuk-body-m">
         No named NHS deployments are recorded for this product in catalogue sources.
       </p>
     )
@@ -95,18 +95,18 @@ export function DeploymentRegisterTable({ rows }: { rows: DeploymentRow[] }) {
             {rows.map((r, i) => (
               <tr key={i} className="nhsuk-table__row hs-deploy-row align-top">
                 <td className="nhsuk-table__cell">
-                  <div className="hs-font-normal" style={{ color: 'var(--text-primary)' }}>{r.site}</div>
+                  <div className="hs-font-normal">{r.site}</div>
                   {r.condition ? (
-                    <div className="hs-text-caption" style={{ color: 'var(--text-muted)' }}>{r.condition}</div>
+                    <div>{r.condition}</div>
                   ) : null}
                 </td>
-                <td className="nhsuk-table__cell" style={{ color: 'var(--text-secondary)' }}>
+                <td className="nhsuk-table__cell">
                   <div>{dash(r.icb)}</div>
                   {r.location ? (
-                    <div className="hs-text-caption" style={{ color: 'var(--text-muted)' }}>{r.location}</div>
+                    <div>{r.location}</div>
                   ) : null}
                 </td>
-                <td className="nhsuk-table__cell" style={{ color: 'var(--text-secondary)' }}>
+                <td className="nhsuk-table__cell">
                   {formatCareSetting(r.care_setting)}
                 </td>
                 <td className="nhsuk-table__cell" style={{ textAlign: 'right' }}>
@@ -124,23 +124,23 @@ export function DeploymentRegisterTable({ rows }: { rows: DeploymentRow[] }) {
             <li key={i} className="p-4">
               <div className="mb-2 flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <div className="hs-font-bold" style={{ color: 'var(--text-primary)' }}>{r.site}</div>
+                  <div className="hs-font-bold">{r.site}</div>
                   {r.condition ? (
-                    <div className="hs-text-caption" style={{ color: 'var(--text-muted)' }}>{r.condition}</div>
+                    <div>{r.condition}</div>
                   ) : null}
                 </div>
                 <StatusBadge status={r.status} />
               </div>
-              <dl className="space-y-1 hs-text-caption" style={{ color: 'var(--text-secondary)' }}>
+              <dl className="nhsuk-body-m">
                 <div>
-                  <dt className="inline hs-font-bold" style={{ color: 'var(--text-muted)' }}>ICB / place: </dt>
+                  <dt className="inline nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-secondary-text-color">ICB / place: </dt>
                   <dd className="inline">
                     {dash(r.icb)}
                     {r.location ? ` — ${r.location}` : ''}
                   </dd>
                 </div>
                 <div>
-                  <dt className="inline hs-font-bold" style={{ color: 'var(--text-muted)' }}>Care setting: </dt>
+                  <dt className="inline nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-secondary-text-color">Care setting: </dt>
                   <dd className="inline">{formatCareSetting(r.care_setting)}</dd>
                 </div>
               </dl>

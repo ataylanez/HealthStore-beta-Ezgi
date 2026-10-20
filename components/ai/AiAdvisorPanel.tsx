@@ -225,10 +225,7 @@ function AiAdvisorChat({ profile }: { profile: AiAdvisorClientProfile }) {
                 {profile.icbName}
                 {profile.region ? ` · ${profile.region}` : ''}
               </p>
-              <p
-                className="mb-8 max-w-md text-center leading-relaxed"
-                style={{ color: 'var(--text-secondary)' }}
-              >
+              <p className="nhsuk-body-m nhsuk-u-margin-bottom-6">
                 I can help you explore digital health options, model costs for your
                 population, find funding, and work through implementation planning.
                 Tell me what you&rsquo;re working on.
@@ -376,8 +373,8 @@ export default function AiAdvisorPanel({ open, onClose, profile }: Props) {
             <button
               type="button"
               onClick={() => setIsFullScreen(prev => !prev)}
-              className="hidden flex-shrink-0 hs-text-label hs-font-normal transition-colors underline hover:no-underline md:block"
-              style={{ color: 'var(--text-secondary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
+              className="hidden flex-shrink-0 nhsuk-body-m nhsuk-u-margin-bottom-0 transition-colors underline hover:no-underline md:block"
+              style={{ color: 'var(--nhs-blue)', fontFamily: 'Frutiger, Arial, sans-serif' }}
             >
               {isFullScreen ? 'Exit full screen view' : 'Full screen view'}
             </button>

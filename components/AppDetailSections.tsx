@@ -64,12 +64,12 @@ export function TechnicalIntegrationTable({
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full hs-text-label">
+      <table className="w-full">
         <tbody>
           {rows.filter((r) => !exclude.has(r.label)).map(r => (
             <tr key={r.label} className="border-b last:border-0" style={{ borderColor: 'var(--border)' }}>
-              <td className="py-2 pr-4 hs-font-bold w-56" style={{ color: 'var(--text-muted)' }}>{r.label}</td>
-              <td className="py-2" style={{ color: r.value ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+              <td className="py-2 pr-4 nhsuk-body-s nhsuk-u-font-weight-bold w-56 nhsuk-u-secondary-text-color">{r.label}</td>
+              <td className={`py-2${r.value ? '' : ' nhsuk-body-s nhsuk-u-secondary-text-color'}`}>
                 {r.value || 'Not confirmed'}
               </td>
             </tr>
@@ -101,7 +101,7 @@ export function ScaleAndMaturitySection({ app, showDeploymentRegister = true }: 
           <EvidenceBadge strength={app.evidence_strength} />
         </div>
       </div>
-      <dl className="space-y-4 mb-6" style={{ color: 'var(--text-secondary)' }}>
+      <dl className="space-y-4 mb-6">
         {app.evidence_strength_rationale && (
           <div>
             <dt className="hs-text-label hs-font-bold mb-1" style={{ color: 'var(--text-muted)' }}>Evidence overview</dt>
@@ -111,7 +111,7 @@ export function ScaleAndMaturitySection({ app, showDeploymentRegister = true }: 
         {app.patients_covered_note && (
           <div>
             <dt className="hs-text-label hs-font-bold mb-1" style={{ color: 'var(--text-muted)' }}>Population reach</dt>
-            <dd style={{ lineHeight: 1.6 }}>{app.patients_covered_note}</dd>
+            <dd className="nhsuk-body-m nhsuk-u-margin-bottom-0">{app.patients_covered_note}</dd>
           </div>
         )}
       </dl>
@@ -155,9 +155,9 @@ export function WhatItTakesLocallySection({ app, accent }: { app: any; accent: s
         </div>
       )}
       {app.local_wraparound_detail && (
-        <p className="nhsuk-body-m" style={{ color: 'var(--text-secondary)' }}>{app.local_wraparound_detail}</p>
+        <p className="nhsuk-body-m">{app.local_wraparound_detail}</p>
       )}
-      <div className="space-y-4" style={{ color: 'var(--text-secondary)' }}>
+      <div className="space-y-4">
         {app.onboarding_model && (
           <div>
             <strong style={{ color: 'var(--text-primary)' }}>Onboarding model:</strong>{' '}
@@ -192,7 +192,7 @@ export function WhatItTakesLocallySection({ app, accent }: { app: any; accent: s
           </div>
         )}
         {app.escalation_note && (
-          <div style={{ color: 'var(--text-secondary)' }}>
+          <div>
             <strong style={{ color: 'var(--text-primary)' }}>Escalation:</strong> {app.escalation_note}
           </div>
         )}
@@ -207,7 +207,7 @@ export function WhatItTakesLocallySection({ app, accent }: { app: any; accent: s
           <div className="hs-text-label hs-font-bold mb-2" style={{ color: 'var(--text-muted)' }}>Prerequisites</div>
           <ul className="space-y-2">
             {app.implementation_prerequisites.map((p: string, i: number) => (
-              <li key={i} className="flex items-start gap-2" style={{ color: 'var(--text-secondary)' }}>
+              <li key={i} className="nhsuk-body-m flex items-start gap-2">
                 <span className="mt-1 flex-shrink-0" style={{ color: accent }}>✓</span>
                 {p}
               </li>
@@ -477,7 +477,6 @@ function yesNo(value: boolean | undefined | null): string {
 function CommercialDlRow({
   label,
   value,
-  mutedWhenEmpty,
   children,
 }: {
   label: string
@@ -489,17 +488,14 @@ function CommercialDlRow({
   const content = children ?? value
   return (
     <div
-      className="flex flex-col sm:flex-row sm:gap-4 gap-1 py-4 border-b last:border-0 hs-text-label"
+      className="flex flex-col sm:flex-row sm:gap-4 gap-1 py-4 border-b last:border-0"
       style={{ borderColor: 'var(--border)' }}
     >
-      <dt className="w-full sm:w-52 flex-shrink-0 hs-font-bold" style={{ color: 'var(--text-muted)' }}>
+      <dt className="w-full sm:w-52 flex-shrink-0 nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-secondary-text-color">
         {label}
       </dt>
       <dd
-        className="min-w-0 flex-1 leading-relaxed"
-        style={{
-          color: has || !mutedWhenEmpty ? 'var(--text-primary)' : 'var(--text-muted)',
-        }}
+        className={`min-w-0 flex-1 leading-relaxed${has ? '' : ' nhsuk-body-s nhsuk-u-secondary-text-color'}`}
       >
         {has ? content : CHECK_WITH_SUPPLIER}
       </dd>
@@ -529,16 +525,16 @@ export function CommercialModelAndCostSection({ app }: { app: any }) {
           mutedWhenEmpty
         />
         <div
-          className="flex flex-col sm:flex-row sm:gap-4 gap-1 py-4 border-b hs-text-label"
+          className="flex flex-col sm:flex-row sm:gap-4 gap-1 py-4 border-b"
           style={{ borderColor: 'var(--border)' }}
         >
-          <dt className="w-full sm:w-52 flex-shrink-0 hs-font-bold" style={{ color: 'var(--text-muted)' }}>
+          <dt className="w-full sm:w-52 flex-shrink-0 nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-secondary-text-color">
             Indicative price
           </dt>
-          <dd className="min-w-0 flex-1 leading-relaxed" style={{ color: 'var(--text-primary)' }}>
-            {app.indicative_price_text ?? CHECK_WITH_SUPPLIER}
+          <dd className="min-w-0 flex-1 leading-relaxed">
+            {app.indicative_price_text ?? <span className="nhsuk-body-s nhsuk-u-secondary-text-color">{CHECK_WITH_SUPPLIER}</span>}
             {conf ? (
-              <div className="hs-text-caption mt-2" style={{ color: 'var(--text-muted)' }}>
+              <div className="nhsuk-body-s nhsuk-u-secondary-text-color nhsuk-u-margin-top-2">
                 Pricing confidence: {conf}
               </div>
             ) : null}
@@ -577,16 +573,13 @@ function FinancialContextDlRow({
   const has = !!(value && String(value).trim())
   return (
     <div
-      className="flex flex-col sm:flex-row sm:gap-4 gap-1 py-4 border-b last:border-0 hs-text-label"
+      className="flex flex-col sm:flex-row sm:gap-4 gap-1 py-4 border-b last:border-0"
       style={{ borderColor: 'var(--border)' }}
     >
-      <dt className="w-full sm:w-52 flex-shrink-0 hs-font-bold" style={{ color: 'var(--text-muted)' }}>
+      <dt className="w-full sm:w-52 flex-shrink-0 nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-secondary-text-color">
         {label}
       </dt>
-      <dd
-        className="min-w-0 flex-1 leading-relaxed"
-        style={{ color: has ? 'var(--text-primary)' : 'var(--text-muted)' }}
-      >
+      <dd className={`min-w-0 flex-1 leading-relaxed${has ? '' : ' nhsuk-body-s nhsuk-u-secondary-text-color'}`}>
         {has ? value : CHECK_WITH_SUPPLIER}
       </dd>
     </div>
@@ -608,12 +601,13 @@ function IndicativeFinancialContextBody({ app }: { app: any }) {
           <FinancialContextDlRow label="Minimum conditions for success" value={app.minimum_conditions_for_success} />
         )}
       </dl>
-      <div className="mt-4 rounded-lg p-4" style={{ background: '#E6F0FB', border: '1px solid #A2C8E8' }}>
-        <p className="hs-text-caption leading-relaxed" style={{ color: '#003087' }}>
-          These are directional indicators only. Local finance modelling using actual baseline activity,
-          population size and pathway design is required before any business case submission.
-        </p>
-      </div>
+        <div className="nhsuk-inset-text">
+          <span className="nhsuk-u-visually-hidden">Information: </span>
+          <p>
+            These are directional indicators only. Local finance modelling using actual baseline activity,
+            population size and pathway design is required before any business case submission.
+          </p>
+        </div>
     </div>
   )
 }
@@ -626,9 +620,9 @@ export function IndicativeFinancialContextSection({ app }: { app: any }) {
 function GovernanceRow({ label, value, children }: { label: string; value?: string | null; mutedWhenEmpty?: boolean; children?: React.ReactNode }) {
   const has = children != null ? true : !!(value && String(value).trim())
   return (
-    <div className="flex flex-col gap-1 py-4 border-b last:border-0 hs-text-label sm:flex-row sm:gap-4" style={{ borderColor: 'var(--border)' }}>
-      <dt className="w-full flex-shrink-0 hs-font-bold sm:w-52" style={{ color: 'var(--text-muted)' }}>{label}</dt>
-      <dd className="min-w-0 flex-1 leading-relaxed" style={{ color: has ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+    <div className="flex flex-col gap-1 py-4 border-b last:border-0 sm:flex-row sm:gap-4" style={{ borderColor: 'var(--border)' }}>
+      <dt className="w-full flex-shrink-0 nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-secondary-text-color sm:w-52">{label}</dt>
+      <dd className={`min-w-0 flex-1 leading-relaxed${has ? '' : ' nhsuk-body-s nhsuk-u-secondary-text-color'}`}>
         {children ?? (has ? value : CHECK_WITH_SUPPLIER)}
       </dd>
     </div>
@@ -654,7 +648,7 @@ export function SafetyAndGovernanceSection({ app }: { app: any }) {
           <GovernanceRow label="DTAC">
             <span className="inline-flex flex-wrap items-center gap-2">
               <DtacBadge status={app.dtac_status} />
-              {app.dtac_note ? <span style={{ color: 'var(--text-secondary)' }}>{app.dtac_note}</span> : null}
+              {app.dtac_note ? <span>{app.dtac_note}</span> : null}
             </span>
           </GovernanceRow>
           <GovernanceRow label="DCB0129 (manufacturer)" value={app.dcb0129_status} mutedWhenEmpty />
@@ -666,7 +660,7 @@ export function SafetyAndGovernanceSection({ app }: { app: any }) {
           <GovernanceRow label="Device class">
             <div>
               <div style={{ fontWeight: 600 }}>{app.device_class ?? CHECK_WITH_SUPPLIER}</div>
-              {app.device_class_note && <div className="mt-1 hs-text-caption" style={{ color: '#7A4800' }}>⚠ {app.device_class_note}</div>}
+              {app.device_class_note && <div className="nhsuk-body-m nhsuk-u-margin-top-1">{app.device_class_note}</div>}
               <DeviceClassDetails deviceClass={app.device_class} />
             </div>
           </GovernanceRow>
@@ -685,8 +679,8 @@ export function SafetyAndGovernanceSection({ app }: { app: any }) {
           <GovernanceRow label="DSP Toolkit" value={app.dspt_status} mutedWhenEmpty />
         </dl>
         {app.cyber_notes && (
-          <div className="mt-4 rounded p-4 hs-text-caption" style={{ background: '#FEF5E6', color: '#7A4800' }}>
-            {app.cyber_notes}
+          <div className="nhsuk-warning-callout nhsuk-u-margin-top-4">
+            <p className="nhsuk-body-m">{app.cyber_notes}</p>
           </div>
         )}
       </div>
@@ -703,17 +697,16 @@ export function RelatedFundingSection({ fundingIds }: { fundingIds: string[] }) 
         {funding.map((f: any) => (
             <div key={f.id} className="rounded-lg border p-4" style={{ borderColor: 'var(--border)', background: '#F0F4F5' }}>
               <div className="flex items-start justify-between gap-2 mb-2">
-                <div className="hs-font-bold hs-text-label" style={{ color: 'var(--text-primary)' }}>{f.title}</div>
+                <h3 className="nhsuk-heading-s nhsuk-u-margin-bottom-0">{f.title}</h3>
                 <FundingStatusBadge status={f.status} />
               </div>
-              <p className="hs-text-caption mb-2" style={{ color: 'var(--text-secondary)', lineHeight: 1.5 }}>{f.description}</p>
+              <p className="nhsuk-body-m">{f.description}</p>
               {f.total_value && (
-                <div className="hs-text-caption" style={{ color: 'var(--text-muted)' }}>Value: {f.total_value}</div>
+                <div className="nhsuk-body-s nhsuk-u-secondary-text-color">Value: {f.total_value}</div>
               )}
               {f.external_url && (
-                <a href={f.external_url} target="_blank" rel="noopener noreferrer"
-                  className="hs-text-caption hs-font-normal mt-2 inline-block" style={{ color: 'var(--nhs-blue)' }}>
-                  {f.external_url_label ?? 'More info'} (opens in a new tab)
+                <a href={f.external_url} target="_blank" rel="noopener noreferrer" className="nhsuk-body-m">
+                  {f.external_url_label ?? `More information about ${f.title}`} (opens in a new tab)
                 </a>
               )}
             </div>

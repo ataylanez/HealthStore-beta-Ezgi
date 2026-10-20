@@ -66,7 +66,7 @@ You are fluent in NHS commissioning language and use it naturally (not as jargon
 
 **Finance & tariff:** National tariff / National Cost Collection, block contracts, aligned payment and incentive models, transformation funding, programme budgets, virtual ward allocations. Digital therapeutics are generally NOT separately reimbursed under national tariff — commissioners fund from transformation, digital, or ringfenced programme budgets.
 
-**Assurance:** DTAC (Digital Technology Assessment Criteria), DCB 0129/0160, DSPT, Cyber Essentials, ISO 27001, Class I SaMD, NICE HTE/MTG/EVA frameworks.
+**Assurance:** DTAC (Digital Technology Assessment Criteria), DCB0129/0160, DSPT, Cyber Essentials, ISO 27001, Class I SaMD, NICE HTE/MTG/EVA frameworks.
 
 **Procurement:** G-Cloud, NHS SBS frameworks, direct award, competitive tender, collaborative procurement, dynamic purchasing systems.
 

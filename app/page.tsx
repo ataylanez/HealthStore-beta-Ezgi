@@ -26,7 +26,7 @@ export default async function HomePage() {
                 <h1 className="nhsuk-heading-xl nhsuk-u-margin-bottom-3">{dash.hero.headline}</h1>
                 <p className="nhsuk-body-l">{dash.hero.subheadline}</p>
                 <Link href="/about" className="nhsuk-button nhsuk-button--reverse nhsuk-u-margin-bottom-0 max-sm:w-full">
-                  Find out more
+                  About the NHS HealthStore
                 </Link>
               </div>
             </div>

@@ -14,13 +14,15 @@ export function buildRegulatoryFacts(narrative: ProductNarrative): RegFact[] {
   const linkStyle = { color: STORE_ACCENT }
   const facts: RegFact[] = []
   if (reg?.nice) {
+    const noRecommendation = /no recommendation/i.test(reg.nice.status)
     facts.push({
-      label: 'NICE recommendation',
+      label: noRecommendation ? 'NICE guidance' : 'NICE recommendation',
       value: (
         <>
           <a href={reg.nice.url} target="_blank" rel="noopener noreferrer" className="nhsuk-link" style={linkStyle}>
             {reg.nice.ref}
           </a>
+          {noRecommendation ? <span className="block">{reg.nice.status}</span> : null}
           <span className="block">Last updated {reg.nice.last_updated}</span>
         </>
       ),

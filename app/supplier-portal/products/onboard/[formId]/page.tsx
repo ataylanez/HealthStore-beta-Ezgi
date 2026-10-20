@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
 import SupplierOnboardingTaskList from '@/components/supplier-onboard/SupplierOnboardingTaskList'
-import FormActionNeededNotice from '@/components/supplier-portal/FormActionNeededNotice'
 import { PortalBreadcrumb } from '@/components/supplier-portal/PortalBreadcrumb'
 import { ONBOARDING_NOTICE, SERVICE_NAME } from '@/lib/supplierOnboarding'
 import { ONBOARDING_FORMS, PORTAL_PATHS, findOnboardingForm } from '@/lib/supplierPortal'
@@ -50,7 +49,6 @@ export default async function SupplierOnboardFormPage({ params }: { params: Para
                 {ONBOARDING_NOTICE}
               </p>
             </div>
-            {form.actionNeeded && <FormActionNeededNotice formId={form.id} message={form.actionNeeded} />}
           </div>
           <SupplierOnboardingTaskList formId={form.id} />
         </div>

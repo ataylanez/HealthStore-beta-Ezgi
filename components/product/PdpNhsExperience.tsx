@@ -63,15 +63,18 @@ export default function PdpNhsExperience({ app }: { app: any }) {
 
       {hasCases && (
         <div>
-          <h3 className="hs-font-bold mb-1" style={{ fontSize: 'var(--text-card-title-sm)', color: 'var(--text-secondary)' }}>
+          <h3 className="nhsuk-heading-s">
             Case studies and evaluations
           </h3>
-          <p className="hs-text-caption mb-0 p-2 rounded" style={{ background: '#E6F0FB', color: '#003087', lineHeight: 1.5 }}>
-            <strong>Commissioner note:</strong>{' '}
-            Case studies and service evaluations are illustrative local reports and may not meet the same
-            standard as peer-reviewed trials. See the formal record in the{' '}
-            <a href={`/apps/${app.slug}/assurance`} className="hs-font-bold underline" style={{ color: '#003087' }}>Assurance and evidence</a> page.
-          </p>
+          <div className="nhsuk-inset-text">
+            <span className="nhsuk-u-visually-hidden">Information: </span>
+            <p>
+              <strong>Commissioner note:</strong>{' '}
+              Case studies and service evaluations are illustrative local reports and may not meet the same
+              standard as peer-reviewed trials. See the formal record on the{' '}
+              <a href={`/apps/${app.slug}/assurance`}>Assurance and evidence</a> page.
+            </p>
+          </div>
           <CaseStudyCards caseStudies={caseStudies} />
         </div>
       )}

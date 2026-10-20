@@ -18,9 +18,6 @@ import { computeIllustrativeWorth, formatGbp } from '@/lib/pdpWorth'
  * Server component — no client boundary.
  */
 
-/* Body copy inherits the NHS body-m size/leading from <body>; only the colour is set. */
-const bodyStyle = { color: 'var(--text-secondary)' } as const
-
 function Block({
   slug,
   sectionId,
@@ -111,7 +108,7 @@ export default function PdpOverviewSummary({
         block(
           'how-it-helps',
           `How ${name} can change a treatment pathway`,
-          <ul className="nhsuk-list nhsuk-list--bullet" style={{ ...bodyStyle, margin: 0 }}>
+          <ul className="nhsuk-list nhsuk-list--bullet" style={{ margin: 0 }}>
             {bullets.map((b) => (
               <li key={b}>{b}</li>
             ))}
@@ -128,7 +125,7 @@ export default function PdpOverviewSummary({
               Illustrative economics for a 500-patient cohort. Cash and capacity are reported separately.
             </p>
           </div>
-          <ul className="nhsuk-list nhsuk-list--bullet" style={{ ...bodyStyle, margin: 0 }}>
+          <ul className="nhsuk-list nhsuk-list--bullet" style={{ margin: 0 }}>
             <li>
               <strong>{formatGbp(worth.capacity)}</strong> capacity released per year — freed acute beds and clinician time
             </li>
@@ -149,7 +146,7 @@ export default function PdpOverviewSummary({
         block(
           'funding-levers',
           'Funding levers and tariffs',
-          <p className="nhsuk-body-m" style={{ ...bodyStyle, margin: 0 }}>
+          <p className="nhsuk-body-m" style={{ margin: 0 }}>
             {fundingTeaser(tariffNote)}
           </p>,
         )}
@@ -161,7 +158,7 @@ export default function PdpOverviewSummary({
         block(
           'implementation',
           pdpSectionTitle('implementation'),
-          <p className="nhsuk-body-m" style={{ ...bodyStyle, margin: 0 }}>
+          <p className="nhsuk-body-m" style={{ margin: 0 }}>
             {impl.workforce}
           </p>,
         )}
@@ -170,7 +167,7 @@ export default function PdpOverviewSummary({
         block(
           'nhs-experience',
           pdpSectionTitle('nhs-experience'),
-          <p className="nhsuk-body-m" style={{ ...bodyStyle, margin: 0 }}>
+          <p className="nhsuk-body-m" style={{ margin: 0 }}>
             {name} has {deploymentSummary.total} recorded NHS deployment{deploymentSummary.total === 1 ? '' : 's'}
             {deploymentSummary.liveCount > 0 ? ` (${deploymentSummary.liveCount} live` : ''}
             {deploymentSummary.liveCount > 0 && deploymentSummary.pilotCount > 0
@@ -185,7 +182,7 @@ export default function PdpOverviewSummary({
         block(
           'how-to-buy',
           pdpSectionTitle('how-to-buy', { appName: name }),
-          <ul className="nhsuk-list nhsuk-list--bullet" style={{ ...bodyStyle, margin: 0 }}>
+          <ul className="nhsuk-list nhsuk-list--bullet" style={{ margin: 0 }}>
             {[
               { label: 'Recommended route', value: commercial.route_status },
               { label: 'Buyer pack', value: commercial.buyer_pack_status },

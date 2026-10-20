@@ -25,5 +25,5 @@ export default async function SupplierOnboardTaskPage({ params }: { params: Para
   if (match.task.questions.length === 0) {
     return <TaskStubPage formId={formId} task={match.task} section={match.section} />
   }
-  return <TaskQuestionPage formId={formId} task={match.task} step={1} />
+  return <TaskQuestionPage formId={formId} task={match.task} section={match.section} step={1} />
 }

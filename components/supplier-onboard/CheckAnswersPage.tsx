@@ -17,7 +17,12 @@ import {
   formBasePath,
   isQuestionAnswered,
   isValidIsoDate,
+  otherDetailsKey,
   parseUploadedDocuments,
+  knownProductName,
+  optionDisplayLabel,
+  questionDisplayLabel,
+  substituteProductName,
   taskStepHref,
   visibleQuestions,
   type OnboardingQuestion,
@@ -81,14 +86,31 @@ export default function CheckAnswersPage({ formId }: { formId: string }) {
               {section.tasks.map((task) => {
                 const answers = getAnswers(task.id)
                 const visible = visibleQuestions(task, answers)
+                const answersFor = (taskId: string) => (taskId === task.id ? answers : getAnswers(taskId))
+                const productName = knownProductName(answersFor)
+                const labelFor = (question: OnboardingQuestion) => questionDisplayLabel(question, answersFor)
+                const displayQuestion = (question: OnboardingQuestion): OnboardingQuestion => {
+                  if (question.type !== 'radios' && question.type !== 'checkboxes') return question
+                  return {
+                    ...question,
+                    options: question.options.map((o) => ({
+                      ...o,
+                      label: optionDisplayLabel(question, o, answersFor),
+                      hint: o.hint ? substituteProductName(o.hint, productName) : o.hint,
+                    })),
+                  }
+                }
                 return (
                   <div key={task.id} className="nhsuk-u-margin-bottom-5">
                     {/* Task title shown only when it is not simply repeated by its single question. */}
-                    {(visible.length !== 1 || visible[0].question.label !== task.title) && (
+                    {(visible.length !== 1 || labelFor(visible[0].question) !== task.title) && (
                       <h3 className="nhsuk-heading-s nhsuk-u-margin-bottom-2">{task.title}</h3>
                     )}
                     <dl className="nhsuk-summary-list">
-                      {visible.map(({ question, step }) => (
+                      {visible.map(({ question, step }) => {
+                        if (question.hideInSummary) return null
+                        const label = labelFor(question)
+                        return (
                         <div key={question.id} className="nhsuk-summary-list__row">
                           <dt className="nhsuk-summary-list__key">
                             {question.code && (
@@ -96,16 +118,17 @@ export default function CheckAnswersPage({ formId }: { formId: string }) {
                                 {question.code}
                               </span>
                             )}
-                            {question.label}
+                            {label}
                           </dt>
-                          <dd className="nhsuk-summary-list__value">{formatAnswer(question, answers)}</dd>
+                          <dd className="nhsuk-summary-list__value">{formatAnswer(displayQuestion(question), answers)}</dd>
                           <dd className="nhsuk-summary-list__actions">
                             <Link className="hs-link-button" href={taskStepHref(formId, task, step)}>
-                              Change<span className="nhsuk-u-visually-hidden"> {question.code ? `${question.code} ` : ''}{question.label}</span>
+                              Change<span className="nhsuk-u-visually-hidden"> {question.code ? `${question.code} ` : ''}{label}</span>
                             </Link>
                           </dd>
                         </div>
-                      ))}
+                        )
+                      })}
                     </dl>
                   </div>
                 )
@@ -124,6 +147,17 @@ export default function CheckAnswersPage({ formId }: { formId: string }) {
   )
 }
 
+/** Option label, with nested follow-up text appended when that option reveals a field. */
+function choiceLabel(question: OnboardingQuestion, value: string, answers: TaskAnswers): string | undefined {
+  if (question.type !== 'radios' && question.type !== 'checkboxes') return undefined
+  const label = question.options.find((o) => o.value === value)?.label
+  if (!label) return undefined
+  const followUp = question.options.find((o) => o.value === value)?.followUp || (value === 'other' ? { label: 'Give details' } : undefined)
+  if (!followUp) return label
+  const details = (answers[otherDetailsKey(question.id)] ?? '').trim()
+  return details ? `${label}: ${details}` : label
+}
+
 /** Human-readable replay of one answer, per question type. Shared with Company information. */
 export function formatAnswer(question: OnboardingQuestion, answers: TaskAnswers): ReactNode {
   const raw = answers[question.id] ?? ''
@@ -131,11 +165,13 @@ export function formatAnswer(question: OnboardingQuestion, answers: TaskAnswers)
 
   switch (question.type) {
     case 'radios':
-      return question.options.find((o) => o.value === raw)?.label ?? empty
+      return choiceLabel(question, raw, answers) ?? empty
 
     case 'checkboxes': {
       const chosen = raw.split(CHECKBOX_SEPARATOR).filter(Boolean)
-      const labels = question.options.filter((o) => chosen.includes(o.value)).map((o) => o.label)
+      const labels = chosen
+        .map((value) => choiceLabel(question, value, answers))
+        .filter((label): label is string => !!label)
       return labels.length > 0 ? labels.join(', ') : empty
     }
 
@@ -153,7 +189,7 @@ export function formatAnswer(question: OnboardingQuestion, answers: TaskAnswers)
           </a>
         )
       }
-      return value
+      return question.suffix ? `${value}${question.suffix}` : value
     }
 
     case 'fields': {
@@ -185,16 +221,32 @@ export function formatAnswer(question: OnboardingQuestion, answers: TaskAnswers)
     }
 
     case 'upload': {
+      if (question.multiple) {
+        if (raw === NOT_PROVIDED) return raw
+        const docs = parseUploadedDocuments(raw)
+        if (docs.length === 0) return empty
+        return (
+          <ul className="nhsuk-list nhsuk-u-margin-bottom-0">
+            {docs.map((doc, i) => (
+              <li key={`${doc.uploadedAt}-${i}`}>{doc.name}</li>
+            ))}
+          </ul>
+        )
+      }
       if (!isQuestionAnswered(question, answers)) return empty
       if (question.noReference) return raw
       return (
         <>
           {answers[`${question.id}${UPLOAD_REFERENCE_SUFFIX}`]}
           <br />
-          <span className="nhsuk-u-secondary-text-color nhsuk-body-s">{raw}</span>
+          <span>{raw}</span>
         </>
       )
     }
+
+    case 'blocked':
+    case 'info':
+      return empty
 
     case 'multi-upload': {
       const docs = parseUploadedDocuments(raw)
@@ -207,11 +259,11 @@ export function formatAnswer(question: OnboardingQuestion, answers: TaskAnswers)
               <li key={`${doc.uploadedAt}-${i}`}>
                 {doc.reference}
                 <br />
-                <span className="nhsuk-u-secondary-text-color nhsuk-body-s">{doc.name}</span>
+                <span>{doc.name}</span>
               </li>
             ))}
           </ul>
-          <span className="nhsuk-body-s nhsuk-u-margin-bottom-0">
+          <span className="nhsuk-body-m nhsuk-u-margin-bottom-0">
             {docs.length} {docs.length === 1 ? 'document' : 'documents'}
             {confirmed ? ', marked as complete' : ''}
           </span>

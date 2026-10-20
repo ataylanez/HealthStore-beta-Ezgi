@@ -9,7 +9,6 @@ import {
 import { companyComplete } from '@/lib/supplierCompany'
 import {
   ONBOARDING_FORMS,
-  UPLOADED_ON_SUFFIX,
   type ManagedProduct,
   type ManagedProductStatus,
   type OnboardingForm,
@@ -31,82 +30,16 @@ export function companyStatus(record: CompanyRecord): CompanyStatus {
   return changed ? 'draft_changes' : 'up_to_date'
 }
 
-export function onboardingFormStatus(form: OnboardingForm, progress: OnboardingProgress): OnboardingFormStatus {
-  if (progress.submission) return 'submitted'
-  if (form.actionNeeded) return 'action_needed'
-  return 'incomplete'
+export function onboardingFormStatus(progress: OnboardingProgress): OnboardingFormStatus {
+  return progress.submission ? 'submitted' : 'incomplete'
 }
 
-/** True when the draft has a content or document value that differs from the last submission. */
-function hasProductDraftChanges(record: EditRecord): boolean {
-  const draft = record.draft ?? {}
-  const values = record.values ?? {}
-  return Object.entries(draft).some(([key, value]) => {
-    if (key.endsWith(UPLOADED_ON_SUFFIX)) return false
-    return value !== (values[key] ?? '')
-  })
-}
-
-function productNeedsAction(product: ManagedProduct, record: EditRecord, status: ManagedProductStatus): boolean {
-  if (status === 'action_needed') return true
-  if (status !== 'draft_changes') return false
-  return Boolean(
-    (record.actionNeededFields?.length ?? 0) > 0 ||
-      (product.actionNeededFields?.length ?? 0) > 0 ||
-      product.actionNeeded,
-  )
-}
-
-/**
- * All statuses that apply to a managed product, highest priority first.
- * Action needed outranks Draft changes when both apply (review sent back and
- * the supplier has since saved further edits).
- */
-export function managedProductStatuses(product: ManagedProduct, record: EditRecord): ManagedProductStatus[] {
-  const status = (record.status as ManagedProductStatus | undefined) ?? product.status
-  const actionNeeded = productNeedsAction(product, record, status)
-  const draftChanges = status === 'draft_changes' || (actionNeeded && hasProductDraftChanges(record))
-
-  if (actionNeeded && draftChanges) return ['action_needed', 'draft_changes']
-  if (actionNeeded) return ['action_needed']
-  return [status]
-}
-
-/** Primary status (first of {@link managedProductStatuses}). */
 export function managedProductStatus(product: ManagedProduct, record: EditRecord): ManagedProductStatus {
-  return managedProductStatuses(product, record)[0]
+  return (record.status as ManagedProductStatus | undefined) ?? product.status
 }
 
-function hasPageDraftChanges(record: EditRecord): boolean {
-  const draft = record.draft ?? {}
-  const values = record.values ?? {}
-  return Object.entries(draft).some(([key, value]) => value !== (values[key] ?? ''))
-}
-
-/**
- * All statuses that apply to a published page, highest priority first.
- * Action needed outranks Unpublished / Unpublished changes when both apply.
- */
-export function publishedPageStatuses(record: EditRecord): PublishedPageStatus[] {
-  const status = (record.status as PublishedPageStatus | undefined) ?? 'unpublished'
-  const actionNeeded =
-    status === 'action_needed' ||
-    ((status === 'unpublished' || status === 'unpublished_changes') && (record.actionNeededFields?.length ?? 0) > 0)
-  const draftSide =
-    status === 'unpublished_changes' ||
-    status === 'unpublished' ||
-    (actionNeeded && hasPageDraftChanges(record))
-
-  if (actionNeeded && draftSide && hasPageDraftChanges(record)) {
-    return ['action_needed', record.hasBeenPublished ? 'unpublished_changes' : 'unpublished']
-  }
-  if (actionNeeded) return ['action_needed']
-  return [status]
-}
-
-/** Primary status (first of {@link publishedPageStatuses}). */
 export function publishedPageStatus(record: EditRecord): PublishedPageStatus {
-  return publishedPageStatuses(record)[0]
+  return (record.status as PublishedPageStatus | undefined) ?? 'unpublished'
 }
 
 export type OnboardingFormSummary = {
@@ -129,7 +62,7 @@ export function useOnboardingFormSummaries(): { hydrated: boolean; summaries: On
           const progress = readOnboardingProgress(form.id)
           return {
             form,
-            status: onboardingFormStatus(form, progress),
+            status: onboardingFormStatus(progress),
             lastSaved: progress.updatedAt ?? form.startedOn,
             completedTasks: Object.values(progress.complete).filter(Boolean).length,
           }

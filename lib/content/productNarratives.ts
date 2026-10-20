@@ -578,11 +578,134 @@ const JOINT_ACADEMY_NARRATIVE: ProductNarrative = {
   publishing: { content_owner: 'NHS HealthStore', review_date: '2026-06-25', next_review: '2026-09-25' },
 }
 
+/**
+ * Limited market view. No funding levers, no price and no buyer pack.
+ * Assurance domains stay incomplete: nothing is held for local assurance.
+ */
+export const WELLINKS_NARRATIVE: ProductNarrative = {
+  decision_summary: {
+    one_line_proposition:
+      'An online platform for COPD self-management, with health coaching and connected devices for remote monitoring and education.',
+    pathway_problem:
+      'COPD care still depends on people managing exacerbations between appointments. NICE guidance expects a self-management plan, inhaler review and access to exercise, usually delivered face to face by a respiratory team. Many people leave hospital after an exacerbation without the support to cope at home, and pulmonary rehabilitation does not reach most of those who are eligible.',
+    intervention_class: 'COPD self-management platform with health coaching',
+    why_relevant:
+      'NICE assessed Wellinks in HTG736 and made no recommendation. The guidance records that it is not used in the NHS and does not have UK regulatory approval. It is included so the wider COPD market is visible next to technologies that can be commissioned.',
+  },
+  what_it_does_bullets: [
+    'Health coaching for self-management, delivered by respiratory professionals, as described by NICE',
+    'A patient app with connected devices, such as pulse oximeters and spirometers, for monitoring and education',
+    'Virtual pulmonary rehabilitation, one-to-one clinical coaching and nurse triage, as published by the supplier for use outside the NHS',
+  ],
+  pathway_model: {
+    current_steps: [
+      { id: 'c1', label: 'Person with COPD is on the primary care register', role: 'GP practice' },
+      { id: 'c2', label: 'Face-to-face review, inhaler check and self-management advice', role: 'Respiratory nurse' },
+      { id: 'c3', label: 'Pulmonary rehabilitation if a place is available', role: 'Therapy team' },
+      { id: 'c4', label: 'Unplanned care if the person deteriorates at home', role: 'Urgent and emergency care' },
+    ],
+    future_steps: [
+      { id: 'f1', label: 'Supplier enrols the person with a health plan or provider outside the NHS', role: 'Wellinks', change: 'added', notes: 'Not an NHS pathway' },
+      { id: 'f2', label: 'Person uses the app and connected monitoring devices', role: 'Patient', change: 'added' },
+      { id: 'f3', label: 'Supplier clinical team provides coaching and triage', role: 'Wellinks clinicians', change: 'added' },
+      { id: 'f4', label: 'No NHS follow-up pathway is recorded', role: 'NHS', change: 'unchanged' },
+    ],
+    roles: ['Patient', 'Wellinks clinical team'],
+    changed_resources: ['Not an NHS pathway', 'No NHS workforce or tariff impact is recorded'],
+  },
+  regulatory_position: {
+    device_class: 'No UK regulatory approval recorded',
+    assurance_speed_note:
+      'Verified source documents for local assurance are not held on the HealthStore.',
+    nice: {
+      ref: 'NICE HTG736',
+      url: 'https://www.nice.org.uk/guidance/htg736/chapter/2-The-technologies#wellinks',
+      status: 'No recommendation. Wellinks is not used in the NHS and does not have UK regulatory approval.',
+      last_updated: '3 February 2026',
+    },
+    dtac_complete: false,
+  },
+  assurance_domains: [
+    {
+      domain: 'Clinical safety',
+      status: 'incomplete',
+      summary: 'No UK regulatory approval is recorded. A DCB0129 clinical safety case, PAQ and hazard log are not held.',
+      items: [
+        { label: 'Medical device status', value: 'No UK regulatory approval recorded' },
+        { label: 'PAQ form', value: 'Not held' },
+        { label: 'DCB0129 hazard log', value: 'Not held' },
+        { label: 'DCB0160 local hazard log template', value: 'Not held' },
+      ],
+    },
+    {
+      domain: 'Data protection',
+      status: 'incomplete',
+      summary: 'ICO registration, a data processing agreement and a DPIA are not held.',
+      items: [
+        { label: 'ICO registration', value: 'Not held' },
+        { label: 'Data processing agreement', value: 'Not held' },
+        { label: 'DPIA template', value: 'Not held' },
+      ],
+    },
+    {
+      domain: 'Technical security',
+      status: 'incomplete',
+      summary: 'Cyber Essentials, a penetration test and ISO 27001 are not held.',
+      items: [
+        { label: 'Cyber Essentials', value: 'Not held' },
+        { label: 'Penetration test summary', value: 'Not held' },
+        { label: 'ISO 27001', value: 'Not held' },
+      ],
+    },
+    {
+      domain: 'Interoperability',
+      status: 'incomplete',
+      summary: 'NHS integration is not confirmed. Wellinks is not used in the NHS.',
+    },
+    {
+      domain: 'Usability and accessibility',
+      status: 'incomplete',
+      summary: 'User journeys and a WCAG 2.2 AA audit are not held.',
+      items: [
+        { label: 'User journeys', value: 'Not held' },
+        { label: 'WCAG 2.2 AA third-party audit', value: 'Not held' },
+      ],
+    },
+    {
+      domain: 'NICE recommendation',
+      status: 'incomplete',
+      summary:
+        'Assessed in NICE HTG736. No recommendation was made, because Wellinks is not used in the NHS and does not have UK regulatory approval.',
+    },
+    {
+      domain: 'Completed DTAC form',
+      status: 'incomplete',
+      summary: 'A completed DTAC form is not held.',
+      items: [{ label: 'DTAC form', value: 'Not held' }],
+    },
+  ],
+  implementation: {
+    human_wrapper:
+      'NICE describes health coaching by respiratory professionals and a patient app with connected pulse oximeters and spirometers. The supplier also publishes virtual pulmonary rehabilitation and nurse triage. This is the supplier’s published service. It is not an NHS pathway.',
+    workforce:
+      'No NHS workforce model is held. NICE records that Wellinks is not used in the NHS, so there is no local clinical team, hub or onboarding route to plan from this page.',
+    timescale:
+      'There is no NHS go-live timeline. UK regulatory approval is not in place, and Wellinks is not available to commission through the NHS HealthStore.',
+    prerequisites: [
+      'UK regulatory approval is not recorded',
+      'DTAC, clinical safety and information governance evidence are not held',
+      'No NHS clinical owner or deployment is recorded',
+    ],
+  },
+  publishing: { content_owner: 'NHS HealthStore product team', review_date: '2026-10-19', next_review: '2027-01-19' },
+}
+
 export function getProductNarrative(slug: string): ProductNarrative | null {
   if (slug === 'luscii') return LUSCII_NARRATIVE
   if (slug === 'mycopd') return MYCOPD_NARRATIVE
   if (slug === 'myheart') return MYHEART_NARRATIVE
   if (slug === 'joint-academy') return JOINT_ACADEMY_NARRATIVE
+  if (slug === 'wellinks') return WELLINKS_NARRATIVE
   return null
 }
 

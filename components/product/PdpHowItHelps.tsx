@@ -16,7 +16,7 @@ export default function PdpHowItHelps({ app, narrative }: { app: App; narrative:
       title={pdpSectionTitle('how-it-helps', { appName: app.app_name })}
     >
       {bullets.length > 0 && (
-        <ul className="space-y-2" style={{ margin: '0 0 8px', paddingLeft: 20, lineHeight: 1.7, color: 'var(--text-secondary)', fontSize: 'var(--text-body)' }}>
+        <ul className="nhsuk-list nhsuk-list--bullet">
           {bullets.map((b) => (
             <li key={b}>{b}</li>
           ))}
@@ -52,10 +52,10 @@ export default function PdpHowItHelps({ app, narrative }: { app: App; narrative:
             </div>
           </div>
           <details className="mt-4">
-            <summary style={{ cursor: 'pointer', fontSize: 'var(--text-label)', color: 'var(--nhs-blue)' }}>
+            <summary className="nhsuk-body-m" style={{ cursor: 'pointer' }}>
               Text-only pathway description
             </summary>
-            <div className="mt-2 hs-text-caption" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+            <div className="nhsuk-body-m nhsuk-u-margin-top-2">
               <p><strong>Current:</strong> {pathway.current_steps.map((s) => s.label).join(' → ')}</p>
               <p className="mt-1"><strong>With {app.app_name}:</strong> {pathway.future_steps.map((s) => `${s.label}${s.change && s.change !== 'unchanged' ? ` [${s.change}]` : ''}`).join(' → ')}</p>
             </div>

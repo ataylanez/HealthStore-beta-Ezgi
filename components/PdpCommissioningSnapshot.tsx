@@ -17,14 +17,9 @@ function interopItemsInOrder(items: InteropSnapshotItem[], keys: readonly string
   })
 }
 
-function SnapshotText({ muted, children }: { muted?: boolean; children: ReactNode }) {
+function SnapshotText({ children }: { children: ReactNode }) {
   return (
-    <span
-      className={`hs-text-label leading-snug ${muted ? 'opacity-50' : ''}`}
-      style={{ color: 'var(--text-secondary)' }}
-    >
-      {children}
-    </span>
+    <span className="nhsuk-body-s nhsuk-u-secondary-text-color">{children}</span>
   )
 }
 
@@ -97,7 +92,7 @@ function GovernanceSegment({
                 {' · '}
               </span>
             ) : null}
-            <SnapshotText muted={p.muted}>{p.label}</SnapshotText>
+            <SnapshotText>{p.label}</SnapshotText>
           </li>
         ))}
       </ul>
@@ -117,13 +112,13 @@ function CostSegment({
       <div>
         <SnapshotTextList items={card.modelPills} />
         {card.indicativeNote ? (
-          <p className="mt-1 mb-0 hs-text-caption leading-snug" style={{ color: 'var(--text-muted)' }}>
+          <p className="nhsuk-body-s nhsuk-u-secondary-text-color nhsuk-u-margin-top-1 nhsuk-u-margin-bottom-0">
             {card.indicativeNote}
           </p>
         ) : null}
       </div>
       {card.subline ? (
-        <p className="mt-2 mb-0 hs-text-caption leading-snug" style={{ color: 'var(--text-muted)' }}>
+        <p className="nhsuk-body-m nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0">
           {card.subline}
         </p>
       ) : null}

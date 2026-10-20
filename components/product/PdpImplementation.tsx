@@ -2,6 +2,7 @@ import type { App } from '@/lib/data'
 import type { ProductNarrative } from '@/lib/content/productModel'
 import { PdpSection } from '@/components/PdpSection'
 import { pdpSectionTitle } from '@/lib/pdpSections'
+import { isMarketPreview } from '@/lib/marketPreview'
 
 /**
  * "Making it work at your site" — the curated implementation narrative.
@@ -22,6 +23,7 @@ export default function PdpImplementation({
 }) {
   const impl = narrative.implementation
   if (!impl) return null
+  const marketPreview = isMarketPreview(app)
 
   const cards = [
     { label: 'Clinical and human wrapper', value: impl.human_wrapper },
@@ -34,7 +36,11 @@ export default function PdpImplementation({
       id="implementation"
       shareKey="narrative-implementation"
       title={pdpSectionTitle('implementation')}
-      description="Successful deployment depends on three things: clinical engagement, systematic patient invitation, and ongoing monitoring. Here is what the supplier provides and what your local team needs to organise."
+      description={
+        marketPreview
+          ? 'This is the service the supplier publishes. It is not an NHS deployment, and there is no commissioning route through the NHS HealthStore.'
+          : 'Successful deployment depends on three things: clinical engagement, systematic patient invitation, and ongoing monitoring. Here is what the supplier provides and what your local team needs to organise.'
+      }
     >
       <ol className="hs-impl-timeline">
         {cards.map((c) => (
@@ -48,7 +54,7 @@ export default function PdpImplementation({
             </div>
             <div className="hs-impl-timeline__card">
               <div className="hs-font-bold hs-text-body mb-1" style={{ color: 'var(--text-primary)' }}>{c.label}</div>
-              <p className="hs-text-body" style={{ color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>{c.value}</p>
+              <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">{c.value}</p>
             </div>
           </li>
         ))}
@@ -59,7 +65,7 @@ export default function PdpImplementation({
           <h3 className="nhsuk-heading-s hs-pdp-subheading">
             Local prerequisites
           </h3>
-          <ul className="space-y-1" style={{ margin: 0, paddingLeft: 20, maxWidth: 720, lineHeight: 1.7, color: 'var(--text-secondary)', fontSize: 'var(--text-label)' }}>
+          <ul className="nhsuk-list nhsuk-list--bullet">
             {impl.prerequisites.map((p) => (
               <li key={p}>{p}</li>
             ))}
@@ -67,11 +73,12 @@ export default function PdpImplementation({
         </div>
       )}
 
+      {!marketPreview && (
       <div className="rounded-lg p-4 mt-4" style={{ background: '#E6F0FB', border: '1px solid var(--border)' }}>
         <div className="hs-font-bold hs-text-label mb-1" style={{ color: 'var(--text-primary)' }}>
           Supplier support included
         </div>
-        <p className="hs-text-label" style={{ color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
+        <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">
           The supplier provides onboarding, training materials, technical integration support and ongoing account management as
           part of the standard package. The NHS HealthStore brokers the introduction and tracks mobilisation milestones{impl.owner ? `, with the ${impl.owner} as the recommended local owner` : ''}.
         </p>
@@ -131,13 +138,14 @@ export default function PdpImplementation({
               )}
             </div>
             {impl.onboarding_note && (
-              <p className="mt-2 hs-text-caption" style={{ color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: 720 }}>
+              <p className="nhsuk-body-m nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0">
                 {impl.onboarding_note}
               </p>
             )}
           </div>
         )}
       </div>
+      )}
     </PdpSection>
   )
 }

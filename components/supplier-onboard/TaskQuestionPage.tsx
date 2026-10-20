@@ -1,8 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { BackLink } from '@/components/BackLink'
+import { ErrorSummary } from '@/components/eoi/journey/shared'
 import { NhsFileUpload } from '@/components/nhs/NhsFileUpload'
 import { Button } from '@/components/ui/Button'
 import { FormField, Textarea, TextInput } from '@/components/ui/FormField'
@@ -13,19 +15,34 @@ import {
   UPLOAD_REFERENCE_SUFFIX,
   fieldKey,
   formBasePath,
+  isAnswered,
+  isFutureIsoDate,
+  isQuestionAnswered,
   isQuestionVisible,
   isTaskComplete,
+  isValidIsoDate,
   nextPageHref,
+  NOT_PROVIDED_ANSWER,
+  optionDisplayLabel,
+  optionFollowUp,
+  otherDetailsKey,
   parseUploadedDocuments,
   prevPageHref,
+  knownProductName,
+  questionDisplayHint,
+  questionDisplayLabel,
+  questionDisplayPageTitle,
+  questionHasConditionalInput,
   questionKeys,
+  substituteProductName,
   serializeUploadedDocuments,
-  visibleQuestions,
   type UploadedDocument,
   type OnboardingQuestion,
+  type OnboardingSection,
   type OnboardingTask,
   type TaskAnswers,
 } from '@/lib/supplierOnboarding'
+import { sampleAnswerFor } from '@/lib/supplierOnboardingSampleAnswers'
 import { useOnboardingProgress } from './useOnboardingProgress'
 
 /**
@@ -42,10 +59,10 @@ import { useOnboardingProgress } from './useOnboardingProgress'
  *    gate (MoJ Multi file upload pattern rebuilt from NHS components — see MultiUploadField)
  *
  * Routing: the questionnaire branches on earlier answers (see `showIf` in
- * lib/supplierOnboarding.ts). Next / back targets and the "question x of y"
- * caption are computed from the saved answers merged with this page's draft, so
- * they follow the answer being given. A page whose question is not on the
- * current route redirects to the next one that is.
+ * lib/supplierOnboarding.ts). Next / back targets are computed from the saved
+ * answers merged with this page's draft, so they follow the answer being given.
+ * A page whose question is not on the current route redirects to the next one
+ * that is.
  *
  * Actions:
  *  - Save and Next  — saves, then goes to the next page in journey order: the next
@@ -59,10 +76,12 @@ import { useOnboardingProgress } from './useOnboardingProgress'
 export default function TaskQuestionPage({
   formId,
   task,
+  section,
   step,
 }: {
   formId: string
   task: OnboardingTask
+  section: OnboardingSection
   step: number
 }) {
   const router = useRouter()
@@ -70,22 +89,23 @@ export default function TaskQuestionPage({
   const taskListHref = formBasePath(formId)
 
   const question = task.questions[step - 1]
+  const blocked = question.type === 'blocked'
+  const info = question.type === 'info'
 
   /** Unsaved answers for this page only, keyed like TaskAnswers. */
   const [draft, setDraft] = useState<TaskAnswers>({})
+  const [error, setError] = useState<string | undefined>()
 
   const saved = getAnswers(task.id)
   /** Saved answers with this page's draft applied — the basis for routing. */
   const merged = useMemo(() => ({ ...saved, ...draft }), [saved, draft])
 
-  const visible = visibleQuestions(task, merged)
-  const position = visible.findIndex((v) => v.step === step) + 1
-  const total = visible.length
-  const multiPage = total > 1
   /** Next page anywhere in the journey; null only on the final page of the final task. */
   const nextHref = nextPageHref(formId, task, step, merged)
   const isLast = nextHref === null
-  const backHref = prevPageHref(formId, task, step, merged)
+  const backHref = prevPageHref(formId, task, step, (taskId) =>
+    taskId === task.id ? merged : getAnswers(taskId),
+  )
 
   // Prefill from saved answers once storage has been read.
   useEffect(() => {
@@ -104,11 +124,14 @@ export default function TaskQuestionPage({
     router.replace(nextPageHref(formId, task, step, saved) ?? taskListHref)
   }, [offRoute, router, formId, task, step, saved, taskListHref])
 
-  const patch = (changes: TaskAnswers) => setDraft((d) => ({ ...d, ...changes }))
+  const patch = (changes: TaskAnswers) => {
+    setDraft((d) => ({ ...d, ...changes }))
+    if (error) setError(undefined)
+  }
 
   function save() {
-    const merged = { ...getAnswers(task.id), ...draft }
-    saveTask(task.id, draft, isTaskComplete(task, merged))
+    const next = { ...getAnswers(task.id), ...draft }
+    saveTask(task.id, draft, isTaskComplete(task, next))
   }
 
   /**
@@ -119,22 +142,76 @@ export default function TaskQuestionPage({
   function commit(changes: TaskAnswers) {
     const nextDraft = { ...draft, ...changes }
     setDraft(nextDraft)
-    const merged = { ...getAnswers(task.id), ...nextDraft }
-    saveTask(task.id, nextDraft, isTaskComplete(task, merged))
+    const next = { ...getAnswers(task.id), ...nextDraft }
+    saveTask(task.id, nextDraft, isTaskComplete(task, next))
+  }
+
+  function validate(): boolean {
+    if (question.type === 'date' && question.mustBeFuture) {
+      const value = merged[question.id]
+      if (!isValidIsoDate(value)) {
+        setError('Enter a valid date')
+        return false
+      }
+      if (!isFutureIsoDate(value)) {
+        setError('The expiry date must be in the future')
+        return false
+      }
+      return true
+    }
+    if (
+      (question.type === 'radios' || question.type === 'checkboxes') &&
+      isAnswered(merged[question.id]) &&
+      optionFollowUp(question, merged[question.id]) &&
+      !isAnswered(merged[otherDetailsKey(question.id)])
+    ) {
+      const followUp = optionFollowUp(question, merged[question.id])
+      setError(followUp?.inputType === 'url' ? 'Enter a URL' : 'Enter details')
+      return false
+    }
+    if (question.optional || question.type === 'blocked' || question.type === 'info' || isQuestionAnswered(question, merged)) {
+      return true
+    }
+    if (question.type === 'upload') {
+      setError(question.noReference ? 'Select a file' : 'Select a file and enter a reference name')
+      return false
+    }
+    if (question.type === 'date') {
+      setError('Enter a valid date')
+      return false
+    }
+    setError('Enter an answer')
+    return false
   }
 
   function saveAndNext() {
+    if (!validate()) return
     save()
     if (nextHref) router.push(nextHref)
   }
 
+  /** Persist an answer that changes the route, then open the next question on that route. */
+  function continueWith(changes: TaskAnswers) {
+    const nextDraft = { ...draft, ...changes }
+    setDraft(nextDraft)
+    const mergedNext = { ...getAnswers(task.id), ...nextDraft }
+    saveTask(task.id, nextDraft, isTaskComplete(task, mergedNext))
+    const href = nextPageHref(formId, task, step, mergedNext)
+    if (href) router.push(href)
+  }
+
   function saveAndExit() {
+    if (!validate()) return
     save()
     router.push(taskListHref)
   }
 
   function cancel() {
     router.push(taskListHref)
+  }
+
+  function fillWithSample() {
+    setDraft((d) => ({ ...d, ...sampleAnswerFor(question) }))
   }
 
   if (offRoute) return null
@@ -144,14 +221,28 @@ export default function TaskQuestionPage({
       <div className="nhsuk-grid-row">
         <div className="nhsuk-grid-column-two-thirds">
           <BackLink href={backHref} />
-          {/* Caption gives task context (and the questionnaire reference, e.g. C1.1.1). */}
-          {(multiPage || question.code || question.label !== task.title) && (
-            <span className="nhsuk-caption-l">
-              {task.title}
-              {question.code ? ` — ${question.code}` : ''}
-              {multiPage && position > 0 ? ` — question ${position} of ${total}` : ''}
-            </span>
-          )}
+          <ErrorSummary
+            errors={
+              error
+                ? [
+                    {
+                      field:
+                        question.type === 'date'
+                          ? `${question.id}-day`
+                          : question.type === 'upload'
+                            ? `${question.id}-file`
+                            : (question.type === 'radios' || question.type === 'checkboxes') &&
+                                optionFollowUp(question, merged[question.id]) &&
+                                !isAnswered(merged[otherDetailsKey(question.id)])
+                              ? otherDetailsKey(question.id)
+                              : question.id,
+                      message: error,
+                    },
+                  ]
+                : []
+            }
+          />
+          <span className="nhsuk-caption-l">{section.title}</span>
 
           <form
             noValidate
@@ -161,23 +252,92 @@ export default function TaskQuestionPage({
               else saveAndNext()
             }}
           >
-            <QuestionField question={question} draft={draft} patch={patch} commit={commit} />
+            <QuestionField
+              question={(() => {
+                const answersFor = (taskId: string) => (taskId === task.id ? merged : getAnswers(taskId))
+                const productName = knownProductName(answersFor)
+                const display = {
+                  ...question,
+                  label: questionDisplayLabel(question, answersFor),
+                  pageTitle: questionDisplayPageTitle(question, answersFor),
+                  hint: questionDisplayHint(question, answersFor),
+                  fieldHint: question.fieldHint
+                    ? substituteProductName(question.fieldHint, productName)
+                    : question.fieldHint,
+                  details: question.details?.map((item) => ({
+                    ...item,
+                    summary: substituteProductName(item.summary, productName),
+                    text: substituteProductName(item.text, productName),
+                  })),
+                }
+                if (display.type === 'radios' || display.type === 'checkboxes') {
+                  return {
+                    ...display,
+                    options: display.options.map((o) => ({
+                      ...o,
+                      label: optionDisplayLabel(question, o, answersFor),
+                      hint: o.hint ? substituteProductName(o.hint, productName) : o.hint,
+                    })),
+                  }
+                }
+                return display
+              })()}
+              draft={draft}
+              patch={patch}
+              commit={commit}
+              error={error}
+              onDecline={
+                question.type === 'upload' && question.declineLabel
+                  ? () => continueWith({ [question.id]: NOT_PROVIDED_ANSWER })
+                  : undefined
+              }
+            />
+
+            {!blocked && !info && (
+              <p className="nhsuk-body-m nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0">
+                <button
+                  type="button"
+                  className="nhsuk-link"
+                  onClick={fillWithSample}
+                  style={{ background: 'none', border: 0, padding: 0, cursor: 'pointer', textDecoration: 'underline', font: 'inherit' }}
+                >
+                  Fill with sample
+                </button>
+              </p>
+            )}
+
+            {blocked && (
+              <p className="nhsuk-body">
+                <Link className="nhsuk-link" href={backHref}>
+                  You can change your answer
+                </Link>
+                {' or, if you need help you can '}
+                <a className="nhsuk-link" href="#get-support" onClick={(e) => e.preventDefault()}>
+                  Get support
+                </a>
+                {' from the HealthStore team.'}
+              </p>
+            )}
 
             {/* 96px above the actions (collapses with the field's form-group margin) — matches
                 the gap above "Mark as complete" on the DTAC page. */}
+            {!blocked && (
             <div className="nhsuk-u-margin-top-6 flex flex-wrap items-center gap-4">
-              {!isLast && <Button type="submit">Save and Next</Button>}
-              <Button
-                type={isLast ? 'submit' : 'button'}
-                variant={isLast ? 'primary' : 'secondary'}
-                onClick={isLast ? undefined : saveAndExit}
-              >
-                Save and Exit
-              </Button>
+              {!isLast && <Button type="submit">{info ? 'Continue' : 'Save and Next'}</Button>}
+              {!info && (
+                <Button
+                  type={isLast ? 'submit' : 'button'}
+                  variant={isLast ? 'primary' : 'secondary'}
+                  onClick={isLast ? undefined : saveAndExit}
+                >
+                  Save and Exit
+                </Button>
+              )}
               <Button type="button" variant="secondary" onClick={cancel}>
                 Cancel
               </Button>
             </div>
+            )}
           </form>
         </div>
       </div>
@@ -193,6 +353,10 @@ export type QuestionFieldProps = {
   patch: (changes: TaskAnswers) => void
   /** Patch and persist immediately (see TaskQuestionPage.commit). */
   commit: (changes: TaskAnswers) => void
+  /** Records "Not provided" for an upload and moves to the next question. */
+  onDecline?: () => void
+  /** Inline validation message for the current question. */
+  error?: string
 }
 
 type FieldProps = QuestionFieldProps
@@ -202,12 +366,85 @@ type FieldProps = QuestionFieldProps
  * documents); null when empty. Multi-upload lists its documents in a Details
  * component instead (see MultiUploadField).
  */
-function hintContent(question: OnboardingQuestion) {
-  const documents = question.type === 'upload' ? question.documents : undefined
+function linkedText(text: string, link?: { text: string; href: string } | { text: string; href: string }[]) {
+  const links = !link ? [] : Array.isArray(link) ? link : [link]
+  const found = links
+    .map((item) => ({ ...item, at: text.indexOf(item.text) }))
+    .filter((item) => item.at >= 0)
+    .sort((a, b) => a.at - b.at)
+  if (found.length === 0) return text
+  const nodes: ReactNode[] = []
+  let cursor = 0
+  found.forEach((item, index) => {
+    if (item.at < cursor) return
+    if (item.at > cursor) nodes.push(text.slice(cursor, item.at))
+    nodes.push(
+      <a key={`${item.href}-${index}`} className="nhsuk-link" href={item.href} target="_blank" rel="noopener noreferrer">
+        {item.text}
+        <span className="nhsuk-u-visually-hidden"> (opens in a new tab)</span>
+      </a>,
+    )
+    cursor = item.at + item.text.length
+  })
+  if (cursor < text.length) nodes.push(text.slice(cursor))
+  return <>{nodes}</>
+}
+
+function richText(text: string, link?: OnboardingQuestion['hintLink']) {
+  const parts = text.split('\n\n').map((part) => part.trim()).filter(Boolean)
+  const remaining = !link ? [] : Array.isArray(link) ? [...link] : [link]
+  const takeLinks = (part: string) => {
+    const used: typeof remaining = []
+    for (const item of remaining) {
+      if (part.includes(item.text)) used.push(item)
+    }
+    for (const item of used) {
+      const at = remaining.indexOf(item)
+      if (at >= 0) remaining.splice(at, 1)
+    }
+    return used
+  }
+  const blocks: ReactNode[] = []
+  let index = 0
+  while (index < parts.length) {
+    if (parts[index].startsWith('●')) {
+      const items: string[] = []
+      while (index < parts.length && parts[index].startsWith('●')) {
+        items.push(parts[index].replace(/^●\s*/, ''))
+        index += 1
+      }
+      blocks.push(
+        <ul key={`bullets-${index}`} className="nhsuk-list nhsuk-list--bullet">
+          {items.map((item) => (
+            <li key={item}>{linkedText(item, takeLinks(item))}</li>
+          ))}
+        </ul>,
+      )
+    } else {
+      const part = parts[index]
+      blocks.push(
+        <span key={`text-${index}`}>
+          {blocks.length > 0 && (
+            <>
+              <br />
+              <br />
+            </>
+          )}
+          {linkedText(part, takeLinks(part))}
+        </span>,
+      )
+      index += 1
+    }
+  }
+  return <>{blocks}</>
+}
+
+function hintContent(question: OnboardingQuestion, includeDocuments = true) {
+  const documents = includeDocuments && question.type === 'upload' ? question.documents : undefined
   if (!question.hint && !documents?.length) return null
   return (
     <>
-      {question.hint}
+      {question.hint ? richText(question.hint, question.hintLink) : null}
       {documents && documents.length > 0 && (
         <ul className="nhsuk-list nhsuk-list--bullet nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0">
           {documents.map((d) => (
@@ -221,12 +458,66 @@ function hintContent(question: OnboardingQuestion) {
 
 function Hint({ question, id }: { question: OnboardingQuestion; id: string }) {
   const content = hintContent(question)
-  if (!content) return null
+  if (!content && !question.inset) return null
   return (
-    <div className="nhsuk-hint" id={id}>
-      {content}
-    </div>
+    <>
+      {content && (
+        <div className="nhsuk-hint" id={id}>
+          {content}
+        </div>
+      )}
+      {question.inset && (
+        <div className="nhsuk-inset-text">
+          <span className="nhsuk-u-visually-hidden">Information: </span>
+          <p>{question.inset}</p>
+        </div>
+      )}
+    </>
   )
+}
+
+function detailBody(item: NonNullable<OnboardingQuestion['details']>[number]) {
+  return richText(item.text, item.link)
+}
+
+function Disclosure({ item }: { item: NonNullable<OnboardingQuestion['details']>[number] }) {
+  const expander = item.variant === 'expander'
+  return (
+    <details className={expander ? 'nhsuk-details nhsuk-expander' : 'nhsuk-details'}>
+      <summary className="nhsuk-details__summary">
+        <span className="nhsuk-details__summary-text">{item.summary}</span>
+      </summary>
+      <div className="nhsuk-details__text">{detailBody(item)}</div>
+    </details>
+  )
+}
+
+/** NHS Details and Expanders authored on the question, shown under the hint. */
+function QuestionDisclosures({ question }: { question: OnboardingQuestion }) {
+  const items = question.details
+  if (!items?.length) return null
+  const blocks: ReactNode[] = []
+  let index = 0
+  while (index < items.length) {
+    if (items[index].variant === 'expander') {
+      const group: typeof items = []
+      while (index < items.length && items[index].variant === 'expander') {
+        group.push(items[index])
+        index += 1
+      }
+      blocks.push(
+        <div key={group[0].summary} className="nhsuk-expander-group">
+          {group.map((item) => (
+            <Disclosure key={item.summary} item={item} />
+          ))}
+        </div>,
+      )
+    } else {
+      blocks.push(<Disclosure key={items[index].summary} item={items[index]} />)
+      index += 1
+    }
+  }
+  return <>{blocks}</>
 }
 
 /**
@@ -234,10 +525,11 @@ function Hint({ question, id }: { question: OnboardingQuestion; id: string }) {
  * Exported so other one-question-per-page journeys (Company information) render
  * identically.
  */
-export function QuestionField({ question, draft, patch, commit }: FieldProps) {
+export function QuestionField({ question, draft, patch, commit, onDecline, error }: FieldProps) {
   const hintId = `${question.id}-hint`
+  const errorId = error ? `${question.id}-error` : undefined
   const hasHint = !!hintContent(question)
-  const describedBy = hasHint ? hintId : undefined
+  const describedBy = [hasHint ? hintId : undefined, errorId].filter(Boolean).join(' ') || undefined
   const optionalSuffix = question.optional ? ' (optional)' : ''
 
   switch (question.type) {
@@ -245,6 +537,8 @@ export function QuestionField({ question, draft, patch, commit }: FieldProps) {
     case 'checkboxes': {
       const isCheckbox = question.type === 'checkboxes'
       const options = question.options.filter((o) => !o.hidden)
+      const hasConditional = questionHasConditionalInput(question)
+      const detailsKey = otherDetailsKey(question.id)
       const selected = isCheckbox
         ? (draft[question.id] ?? '').split(CHECKBOX_SEPARATOR).filter(Boolean)
         : []
@@ -256,149 +550,336 @@ export function QuestionField({ question, draft, patch, commit }: FieldProps) {
         else next = [...selected.filter((v) => !exclusiveValues.includes(v)), value]
         patch({ [question.id]: next.join(CHECKBOX_SEPARATOR) })
       }
+      const pageTitle = question.pageTitle
+      const fieldHintId = question.fieldHint ? `${question.id}-field-hint` : undefined
+      const fieldsetDescribedBy = pageTitle ? fieldHintId : describedBy
       return (
+        <>
+          {pageTitle && <h1 className="nhsuk-heading-l">{pageTitle}</h1>}
+          {pageTitle && <Hint question={question} id={hintId} />}
+          {pageTitle && <QuestionDisclosures question={question} />}
         <div className="nhsuk-form-group">
-          <fieldset className="nhsuk-fieldset" aria-describedby={describedBy}>
-            <legend className="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
-              <h1 className="nhsuk-fieldset__heading">
-                {question.label}
-                {optionalSuffix}
-              </h1>
-            </legend>
-            <Hint question={question} id={hintId} />
-            <div className={isCheckbox ? 'nhsuk-checkboxes' : 'nhsuk-radios'}>
+          <fieldset className="nhsuk-fieldset" aria-describedby={fieldsetDescribedBy}>
+            {pageTitle ? (
+              <legend className="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">
+                <h2 className="nhsuk-fieldset__heading">
+                  {question.label}
+                  {optionalSuffix}
+                </h2>
+              </legend>
+            ) : (
+              <legend className="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+                <h1 className="nhsuk-fieldset__heading">
+                  {question.label}
+                  {optionalSuffix}
+                </h1>
+              </legend>
+            )}
+            {pageTitle && question.fieldHint && (
+              <div className="nhsuk-hint" id={fieldHintId}>
+                {question.fieldHint}
+              </div>
+            )}
+            {!pageTitle && <Hint question={question} id={hintId} />}
+            {!pageTitle && <QuestionDisclosures question={question} />}
+            <div
+              className={
+                isCheckbox
+                  ? `nhsuk-checkboxes${hasConditional ? ' nhsuk-checkboxes--conditional' : ''}`
+                  : `nhsuk-radios${hasConditional ? ' nhsuk-radios--conditional' : ''}`
+              }
+            >
               {options.map((o) => {
                 const id = `${question.id}-${o.value}`
+                const followUp = optionFollowUp(question, o.value)
+                const reveals = !!followUp
+                const open = isCheckbox ? selected.includes(o.value) : draft[question.id] === o.value
+                const conditionalId = `conditional-${question.id}-${o.value}`
+                const optionHintId = o.hint ? `${id}-hint` : undefined
+                const followUpHintId = followUp?.hint ? `${detailsKey}-hint` : undefined
+                const followUpType = followUp?.inputType ?? 'text'
                 return (
-                  <div key={o.value} className={isCheckbox ? 'nhsuk-checkboxes__item' : 'nhsuk-radios__item'}>
-                    <input
-                      className={isCheckbox ? 'nhsuk-checkboxes__input' : 'nhsuk-radios__input'}
-                      id={id}
-                      name={question.id}
-                      type={isCheckbox ? 'checkbox' : 'radio'}
-                      value={o.value}
-                      checked={isCheckbox ? selected.includes(o.value) : draft[question.id] === o.value}
-                      onChange={() => (isCheckbox ? toggle(o.value) : patch({ [question.id]: o.value }))}
-                    />
-                    <label
-                      className={`nhsuk-label ${isCheckbox ? 'nhsuk-checkboxes__label' : 'nhsuk-radios__label'}`}
-                      htmlFor={id}
-                    >
-                      {o.label}
-                    </label>
-                  </div>
+                  <Fragment key={o.value}>
+                    {o.dividerBefore && (
+                      <div className={isCheckbox ? 'nhsuk-checkboxes__divider' : 'nhsuk-radios__divider'}>or</div>
+                    )}
+                    <div className={isCheckbox ? 'nhsuk-checkboxes__item' : 'nhsuk-radios__item'}>
+                      <input
+                        className={isCheckbox ? 'nhsuk-checkboxes__input' : 'nhsuk-radios__input'}
+                        id={id}
+                        name={question.id}
+                        type={isCheckbox ? 'checkbox' : 'radio'}
+                        value={o.value}
+                        checked={open}
+                        aria-controls={reveals ? conditionalId : undefined}
+                        aria-describedby={optionHintId}
+                        aria-expanded={reveals ? open : undefined}
+                        onChange={() => (isCheckbox ? toggle(o.value) : patch({ [question.id]: o.value }))}
+                      />
+                      <label
+                        className={`nhsuk-label ${isCheckbox ? 'nhsuk-checkboxes__label' : 'nhsuk-radios__label'}`}
+                        htmlFor={id}
+                      >
+                        {o.label}
+                      </label>
+                      {o.hint && (
+                        <div className={`nhsuk-hint ${isCheckbox ? 'nhsuk-checkboxes__hint' : 'nhsuk-radios__hint'}`} id={optionHintId}>
+                          {o.hint}
+                        </div>
+                      )}
+                    </div>
+                    {reveals && open && followUp && (
+                      <div
+                        className={isCheckbox ? 'nhsuk-checkboxes__conditional' : 'nhsuk-radios__conditional'}
+                        id={conditionalId}
+                      >
+                        <div className="nhsuk-form-group">
+                          <label className="nhsuk-label" htmlFor={detailsKey}>
+                            {followUp.label}
+                          </label>
+                          {followUp.hint && (
+                            <div className="nhsuk-hint" id={followUpHintId}>
+                              {followUp.hint}
+                            </div>
+                          )}
+                          <TextInput
+                            id={detailsKey}
+                            name={detailsKey}
+                            type={followUpType}
+                            inputMode={followUpType === 'text' ? undefined : followUpType}
+                            autoComplete={followUpType === 'url' ? 'url' : undefined}
+                            spellCheck={followUpType === 'url' || followUpType === 'email' ? false : undefined}
+                            aria-describedby={followUpHintId}
+                            value={draft[detailsKey] ?? ''}
+                            onChange={(e) => patch({ [detailsKey]: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </Fragment>
                 )
               })}
             </div>
           </fieldset>
         </div>
+        </>
       )
     }
 
-    case 'textarea':
+    case 'textarea': {
+      const pageTitle = question.pageTitle
       return (
-        <div className="nhsuk-form-group">
-          <h1 className="nhsuk-label-wrapper">
-            <label className="nhsuk-label nhsuk-label--l" htmlFor={question.id}>
-              {question.label}
-              {optionalSuffix}
-            </label>
-          </h1>
-          <Hint question={question} id={hintId} />
-          <Textarea
-            id={question.id}
-            name={question.id}
-            rows={5}
-            aria-describedby={describedBy}
-            value={draft[question.id] ?? ''}
-            onChange={(e) => patch({ [question.id]: e.target.value })}
-          />
-        </div>
+        <>
+          {pageTitle && <h1 className="nhsuk-heading-l">{pageTitle}</h1>}
+          {pageTitle && <Hint question={question} id={hintId} />}
+          {pageTitle && <QuestionDisclosures question={question} />}
+          <div className="nhsuk-form-group">
+            {pageTitle ? (
+              <label className="nhsuk-label" htmlFor={question.id}>
+                {question.label}
+                {optionalSuffix}
+              </label>
+            ) : (
+              <h1 className="nhsuk-label-wrapper">
+                <label className="nhsuk-label nhsuk-label--l" htmlFor={question.id}>
+                  {question.label}
+                  {optionalSuffix}
+                </label>
+              </h1>
+            )}
+            {!pageTitle && <Hint question={question} id={hintId} />}
+            {!pageTitle && <QuestionDisclosures question={question} />}
+            <Textarea
+              id={question.id}
+              name={question.id}
+              rows={5}
+              aria-describedby={pageTitle ? undefined : describedBy}
+              value={draft[question.id] ?? ''}
+              onChange={(e) => patch({ [question.id]: e.target.value })}
+            />
+          </div>
+        </>
       )
+    }
 
     case 'text': {
       const inputType = question.inputType ?? 'text'
       const noSpellCheck = inputType === 'url' || inputType === 'email'
-      const width = inputType === 'url' ? undefined : inputType === 'tel' ? 'nhsuk-input--width-10' : 'nhsuk-input--width-20'
+      const suffix = question.type === 'text' ? question.suffix : undefined
+      const width =
+        question.type === 'text' && question.inputWidth
+          ? question.inputWidth
+          : inputType === 'url'
+            ? undefined
+            : inputType === 'tel'
+              ? 'nhsuk-input--width-10'
+              : 'nhsuk-input--width-20'
+      const pageTitle = question.pageTitle
+      const fieldHintId = question.fieldHint ? `${question.id}-field-hint` : undefined
+      const inputDescribedBy = pageTitle
+        ? [fieldHintId].filter(Boolean).join(' ') || undefined
+        : describedBy
+      const input = (
+        <TextInput
+          id={question.id}
+          name={question.id}
+          type={inputType}
+          inputMode={inputType === 'text' ? undefined : inputType}
+          autoComplete={inputType === 'email' ? 'email' : inputType === 'tel' ? 'tel' : inputType === 'url' ? 'url' : undefined}
+          spellCheck={noSpellCheck ? false : undefined}
+          className={width}
+          aria-describedby={inputDescribedBy}
+          value={draft[question.id] ?? ''}
+          onChange={(e) => patch({ [question.id]: e.target.value })}
+        />
+      )
       return (
-        <div className="nhsuk-form-group">
-          <h1 className="nhsuk-label-wrapper">
-            <label className="nhsuk-label nhsuk-label--l" htmlFor={question.id}>
-              {question.label}
-              {optionalSuffix}
-            </label>
-          </h1>
-          <Hint question={question} id={hintId} />
-          <TextInput
-            id={question.id}
-            name={question.id}
-            type={inputType}
-            inputMode={inputType === 'text' ? undefined : inputType}
-            autoComplete={inputType === 'email' ? 'email' : inputType === 'tel' ? 'tel' : inputType === 'url' ? 'url' : undefined}
-            spellCheck={noSpellCheck ? false : undefined}
-            className={width}
-            aria-describedby={describedBy}
-            value={draft[question.id] ?? ''}
-            onChange={(e) => patch({ [question.id]: e.target.value })}
-          />
-        </div>
+        <>
+          {pageTitle && <h1 className="nhsuk-heading-l">{pageTitle}</h1>}
+          {pageTitle && <Hint question={question} id={hintId} />}
+          {pageTitle && <QuestionDisclosures question={question} />}
+          <div className="nhsuk-form-group">
+            {pageTitle ? (
+              <label className="nhsuk-label nhsuk-u-visually-hidden" htmlFor={question.id}>
+                {question.label}
+                {optionalSuffix}
+              </label>
+            ) : (
+              <h1 className="nhsuk-label-wrapper">
+                <label className="nhsuk-label nhsuk-label--l" htmlFor={question.id}>
+                  {question.label}
+                  {optionalSuffix}
+                </label>
+              </h1>
+            )}
+            {!pageTitle && <Hint question={question} id={hintId} />}
+            {!pageTitle && <QuestionDisclosures question={question} />}
+            {pageTitle && question.fieldHint && (
+              <div className="nhsuk-hint" id={fieldHintId}>
+                {question.fieldHint}
+              </div>
+            )}
+            {suffix ? (
+              <div className="nhsuk-input__wrapper">
+                {input}
+                <div className="nhsuk-input__suffix" aria-hidden="true">
+                  {suffix}
+                </div>
+              </div>
+            ) : (
+              input
+            )}
+          </div>
+        </>
       )
     }
 
-    case 'fields':
+    case 'fields': {
+      const pageTitle = question.pageTitle
       return (
-        <div className="nhsuk-form-group">
-          <fieldset className="nhsuk-fieldset" aria-describedby={describedBy}>
-            <legend className="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
-              <h1 className="nhsuk-fieldset__heading">
-                {question.label}
-                {optionalSuffix}
-              </h1>
-            </legend>
-            <Hint question={question} id={hintId} />
-            {question.fields.map((field) => {
-              const key = fieldKey(question.id, field)
-              const id = `${question.id}-${field.key}`
-              const inputType = field.inputType ?? 'text'
-              return (
-                <div key={field.key} className="nhsuk-form-group">
-                  <label className="nhsuk-label" htmlFor={id}>
-                    {field.label}
-                    {field.optional ? ' (optional)' : ''}
-                  </label>
-                  <TextInput
-                    id={id}
-                    name={key}
-                    type={inputType}
-                    inputMode={inputType === 'text' ? undefined : inputType}
-                    autoComplete={field.autoComplete}
-                    spellCheck={inputType === 'url' || inputType === 'email' ? false : undefined}
-                    className={field.width}
-                    value={draft[key] ?? ''}
-                    onChange={(e) => patch({ [key]: e.target.value })}
-                  />
-                </div>
-              )
-            })}
-          </fieldset>
-        </div>
+        <>
+          {pageTitle && <h1 className="nhsuk-heading-l">{pageTitle}</h1>}
+          {pageTitle && <Hint question={question} id={hintId} />}
+          {pageTitle && <QuestionDisclosures question={question} />}
+          <div className="nhsuk-form-group">
+            <fieldset className="nhsuk-fieldset" aria-describedby={pageTitle ? undefined : describedBy}>
+              {pageTitle ? (
+                <legend className="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">
+                  <h2 className="nhsuk-fieldset__heading">
+                    {question.label}
+                    {optionalSuffix}
+                  </h2>
+                </legend>
+              ) : (
+                <legend className="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+                  <h1 className="nhsuk-fieldset__heading">
+                    {question.label}
+                    {optionalSuffix}
+                  </h1>
+                </legend>
+              )}
+              {!pageTitle && <Hint question={question} id={hintId} />}
+              {!pageTitle && <QuestionDisclosures question={question} />}
+              {question.fields.map((field) => {
+                const key = fieldKey(question.id, field)
+                const id = `${question.id}-${field.key}`
+                const inputType = field.inputType ?? 'text'
+                return (
+                  <div key={field.key} className="nhsuk-form-group">
+                    <label className="nhsuk-label" htmlFor={id}>
+                      {field.label}
+                      {field.optional ? ' (optional)' : ''}
+                    </label>
+                    <TextInput
+                      id={id}
+                      name={key}
+                      type={inputType}
+                      inputMode={inputType === 'text' ? undefined : inputType}
+                      autoComplete={field.autoComplete}
+                      spellCheck={inputType === 'url' || inputType === 'email' ? false : undefined}
+                      className={field.width}
+                      value={draft[key] ?? ''}
+                      onChange={(e) => patch({ [key]: e.target.value })}
+                    />
+                  </div>
+                )
+              })}
+            </fieldset>
+          </div>
+        </>
       )
+    }
 
     case 'date':
-      return <DateField question={question} draft={draft} patch={patch} commit={commit} describedBy={describedBy} hintId={hintId} optionalSuffix={optionalSuffix} />
+      return (
+        <DateField
+          question={question}
+          draft={draft}
+          patch={patch}
+          commit={commit}
+          describedBy={describedBy}
+          hintId={hintId}
+          optionalSuffix={optionalSuffix}
+          error={error}
+        />
+      )
 
     case 'upload':
-      return <UploadField question={question} draft={draft} patch={patch} commit={commit} describedBy={describedBy} hintId={hintId} optionalSuffix={optionalSuffix} />
+      return question.multiple ? (
+        <MultipleFileUpload question={question} draft={draft} patch={patch} commit={commit} onDecline={onDecline} describedBy={describedBy} hintId={hintId} optionalSuffix={optionalSuffix} error={error} />
+      ) : (
+        <UploadField question={question} draft={draft} patch={patch} commit={commit} onDecline={onDecline} describedBy={describedBy} hintId={hintId} optionalSuffix={optionalSuffix} error={error} />
+      )
 
     case 'multi-upload':
       return <MultiUploadField question={question} draft={draft} patch={patch} commit={commit} describedBy={describedBy} hintId={hintId} optionalSuffix={optionalSuffix} />
+
+    case 'blocked':
+      return (
+        <>
+          <h1 className="nhsuk-heading-l">{question.label}</h1>
+          <Hint question={question} id={hintId} />
+        </>
+      )
+
+    case 'info':
+      return (
+        <>
+          <h1 className="nhsuk-heading-l">{question.label}</h1>
+          {question.hint ? (
+            <div className="nhsuk-body" id={hintId}>
+              {richText(question.hint, question.hintLink)}
+            </div>
+          ) : null}
+        </>
+      )
   }
 }
 
-type SubFieldProps = FieldProps & { describedBy?: string; hintId: string; optionalSuffix: string }
+type SubFieldProps = FieldProps & { describedBy?: string; hintId: string; optionalSuffix: string; error?: string }
 
 /** NHS Date input — three fields, stored as a single YYYY-MM-DD string. */
-function DateField({ question, draft, patch, describedBy, hintId, optionalSuffix }: SubFieldProps) {
+function DateField({ question, draft, patch, describedBy, hintId, optionalSuffix, error }: SubFieldProps) {
   const [year = '', month = '', day = ''] = (draft[question.id] ?? '').split('-')
   const set = (part: 'day' | 'month' | 'year', raw: string) => {
     const v = raw.replace(/\D/g, '').slice(0, part === 'year' ? 4 : 2)
@@ -411,8 +892,9 @@ function DateField({ question, draft, patch, describedBy, hintId, optionalSuffix
     { part: 'month', label: 'Month', value: month, width: 'nhsuk-input--width-2' },
     { part: 'year', label: 'Year', value: year, width: 'nhsuk-input--width-4' },
   ]
+  const errorId = error ? `${question.id}-error` : undefined
   return (
-    <div className="nhsuk-form-group">
+    <div className={`nhsuk-form-group${error ? ' nhsuk-form-group--error' : ''}`}>
       <fieldset className="nhsuk-fieldset" aria-describedby={describedBy} role="group">
         <legend className="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
           <h1 className="nhsuk-fieldset__heading">
@@ -421,6 +903,11 @@ function DateField({ question, draft, patch, describedBy, hintId, optionalSuffix
           </h1>
         </legend>
         <Hint question={question} id={hintId} />
+        {error && (
+          <span className="nhsuk-error-message" id={errorId}>
+            <span className="nhsuk-u-visually-hidden">Error:</span> {error}
+          </span>
+        )}
         <div className="nhsuk-date-input" id={question.id}>
           {parts.map(({ part, label, value, width }) => {
             const id = `${question.id}-${part}`
@@ -431,7 +918,7 @@ function DateField({ question, draft, patch, describedBy, hintId, optionalSuffix
                     {label}
                   </label>
                   <TextInput
-                    className={`nhsuk-date-input__input ${width}`}
+                    className={`nhsuk-date-input__input ${width}${error ? ' nhsuk-input--error' : ''}`}
                     id={id}
                     name={id}
                     type="text"
@@ -449,12 +936,131 @@ function DateField({ question, draft, patch, describedBy, hintId, optionalSuffix
   )
 }
 
+/** File size in the compact form used beside an added file, for example 2MB. */
+function formatCompactSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes}B`
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))}KB`
+  const mb = bytes / (1024 * 1024)
+  const rounded = mb >= 10 ? String(Math.round(mb)) : mb.toFixed(1).replace(/\.0$/, '')
+  return `${rounded}MB`
+}
+
+/**
+ * Several files, chosen together or one after another. Each added file is listed
+ * under the control with its size, an Uploaded tag and a Remove action.
+ */
+function MultipleFileUpload({ question, draft, commit, onDecline, optionalSuffix }: SubFieldProps) {
+  const fileId = `${question.id}-file`
+  const declined = draft[question.id] === NOT_PROVIDED_ANSWER
+  const documents = declined ? [] : parseUploadedDocuments(draft[question.id])
+  const declineLabel = question.type === 'upload' ? question.declineLabel : undefined
+  const footnote = question.type === 'upload' ? question.footnote : undefined
+  const guide = question.type === 'upload' ? question.documents : undefined
+  const hintSeparately = !!question.details?.length && !!guide?.length
+  const [inputKey, setInputKey] = useState(0)
+
+  function addFiles(files: File[]) {
+    if (files.length === 0) return
+    const added: UploadedDocument[] = files.map((file) => ({
+      name: file.name,
+      size: file.size,
+      reference: '',
+      uploadedAt: new Date().toISOString(),
+    }))
+    commit({ [question.id]: serializeUploadedDocuments([...documents, ...added]) })
+    setInputKey((k) => k + 1)
+  }
+
+  function remove(index: number) {
+    commit({ [question.id]: serializeUploadedDocuments(documents.filter((_, i) => i !== index)) })
+  }
+
+  return (
+    <>
+      <NhsFileUpload
+        key={inputKey}
+        id={fileId}
+        multiple
+        labelAsPageHeading
+        label={
+          <>
+            {question.label}
+            {optionalSuffix}
+          </>
+        }
+        hint={hintContent(question, !hintSeparately)}
+        afterHint={
+          <>
+            <QuestionDisclosures question={question} />
+            {hintSeparately && (
+              <div className="nhsuk-hint">
+                <ul className="nhsuk-list nhsuk-list--bullet nhsuk-u-margin-bottom-0">
+                  {guide.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
+        }
+        onFileChange={() => {}}
+        onFilesChange={addFiles}
+      />
+      {documents.length > 0 && (
+        <ul className="nhsuk-list nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0" style={{ padding: 0 }}>
+          {documents.map((doc, index) => (
+            <li
+              key={`${doc.uploadedAt}-${index}`}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0, 1fr) auto auto auto',
+                columnGap: '1.5rem',
+                alignItems: 'start',
+                marginBottom: index === documents.length - 1 ? 0 : '1rem',
+              }}
+            >
+              <span style={{ overflowWrap: 'anywhere' }}>{doc.name}</span>
+              <span style={{ whiteSpace: 'nowrap' }}>{formatCompactSize(doc.size)}</span>
+              <strong className="nhsuk-tag nhsuk-tag--green">Uploaded</strong>
+              <button
+                type="button"
+                className="hs-link-button"
+                onClick={() => remove(index)}
+                style={{ justifySelf: 'end' }}
+              >
+                Remove<span className="nhsuk-u-visually-hidden"> {doc.name}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {footnote && <p className="nhsuk-body">{footnote}</p>}
+      {declineLabel && onDecline && (
+        <p className="nhsuk-body">
+          <a
+            className="nhsuk-link"
+            href="#cant-provide"
+            onClick={(e) => {
+              e.preventDefault()
+              onDecline()
+            }}
+          >
+            {declineLabel}
+          </a>
+        </p>
+      )}
+    </>
+  )
+}
+
 /** NHS File upload plus a required reference name (omitted when `noReference` is set). */
-function UploadField({ question, draft, patch, optionalSuffix }: SubFieldProps) {
+function UploadField({ question, draft, patch, onDecline, optionalSuffix, error }: SubFieldProps) {
   const fileId = `${question.id}-file`
   const referenceKey = `${question.id}${UPLOAD_REFERENCE_SUFFIX}`
   const withReference = !(question.type === 'upload' && question.noReference)
+  const declineLabel = question.type === 'upload' ? question.declineLabel : undefined
   const storedFileName = draft[question.id] ?? ''
+  const declined = storedFileName === NOT_PROVIDED_ANSWER
   // A file input cannot be re-populated from storage, so on return visits we
   // show the saved name until the user picks a file in this session.
   const [pickedThisSession, setPickedThisSession] = useState(false)
@@ -471,15 +1077,31 @@ function UploadField({ question, draft, patch, optionalSuffix }: SubFieldProps) 
           </>
         }
         hint={hintContent(question)}
+        afterHint={<QuestionDisclosures question={question} />}
+        error={error}
         onFileChange={(file) => {
           setPickedThisSession(true)
           patch({ [question.id]: file?.name ?? '' })
         }}
         className="nhsuk-u-margin-bottom-3"
       />
-      {storedFileName && !pickedThisSession && (
-        <p className="nhsuk-body-s nhsuk-u-margin-bottom-5">
+      {storedFileName && !pickedThisSession && !declined && (
+        <p className="nhsuk-body-m nhsuk-u-margin-bottom-5">
           Previously selected file: <strong>{storedFileName}</strong>
+        </p>
+      )}
+      {declineLabel && onDecline && (
+        <p className="nhsuk-body">
+          <a
+            className="nhsuk-link"
+            href="#cant-provide"
+            onClick={(e) => {
+              e.preventDefault()
+              onDecline()
+            }}
+          >
+            {declineLabel}
+          </a>
         </p>
       )}
 

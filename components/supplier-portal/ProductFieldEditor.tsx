@@ -17,6 +17,14 @@ import {
 } from '@/lib/supplierPortal'
 import { useSupplierPortal } from './useSupplierPortal'
 
+const PRODUCT_FIELD_SAMPLES: Record<string, string> = {
+  summary:
+    'Respira CBT is a clinician-supported digital cognitive behavioural therapy programme for adults with generalised anxiety disorder. Patients complete structured modules between Talking Therapies appointments, with weekly asynchronous therapist review.',
+  target_patients:
+    'Adults (18+) referred to NHS Talking Therapies with mild to moderate generalised anxiety disorder, and the psychological wellbeing practitioners who supervise them.',
+  support_email: 'nhs@aurora-health.example',
+}
+
 /**
  * Change one piece of product information, or replace one document.
  * [Provenance: NHS] One thing per page — same layout as the onboarding
@@ -57,6 +65,7 @@ function ProductFieldEditorInner({
 
   const [text, setText] = useState('')
   const [file, setFile] = useState<File | null>(null)
+  const [sampleFileName, setSampleFileName] = useState<string | null>(null)
   const [error, setError] = useState<string | undefined>()
 
   const record = getRecord('products', productId)
@@ -87,6 +96,18 @@ function ProductFieldEditorInner({
   }
 
   const errors = error ? [{ field: match.kind === 'document' ? `${fieldId}-file` : fieldId, message: error }] : []
+  const sectionName = match.kind === 'document' ? 'Documents' : 'Product information'
+
+  function fillWithSample() {
+    setError(undefined)
+    if (match.kind === 'document') {
+      const name = `${product.name.replace(/\s+/g, '-')}-${fieldId}-sample.pdf`
+      setFile(new File(['sample'], name, { type: 'application/pdf' }))
+      setSampleFileName(name)
+      return
+    }
+    setText(PRODUCT_FIELD_SAMPLES[fieldId] ?? `Sample ${match.field.label.toLowerCase()}.`)
+  }
 
   return (
     <div className="nhsuk-width-container nhsuk-main-wrapper">
@@ -94,7 +115,7 @@ function ProductFieldEditorInner({
         <div className="nhsuk-grid-column-two-thirds">
           <BackLink href={backHref} />
           <ErrorSummary errors={errors} />
-          <span className="nhsuk-caption-l">{product.name}</span>
+          <span className="nhsuk-caption-l">{sectionName}</span>
           <form
             noValidate
             onSubmit={(e) => {
@@ -116,9 +137,15 @@ function ProductFieldEditorInner({
                   error={error}
                   onFileChange={(f) => {
                     setFile(f)
+                    setSampleFileName(null)
                     if (f) setError(undefined)
                   }}
                 />
+                {sampleFileName && (
+                  <p className="nhsuk-body-m">
+                    Selected file: <strong>{sampleFileName}</strong>
+                  </p>
+                )}
               </>
             ) : (
               <div className="nhsuk-form-group">
@@ -153,6 +180,17 @@ function ProductFieldEditorInner({
                 )}
               </div>
             )}
+
+            <p className="nhsuk-body-m nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0">
+              <button
+                type="button"
+                className="nhsuk-link"
+                onClick={fillWithSample}
+                style={{ background: 'none', border: 0, padding: 0, cursor: 'pointer', textDecoration: 'underline', font: 'inherit' }}
+              >
+                Fill with sample
+              </button>
+            </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Button type="submit">Save and exit</Button>

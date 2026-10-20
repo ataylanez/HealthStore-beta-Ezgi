@@ -8,11 +8,14 @@ import {
   COMPANY_SECTIONS,
   COMPANY_SUBMITTED_SESSION_KEY,
   COMPANY_TITLE,
+  companyCheckAnswersHref,
+  companyQuestionHref,
+  companySectionResumeStep,
   companySectionSubmitted,
   findCompanySection,
   type CompanySection,
 } from '@/lib/supplierCompany'
-import { PORTAL_PATHS, SAMPLE_SUPPLIER } from '@/lib/supplierPortal'
+import { PORTAL_PATHS } from '@/lib/supplierPortal'
 import { useSupplierPortal } from './useSupplierPortal'
 
 /** The chapter id Check your answers stored just before submitting, or null. */
@@ -75,7 +78,7 @@ function Confirmation({ section }: { section: CompanySection }) {
   if (!hydrated) return null
 
   const values = company.values ?? {}
-  const companyName = values['a1-company-name']?.trim() || SAMPLE_SUPPLIER.name
+  const answers = { ...values, ...(company.draft ?? {}) }
   const outstanding = COMPANY_SECTIONS.filter((s) => !companySectionSubmitted(s.id, values))
 
   return (
@@ -84,35 +87,46 @@ function Confirmation({ section }: { section: CompanySection }) {
         <div className="nhsuk-grid-column-two-thirds">
           <div className="nhsuk-panel" style={{ textAlign: 'center' }}>
             <h1 ref={headingRef} tabIndex={-1} className="nhsuk-panel__title outline-none">
-              {section.title} submitted
+              {section.title} completed
             </h1>
-            <div className="nhsuk-panel__body">{companyName}</div>
           </div>
-          <h2 className="nhsuk-heading-m nhsuk-u-margin-top-6">What happens next</h2>
           <p style={{ fontSize: 'var(--text-body)' }}>
-            This section is now up to date. It is shown on your {COMPANY_TITLE} page, where you can change it at any
-            time.
+            This section is now up to date on your Company information page.
           </p>
-          {outstanding.length > 0 && (
+          {outstanding.length > 0 ? (
             <>
               <p style={{ fontSize: 'var(--text-body)' }}>You still need to complete:</p>
-              <ul className="nhsuk-list nhsuk-list--bullet">
-                {outstanding.map((s) => (
-                  <li key={s.id}>{s.title}</li>
-                ))}
-              </ul>
+              {outstanding.map((s) => {
+                const resume = companySectionResumeStep(s.id, answers)
+                const href = resume ? companyQuestionHref(resume) : companyCheckAnswersHref(s.id)
+                return (
+                  <p key={s.id} style={{ fontSize: 'var(--text-body)' }}>
+                    <Link className="nhsuk-link" href={href}>
+                      {s.title}
+                    </Link>
+                  </p>
+                )
+              })}
+              <p style={{ fontSize: 'var(--text-body)' }}>
+                <Link className="nhsuk-link" href={PORTAL_PATHS.dashboard}>
+                  Return to portal dashboard
+                </Link>
+              </p>
+            </>
+          ) : (
+            <>
+              <p style={{ fontSize: 'var(--text-body)' }}>
+                <Link className="nhsuk-link" href={COMPANY_PATHS.page}>
+                  {COMPANY_TITLE}
+                </Link>
+              </p>
+              <p style={{ fontSize: 'var(--text-body)' }}>
+                <Link className="nhsuk-link" href={PORTAL_PATHS.dashboard}>
+                  Dashboard
+                </Link>
+              </p>
             </>
           )}
-          <p style={{ fontSize: 'var(--text-body)' }}>
-            <Link className="nhsuk-link" href={COMPANY_PATHS.page}>
-              {COMPANY_TITLE}
-            </Link>
-          </p>
-          <p style={{ fontSize: 'var(--text-body)' }}>
-            <Link className="nhsuk-link" href={PORTAL_PATHS.dashboard}>
-              Dashboard
-            </Link>
-          </p>
         </div>
       </div>
     </div>

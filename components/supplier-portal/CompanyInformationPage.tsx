@@ -18,11 +18,10 @@ import {
   companySectionSummaryRows,
   type CompanySection,
 } from '@/lib/supplierCompany'
-import { SAMPLE_SUPPLIER } from '@/lib/supplierPortal'
 import type { TaskAnswers } from '@/lib/supplierOnboarding'
 import { PortalBreadcrumb } from './PortalBreadcrumb'
 import { PortalStatusTag } from './PortalStatusTag'
-import { ReviewStatusSummary } from './ReviewStatusSummary'
+import { StatusSummary } from './StatusSummary'
 import { companyStatus } from './portalStatus'
 import { useSupplierPortal } from './useSupplierPortal'
 
@@ -58,7 +57,6 @@ export default function CompanyInformationPage() {
   const merged = { ...values, ...draft }
   const status = companyStatus(company)
   const hasDraft = Object.keys(draft).length > 0
-  const companyName = merged['a1-company-name']?.trim() || SAMPLE_SUPPLIER.name
 
   const outstanding = COMPANY_SECTIONS.filter((s) => !companySectionSubmitted(s.id, values))
   const submitted = COMPANY_SECTIONS.filter((s) => companySectionSubmitted(s.id, values))
@@ -69,23 +67,21 @@ export default function CompanyInformationPage() {
       <div className="nhsuk-grid-row">
         <div className="nhsuk-grid-column-two-thirds">
           <div className="hs-section">
-            <span className="nhsuk-caption-l">{companyName}</span>
             <h1 className="nhsuk-heading-xl">{COMPANY_TITLE}</h1>
-            <p className="nhsuk-body-l hs-measure">
-              {outstanding.length === 0
-                ? 'The company and key contact details we hold for your organisation.'
-                : 'Tell us about your company and the key contact for your organisation. Complete and submit each section below in any order. We use this to verify your organisation and to contact you about your products.'}
-            </p>
+            {outstanding.length === 0 && (
+              <p className="nhsuk-body-l hs-measure">
+                The company and key contact details we hold for your organisation.
+              </p>
+            )}
           </div>
 
           {!hydrated ? null : (
             <>
               {outstanding.length === 0 && (
-                <ReviewStatusSummary
+                <StatusSummary
                   status={status}
                   lastUpdated={company.lastUpdated}
                   draftMessage="You have changes that have not been submitted. They are marked below. Submit them from the section's Check your answers, or discard them."
-                  onSimulateApproval={() => undefined}
                 />
               )}
 

@@ -49,12 +49,8 @@ export default function OnboardingConfirmationPage({ formId }: { formId: string 
           </p>
           <h2 className="nhsuk-heading-m nhsuk-u-margin-top-6">What happens next</h2>
           <p style={{ fontSize: 'var(--text-body)' }}>
-            The HealthStore onboarding team will review your submission and the evidence you have
-            provided. We will contact you within 10 working days if we need any further information
-            or to confirm the outcome of the review.
-          </p>
-          <p style={{ fontSize: 'var(--text-body)' }}>
-            Your product will not be listed on the NHS HealthStore until the review is complete.
+            Your product has been onboarded to the NHS HealthStore. You can keep its information and
+            documents up to date from Manage products.
           </p>
         </div>
       </div>

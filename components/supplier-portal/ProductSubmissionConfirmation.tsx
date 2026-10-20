@@ -8,14 +8,13 @@ import {
   managedProductHref,
   PORTAL_PATHS,
 } from '@/lib/supplierPortal'
-import { managedProductStatus } from './portalStatus'
 import { useSupplierPortal } from './useSupplierPortal'
 
 /**
  * Product changes submitted — confirmation. [Provenance: NHS Panel]
  *
- * Guard: only reachable after a submission (status In review); otherwise
- * returns to the product page.
+ * Guard: only reachable straight after a submission; otherwise returns to the
+ * product page.
  */
 export default function ProductSubmissionConfirmation({ productId }: { productId: string }) {
   const router = useRouter()
@@ -24,20 +23,20 @@ export default function ProductSubmissionConfirmation({ productId }: { productId
   const { hydrated, getRecord } = useSupplierPortal()
   const headingRef = useRef<HTMLHeadingElement>(null)
 
-  const status = hydrated ? managedProductStatus(product, getRecord('products', productId)) : undefined
+  const justSubmitted = hydrated && Boolean(getRecord('products', productId).justSubmittedAt)
 
   useEffect(() => {
-    if (hydrated && status !== 'in_review') router.replace(productHref)
-  }, [hydrated, status, router, productHref])
+    if (hydrated && !justSubmitted) router.replace(productHref)
+  }, [hydrated, justSubmitted, router, productHref])
 
   useEffect(() => {
-    if (status === 'in_review') {
+    if (justSubmitted) {
       window.scrollTo(0, 0)
       headingRef.current?.focus()
     }
-  }, [status])
+  }, [justSubmitted])
 
-  if (!hydrated || status !== 'in_review') return null
+  if (!justSubmitted) return null
 
   return (
     <div className="nhsuk-width-container nhsuk-main-wrapper">
@@ -45,7 +44,7 @@ export default function ProductSubmissionConfirmation({ productId }: { productId
         <div className="nhsuk-grid-column-two-thirds">
           <div className="nhsuk-panel" style={{ textAlign: 'center' }}>
             <h1 ref={headingRef} tabIndex={-1} className="nhsuk-panel__title outline-none">
-              Changes submitted for review
+              Changes submitted
             </h1>
             <div className="nhsuk-panel__body">
               {product.name}
@@ -53,8 +52,12 @@ export default function ProductSubmissionConfirmation({ productId }: { productId
           </div>
           <h2 className="nhsuk-heading-m nhsuk-u-margin-top-6">What happens next</h2>
           <p style={{ fontSize: 'var(--text-body)' }}>
-            The NHS HealthStore team will review your changes. We will contact you if we need any further information
-            or to confirm the outcome of the review.
+            Your product information and documents have been updated. You can make further changes at any time.
+          </p>
+          <p style={{ fontSize: 'var(--text-body)' }}>
+            <Link className="nhsuk-link" href={productHref}>
+              View {product.name}
+            </Link>
           </p>
           <p style={{ fontSize: 'var(--text-body)' }}>
             <Link className="nhsuk-link" href={PORTAL_PATHS.manage}>

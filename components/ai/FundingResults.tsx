@@ -109,7 +109,7 @@ function ResultCard({ result, disabled }: { result: FundingResult; disabled?: bo
         type="button"
         onClick={() => setExpanded(v => !v)}
         disabled={disabled}
-        className="mt-4 flex items-center gap-1 hs-text-caption hs-font-normal transition-colors underline hover:no-underline disabled:opacity-40"
+        className="mt-4 flex items-center gap-1 nhsuk-body-m nhsuk-u-margin-bottom-0 transition-colors underline hover:no-underline disabled:opacity-40"
         style={{ color: 'var(--nhs-blue)', fontFamily: 'Frutiger, Arial, sans-serif' }}
       >
         {expanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
@@ -117,32 +117,32 @@ function ResultCard({ result, disabled }: { result: FundingResult; disabled?: bo
       </button>
 
       {expanded && (
-        <dl className="mt-4 space-y-2 border-t pt-4 hs-text-label" style={{ borderColor: 'var(--border)' }}>
+        <dl className="mt-4 space-y-2 border-t pt-4" style={{ borderColor: 'var(--border)' }}>
           <div>
-            <dt className="hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>
+            <dt className="nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-secondary-text-color">
               Eligibility
             </dt>
-            <dd style={{ color: 'var(--text-primary)' }}>{result.eligibility_summary || '—'}</dd>
+            <dd className="nhsuk-body-m">{result.eligibility_summary || '—'}</dd>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <dt className="hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>
+              <dt className="nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-secondary-text-color">
                 Amount
               </dt>
-              <dd style={{ color: 'var(--text-primary)' }}>{result.amount_range ?? 'Not specified'}</dd>
+              <dd className="nhsuk-body-m">{result.amount_range ?? 'Not specified'}</dd>
             </div>
             <div>
-              <dt className="hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>
+              <dt className="nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-secondary-text-color">
                 Deadline
               </dt>
-              <dd style={{ color: 'var(--text-primary)' }}>{result.deadline ?? 'Ongoing / unknown'}</dd>
+              <dd className="nhsuk-body-m">{result.deadline ?? 'Ongoing / unknown'}</dd>
             </div>
           </div>
           <div>
-            <dt className="hs-text-label hs-font-bold" style={{ color: 'var(--text-muted)' }}>
+            <dt className="nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-secondary-text-color">
               Why this matches
             </dt>
-            <dd style={{ color: 'var(--text-primary)' }}>{result.match_rationale || '—'}</dd>
+            <dd className="nhsuk-body-m">{result.match_rationale || '—'}</dd>
           </div>
         </dl>
       )}
@@ -162,15 +162,12 @@ export default function FundingResults({
   return (
     <div className="w-full">
       <div className="mb-4">
-        <p
-          className="hs-text-label hs-font-bold"
-          style={{ color: 'var(--text-primary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
-        >
+        <p className="nhsuk-body-m nhsuk-u-font-weight-bold">
           {empty
             ? 'No funding opportunities found'
             : `${results.length} ${results.length === 1 ? 'opportunity' : 'opportunities'} found`}
           {' · '}
-          <span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>
+          <span className="nhsuk-body-s nhsuk-u-font-weight-normal nhsuk-u-secondary-text-color">
             {selectionLabel} · {region}
           </span>
         </p>
@@ -181,7 +178,7 @@ export default function FundingResults({
           className="rounded-xl border px-4 py-6 text-center"
           style={{ borderColor: 'var(--border)', background: 'var(--card)' }}
         >
-          <p className="hs-text-label" style={{ color: 'var(--text-secondary)' }}>
+          <p className="nhsuk-body-m">
             No matches were returned. Try the broader condition area, or a different region.
           </p>
         </div>
@@ -194,8 +191,8 @@ export default function FundingResults({
       )}
 
       <div
-        className="mt-4 flex items-start gap-2 rounded-lg px-4 py-2 hs-text-caption"
-        style={{ background: 'var(--surface)', color: 'var(--text-muted)' }}
+        className="mt-4 flex items-start gap-2 rounded-lg px-4 py-2 nhsuk-body-m"
+        style={{ background: 'var(--surface)' }}
       >
         <AlertTriangle className="mt-1 h-3.5 w-3.5 flex-shrink-0" style={{ color: '#7A4800' }} />
         <span>
@@ -207,8 +204,7 @@ export default function FundingResults({
       {!empty && (
         <div className="mt-4">
           <p
-            className="mb-2 hs-text-label hs-font-bold"
-            style={{ color: 'var(--text-muted)', fontFamily: 'Frutiger, Arial, sans-serif' }}
+            className="mb-2 nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-secondary-text-color"
           >
             Follow-up questions
           </p>
@@ -217,7 +213,7 @@ export default function FundingResults({
               type="button"
               onClick={() => onFollowUp('Compare the top two funds')}
               disabled={disabled}
-              className="rounded-full border px-4 py-2 hs-text-caption hs-font-normal transition-colors disabled:opacity-40"
+              className="rounded-full border px-4 py-2 nhsuk-body-m nhsuk-u-margin-bottom-0 transition-colors disabled:opacity-40"
               style={{
                 borderColor: 'var(--border)',
                 background: 'var(--card)',
@@ -231,7 +227,7 @@ export default function FundingResults({
               type="button"
               onClick={() => onFollowUp('How do I apply for the strongest match?')}
               disabled={disabled}
-              className="rounded-full border px-4 py-2 hs-text-caption hs-font-normal transition-colors disabled:opacity-40"
+              className="rounded-full border px-4 py-2 nhsuk-body-m nhsuk-u-margin-bottom-0 transition-colors disabled:opacity-40"
               style={{
                 borderColor: 'var(--border)',
                 background: 'var(--card)',

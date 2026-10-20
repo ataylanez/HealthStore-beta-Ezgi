@@ -17,10 +17,8 @@ function interopItemsInOrder(items: InteropSnapshotItem[], keys: readonly string
   })
 }
 
-function SnapshotPill({ muted, children }: { muted?: boolean; children: ReactNode }) {
-  return (
-    <span className={`badge badge-grey max-w-full ${muted ? 'opacity-50' : ''}`}>{children}</span>
-  )
+function SnapshotPill({ children }: { children: ReactNode }) {
+  return <span className="badge badge-grey max-w-full">{children}</span>
 }
 
 function MiniSegment({ label, children }: { label: string; children: ReactNode }) {
@@ -37,7 +35,7 @@ function GovernanceMini({ pills }: { pills: RegulationSnapshotPill[] }) {
     <ul className="m-0 flex list-none flex-wrap gap-1 p-0">
       {pills.map(p => (
         <li key={p.label}>
-          <span className={`badge badge-blue max-w-full ${p.muted ? 'opacity-50' : ''}`}>{p.label}</span>
+          <span className="badge badge-blue max-w-full">{p.label}</span>
         </li>
       ))}
     </ul>
@@ -84,9 +82,9 @@ function WhereLiveMini({ app }: { app: App }) {
   const { headline, detail } = getWhereLiveSummary(app)
   return (
     <div>
-      <p className="nhsuk-body-s nhsuk-u-margin-bottom-0 hs-font-bold" style={{ color: 'var(--text-primary)' }}>{headline}</p>
+      <p className="nhsuk-body-m nhsuk-u-font-weight-bold nhsuk-u-margin-bottom-0">{headline}</p>
       {detail ? (
-        <p className="nhsuk-body-s nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-secondary)' }}>{detail}</p>
+        <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">{detail}</p>
       ) : null}
     </div>
   )

@@ -14,6 +14,7 @@ import groHealthHeartbuddy from '@/content/apps/gro-health-heartbuddy.json'
 import kiactiv from '@/content/apps/kiactiv.json'
 import myheart from '@/content/apps/myheart.json'
 import pumpingMarvellous from '@/content/apps/pumping-marvellous.json'
+import wellinks from '@/content/apps/wellinks.json'
 import fundingData from '@/content/funding/funding.json'
 import conditionsData from '@/content/conditions/conditions.json'
 import dashboardData from '@/content/dashboard/dashboard.json'
@@ -24,6 +25,7 @@ import conceptGridData from '@/content/home/concept-grid.json'
 import conceptFeaturedData from '@/content/home/concept-featured.json'
 import type { CaseStudy, ConceptFeaturedContent, ConceptGridContent } from '@/lib/conceptHomeTypes'
 import type { HomeCampaignItem, HomeEvidenceSpotlight, HomeNewsItem } from '@/lib/homeContentTypes'
+import { isMarketPreview } from '@/lib/marketPreview'
 import { isVisibleCondition } from '@/lib/visibleConditions'
 
 /** App JSON: `service_wrap_description` is preferred; `service_wrap_note` is legacy — PDP merges both for “Service wrap details”. Optional `named_sites`: `{ name, status: active|decommissioned|unknown }[]` for **Live sites** on PDP (info tooltip derives placeholder email via `lib/liveSiteContact.ts`); legacy `live_sites` string when structured rows absent. */
@@ -92,13 +94,13 @@ export function getHomeCaseStudies(): CaseStudy[] {
 
 const otherApps = otherAppsData as App[]
 
-const allAppsUnfiltered: App[] = [myCOPD, clinitouch, copdhub, luscii, sleepio, ...otherApps, jointAcademy, w8buddy, overcomingAnorexia, activateYourHeart, dReachHf, digitalHeartManual, groHealthHeartbuddy, kiactiv, myheart, pumpingMarvellous]
+const allAppsUnfiltered: App[] = [myCOPD, clinitouch, copdhub, luscii, sleepio, ...otherApps, jointAcademy, w8buddy, overcomingAnorexia, activateYourHeart, dReachHf, digitalHeartManual, groHealthHeartbuddy, kiactiv, myheart, pumpingMarvellous, wellinks]
 
 /**
  * Temporary catalogue allowlist — only these PDPs are surfaced in listings and
  * condition counts. Set to `null` to show every product again.
  */
-const VISIBLE_APP_SLUGS: string[] | null = ['luscii', 'myheart', 'mycopd']
+const VISIBLE_APP_SLUGS: string[] | null = ['luscii', 'myheart', 'mycopd', 'wellinks']
 
 export function getAllApps(): App[] {
   if (!VISIBLE_APP_SLUGS) return allAppsUnfiltered
@@ -121,7 +123,7 @@ export function getConditionAreas(): { id: string; label: string; colour: string
       label: c.label,
       colour: c.colour,
       icon: c.icon,
-      count: apps.filter((a: App) => a.condition_tags.includes(c.id)).length,
+      count: apps.filter((a: App) => !isMarketPreview(a) && a.condition_tags.includes(c.id)).length,
     }))
 }
 
@@ -185,7 +187,7 @@ export function getDashboardStats() {
   return [
     { value: String(apps.length), label: 'Apps in catalogue', sublabel: `across ${conditions.length} condition areas` },
     { value: String(niceRefs.size), label: 'NICE guidance references', sublabel: 'HTG and EVA recommendations' },
-    { value: String(apps.filter((a: App) => a.condition_tags.includes('copd')).length), label: 'COPD apps', sublabel: 'all NICE HTE19 recommended' },
+    { value: String(apps.filter((a: App) => a.condition_tags.includes('copd')).length), label: 'COPD apps', sublabel: 'including technologies that are not commissionable' },
     { value: String(openFunding.length), label: 'Funding opportunities', sublabel: 'currently open or upcoming' },
   ]
 }

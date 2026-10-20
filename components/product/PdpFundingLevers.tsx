@@ -51,7 +51,7 @@ export default function PdpFundingLevers({
           <div className="hs-font-bold hs-text-label mb-1" style={{ color: 'var(--text-primary)' }}>
             Tariff and QOF implications
           </div>
-          <p className="nhsuk-body-m nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-secondary)' }}>
+          <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">
             {tariffNote}
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function PdpFundingLevers({
                   </p>
                   <span className={leverStatusClass(f.status)}>{f.status}</span>
                 </div>
-                <p className="nhsuk-body-s nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-secondary)' }}>
+                <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">
                   {f.note}
                 </p>
               </div>
@@ -94,28 +94,23 @@ export default function PdpFundingLevers({
                 style={{ borderColor: 'var(--border)' }}
               >
                 <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-                  <div className="hs-font-bold hs-text-label" style={{ color: 'var(--text-secondary)' }}>
+                  <h4 className="nhsuk-heading-s nhsuk-u-margin-bottom-0">
                     {f.title}
-                  </div>
+                  </h4>
                   <FundingStatusBadge status={f.status} />
                 </div>
-                <p className="hs-text-caption mb-2" style={{ color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
-                  {f.description}
-                </p>
+                <p className="nhsuk-body-m">{f.description}</p>
                 {f.total_value && (
-                  <div className="hs-text-caption" style={{ color: 'var(--text-muted)' }}>
-                    Value: {f.total_value}
-                  </div>
+                  <div className="nhsuk-body-s nhsuk-u-secondary-text-color">Value: {f.total_value}</div>
                 )}
                 {f.external_url && (
                   <a
                     href={f.external_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hs-text-caption hs-font-normal mt-2 inline-block"
-                    style={{ color: 'var(--nhs-blue)' }}
+                    className="nhsuk-body-m nhsuk-u-margin-top-2"
                   >
-                    {f.external_url_label ?? 'More info'} (opens in a new tab)
+                    {f.external_url_label ?? `More information about ${f.title}`} (opens in a new tab)
                   </a>
                 )}
               </div>

@@ -24,17 +24,22 @@ export function NhsFileUpload({
   id,
   label,
   hint,
+  afterHint,
   error,
   labelAsPageHeading = false,
   labelSize,
   describedBy,
+  multiple = false,
   onFileChange,
+  onFilesChange,
   className = '',
 }: {
   id: string
   label: ReactNode
   /** Hint content; rendered in `.nhsuk-hint` with id `${id}-hint`. */
   hint?: ReactNode
+  /** Rendered after the hint and before the file control, outside the hint style. */
+  afterHint?: ReactNode
   /** NHS error message (`.nhsuk-error-message`, form group gets `--error`). */
   error?: ReactNode
   /** Render the label inside an `<h1>` (one-question-per-page). Implies size "l". */
@@ -43,11 +48,19 @@ export function NhsFileUpload({
   labelSize?: 's' | 'm' | 'l' | 'xl'
   /** Extra ids for aria-describedby (hint and error ids are added automatically). */
   describedBy?: string
+  /** Allow several files in one selection. */
+  multiple?: boolean
   /** Called with the selected file (or null when cleared). */
   onFileChange: (file: File | null) => void
+  /** When `multiple` is set, called with every file in the selection. */
+  onFilesChange?: (files: File[]) => void
   className?: string
 }) {
   const dropZoneRef = useRef<HTMLDivElement>(null)
+  const onFileChangeRef = useRef(onFileChange)
+  const onFilesChangeRef = useRef(onFilesChange)
+  onFileChangeRef.current = onFileChange
+  onFilesChangeRef.current = onFilesChange
   const hintId = hint ? `${id}-hint` : undefined
   const errorId = error ? `${id}-error` : undefined
   const ariaDescribedBy = [hintId, errorId, describedBy].filter(Boolean).join(' ') || undefined
@@ -61,6 +74,21 @@ export function NhsFileUpload({
     if (ariaDescribedBy) $button.setAttribute('aria-describedby', ariaDescribedBy)
     else $button.removeAttribute('aria-describedby')
   }, [ariaDescribedBy])
+
+  // Listen on the input itself. A dropped file makes the NHS component set
+  // `input.files` and dispatch a non-bubbling change event, which React's
+  // onChange (delegated on the root) never hears.
+  useEffect(() => {
+    const input = dropZoneRef.current?.querySelector<HTMLInputElement>('input[type="file"]')
+    if (!input) return
+    const handle = () => {
+      const files = Array.from(input.files ?? [])
+      if (multiple) onFilesChangeRef.current?.(files)
+      else onFileChangeRef.current(files[0] ?? null)
+    }
+    input.addEventListener('change', handle)
+    return () => input.removeEventListener('change', handle)
+  }, [multiple])
 
   useEffect(() => {
     const $root = dropZoneRef.current
@@ -94,6 +122,7 @@ export function NhsFileUpload({
           {hint}
         </div>
       ) : null}
+      {afterHint}
       {error ? (
         <span className="nhsuk-error-message" id={errorId} role="alert">
           <span className="nhsuk-u-visually-hidden">Error:</span> {error}
@@ -105,8 +134,8 @@ export function NhsFileUpload({
           id={id}
           name={id}
           type="file"
+          multiple={multiple || undefined}
           aria-describedby={ariaDescribedBy}
-          onChange={(e) => onFileChange(e.target.files?.[0] ?? null)}
         />
       </div>
     </div>

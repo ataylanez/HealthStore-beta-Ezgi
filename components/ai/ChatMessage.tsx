@@ -17,7 +17,7 @@ const mdComponents: Components = {
   table: ({ children, ...props }) => (
     <div className="overflow-x-auto my-4">
       <table
-        className="w-full hs-text-label border-collapse"
+        className="w-full border-collapse"
         style={{ borderColor: 'var(--border)' }}
         {...props}
       >
@@ -32,7 +32,7 @@ const mdComponents: Components = {
   ),
   th: ({ children, ...props }) => (
     <th
-      className="px-4 py-2 text-left hs-text-caption hs-font-bold border-b"
+      className="px-4 py-2 text-left nhsuk-body-s nhsuk-u-font-weight-bold border-b"
       style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
       {...props}
     >
@@ -41,7 +41,7 @@ const mdComponents: Components = {
   ),
   td: ({ children, ...props }) => (
     <td
-      className="px-4 py-2 hs-text-label border-b"
+      className="px-4 py-2 border-b"
       style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
       {...props}
     >
@@ -90,14 +90,14 @@ const mdComponents: Components = {
     </h3>
   ),
   h4: ({ children, ...props }) => (
-    <h4 className="hs-text-label hs-font-bold mt-4 mb-1" style={{ color: 'var(--text-primary)' }} {...props}>
+    <h4 className="nhsuk-heading-s" {...props}>
       {children}
     </h4>
   ),
   blockquote: ({ children, ...props }) => (
     <blockquote
-      className="border-l-3 pl-4 my-2 italic"
-      style={{ borderColor: 'var(--nhs-blue)', color: 'var(--text-secondary)' }}
+      className="border-l-3 pl-4 my-2"
+      style={{ borderColor: 'var(--nhs-blue)' }}
       {...props}
     >
       {children}

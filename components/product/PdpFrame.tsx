@@ -3,6 +3,7 @@ import { PdpSharePrintProvider, PdpShareRegion } from '@/components/PdpSharePrin
 import { PageBreadcrumb, type PageBreadcrumbItem } from '@/components/PageBreadcrumb'
 import PdpSectionNav from '@/components/PdpSectionNav'
 import type { PdpPageModel } from '@/lib/pdpPageModel'
+import { isMarketPreview } from '@/lib/marketPreview'
 
 /**
  * Shared chrome for every product page (overview and section pages), on the
@@ -41,7 +42,23 @@ export default function PdpFrame({
                 </aside>
               ) : null}
 
-              <div className="nhsuk-grid-column-two-thirds hs-pdp-main">{children}</div>
+              <div className="nhsuk-grid-column-two-thirds hs-pdp-main">
+                {isMarketPreview(app) && (
+                  <div className="nhsuk-warning-callout">
+                    <h2 className="nhsuk-warning-callout__label">
+                      <span role="text">
+                        <span className="nhsuk-u-visually-hidden">Important: </span>
+                        Limited view
+                      </span>
+                    </h2>
+                    <p>
+                      {app.app_name} is included so you can see the wider market. It is not available to commission
+                      through the NHS HealthStore.
+                    </p>
+                  </div>
+                )}
+                {children}
+              </div>
             </div>
           </div>
         </div>

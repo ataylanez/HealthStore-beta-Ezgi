@@ -13,8 +13,8 @@ export default function ProductOnboardingPage() {
           <div className="hs-section">
             <h1 className="nhsuk-heading-xl">Product onboarding</h1>
             <p className="nhsuk-body-l hs-measure">
-              Each product below has its own onboarding form. Your answers are saved as a draft until you submit the form
-              for review by the NHS HealthStore team.
+              Each product below has its own onboarding form. Your answers are saved as a draft until you submit the
+              form.
             </p>
           </div>
           <OnboardingFormsTable />

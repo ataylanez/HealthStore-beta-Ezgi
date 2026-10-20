@@ -20,15 +20,15 @@ import { useSupplierPortal } from './useSupplierPortal'
 
 const NOT_PROVIDED = 'Not provided'
 const DECLARATION =
-  'By submitting these changes you confirm that the information and documents are accurate and up to date.'
+  'By submitting these changes you confirm that the information and documents are accurate and up to date. Your changes will be used straight away.'
 
 /**
  * Check your answers before submitting product updates.
  * [Provenance: NHS / GOV.UK "Check answers" pattern]
  *
- * Only lists fields that differ from the last approved version (draft changes).
- * Reachable only when the product has draft or action-needed changes; otherwise
- * redirects back to the product page.
+ * Only lists fields that differ from the current version (draft changes).
+ * Reachable only when the product has draft changes; otherwise redirects back
+ * to the product page.
  */
 export default function ProductCheckAnswers({
   productId,
@@ -40,13 +40,13 @@ export default function ProductCheckAnswers({
   const router = useRouter()
   const product = findManagedProduct(productId)!
   const productHref = managedProductHref(productId)
-  const { hydrated, getRecord, submitForReview } = useSupplierPortal()
+  const { hydrated, getRecord, submitChanges } = useSupplierPortal()
   const [submitting, setSubmitting] = useState(false)
   const headingRef = useRef<HTMLHeadingElement>(null)
 
   const record = getRecord('products', productId)
   const status = hydrated ? managedProductStatus(product, record) : undefined
-  const canSubmit = status === 'draft_changes' || status === 'action_needed'
+  const canSubmit = status === 'draft_changes'
   const draft = record.draft ?? {}
   const baseline = (key: string) => record.values?.[key] ?? defaults[key] ?? ''
   const value = (key: string) => draft[key] ?? baseline(key)
@@ -71,7 +71,7 @@ export default function ProductCheckAnswers({
   function confirmAndSubmit() {
     if (submitting) return
     setSubmitting(true)
-    submitForReview('products', productId)
+    submitChanges('products', productId)
     router.push(managedProductConfirmationHref(productId))
   }
 
@@ -80,7 +80,7 @@ export default function ProductCheckAnswers({
       <div className="nhsuk-grid-row">
         <div className="nhsuk-grid-column-two-thirds">
           <BackLink href={productHref} />
-          <span className="nhsuk-caption-l">{product.name}</span>
+          <span className="nhsuk-caption-l">Documents and content</span>
           <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
             Check your answers before submitting
           </h1>

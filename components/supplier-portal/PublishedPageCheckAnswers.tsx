@@ -6,18 +6,18 @@ import { useRouter } from 'next/navigation'
 import { BackLink } from '@/components/BackLink'
 import { Button } from '@/components/ui/Button'
 import type { ContentField } from '@/lib/supplierPortal'
-import { publishedPageStatuses } from './portalStatus'
+import { publishedPageStatus } from './portalStatus'
 import { useSupplierPortal } from './useSupplierPortal'
 
 const NOT_PROVIDED = 'Not provided'
 const DECLARATION =
-  'By submitting these changes you confirm that the information is accurate and up to date.'
+  'By submitting these changes you confirm that the information is accurate and up to date. Your changes will be published on the Commissioning Store straight away.'
 
 /**
  * Check your answers before submitting published page changes.
  * [Provenance: NHS / GOV.UK "Check answers" pattern]
  *
- * Only lists fields that differ from the last approved (or empty) version.
+ * Only lists fields that differ from the published (or empty) version.
  */
 export default function PublishedPageCheckAnswers({
   pageId,
@@ -37,19 +37,17 @@ export default function PublishedPageCheckAnswers({
   confirmationHref: string
 }) {
   const router = useRouter()
-  const { hydrated, getRecord, submitForReview } = useSupplierPortal()
+  const { hydrated, getRecord, submitChanges } = useSupplierPortal()
   const [submitting, setSubmitting] = useState(false)
   const headingRef = useRef<HTMLHeadingElement>(null)
 
   const record = getRecord('pages', pageId)
-  const statuses = hydrated ? publishedPageStatuses(record) : []
-  const canSubmit = statuses.some(
-    (status) => status === 'unpublished' || status === 'unpublished_changes' || status === 'action_needed',
-  )
+  const status = hydrated ? publishedPageStatus(record) : undefined
+  const canSubmit = status === 'unpublished' || status === 'unpublished_changes'
   const draft = record.draft ?? {}
   const baseline = (key: string) => record.values?.[key] ?? defaults[key] ?? ''
   const value = (key: string) => draft[key] ?? baseline(key)
-  // First time the page is submitted there is no approved version yet — show every
+  // First time the page is submitted there is no published version yet — show every
   // field in the draft. Later submissions only list fields that actually changed.
   const isFirstSubmission = !record.hasBeenPublished && !record.values
   const isChanged = (fieldId: string) => {
@@ -77,7 +75,7 @@ export default function PublishedPageCheckAnswers({
   function confirmAndSubmit() {
     if (submitting) return
     setSubmitting(true)
-    submitForReview('pages', pageId)
+    submitChanges('pages', pageId)
     router.push(confirmationHref)
   }
 

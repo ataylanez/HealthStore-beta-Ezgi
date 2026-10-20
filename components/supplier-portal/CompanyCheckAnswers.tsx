@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/Button'
 import {
   COMPANY_PATHS,
   COMPANY_SUBMITTED_SESSION_KEY,
-  COMPANY_TITLE,
   companyConfirmationHref,
   companyQuestionHref,
   companySectionChanged,
@@ -28,7 +27,7 @@ const DECLARATION = 'By submitting you confirm that this information is accurate
  *
  * Reached from the chapter's last question (`?section=<id>`). Lists every
  * answer on the chapter's route with a Change link that returns here. Confirm
- * and submit applies the chapter's draft straight away (no review) and moves
+ * and submit applies the chapter's draft straight away and moves
  * to the confirmation page. Other chapters are not affected.
  *
  * Guard: redirects to the Company information page when the chapter is
@@ -101,9 +100,7 @@ function SectionCheckAnswers({ section }: { section: CompanySection }) {
       <div className="nhsuk-grid-row">
         <div className="nhsuk-grid-column-two-thirds">
           <BackLink href={COMPANY_PATHS.page} />
-          <span className="nhsuk-caption-l">
-            {COMPANY_TITLE} — {section.title}
-          </span>
+          <span className="nhsuk-caption-l">{section.title}</span>
           <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
             {firstTime ? 'Check your answers before submitting' : 'Check your changes before submitting'}
           </h1>

@@ -64,7 +64,7 @@ export function CaseStudyCard({ study, href }: { study: CaseStudy; href?: string
           <div className="flex items-end justify-between gap-4">{Title}</div>
         )}
         {study.description ? (
-          <p className="nhsuk-body-s nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-secondary)' }}>
+          <p className="nhsuk-body-m nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0">
             {study.description}
           </p>
         ) : null}
@@ -113,7 +113,7 @@ function FeaturedCaseStudyCard({ study }: { study: CaseStudy }) {
           {study.title}
         </h3>
         {study.description ? (
-          <p className="nhsuk-body-m nhsuk-u-margin-bottom-0" style={{ color: 'var(--text-secondary)' }}>
+          <p className="nhsuk-body-m nhsuk-u-margin-bottom-0">
             {study.description}
           </p>
         ) : null}
@@ -130,7 +130,7 @@ function CompactCaseStudyCard({ study }: { study: CaseStudy }) {
   return (
     <div className="nhsuk-card app-card hs-card-chevron">
       <div className="nhsuk-card__content hs-card-chevron__content">
-        <h3 className="nhsuk-card__heading nhsuk-body-s nhsuk-u-font-weight-bold hs-card-chevron__heading">
+        <h3 className="nhsuk-card__heading nhsuk-heading-s nhsuk-u-margin-bottom-0 hs-card-chevron__heading">
           {study.title}
         </h3>
         <ChevronRightCircleCompact />

@@ -4,10 +4,17 @@ import { useMemo } from 'react'
 import Link from 'next/link'
 import { PageBreadcrumb } from '@/components/PageBreadcrumb'
 import { ClickableChevronCard } from '@/components/ui/ClickableChevronCard'
+import { isMarketPreview } from '@/lib/marketPreview'
 
 type ConditionArea = { id: string; label: string; colour: string; count: number; icon: string }
 
-type CatalogueApp = { condition_tags?: string[] }
+type CatalogueApp = {
+  slug: string
+  app_name: string
+  supplier_name?: string
+  condition_tags?: string[]
+  market_preview?: boolean
+}
 
 /** COPD and pulmonary rehab share one catalogue card (same as home storytelling). */
 const COPD_PATHWAY_IDS = new Set(['copd', 'pulmonary_rehab'])
@@ -43,10 +50,19 @@ export default function AppsDiscoveryClient({
   apps?: CatalogueApp[]
   totalAppCount: number
 }) {
-  const mergedAreas = useMemo(
-    () => mergeCopdAndPulmonaryRehab(conditionAreas, apps),
-    [conditionAreas, apps],
+  const commissionableApps = useMemo(
+    () => (apps ?? []).filter((a) => !isMarketPreview(a)),
+    [apps],
   )
+  const notOnStore = useMemo(
+    () => (apps ?? []).filter((a) => isMarketPreview(a)),
+    [apps],
+  )
+  const mergedAreas = useMemo(
+    () => mergeCopdAndPulmonaryRehab(conditionAreas, apps ? commissionableApps : undefined),
+    [conditionAreas, apps, commissionableApps],
+  )
+  const catalogueCount = apps ? commissionableApps.length : totalAppCount
   const availableConditions = useMemo(
     () => mergedAreas.filter(c => c.count > 0),
     [mergedAreas],
@@ -90,10 +106,32 @@ export default function AppsDiscoveryClient({
             <Link href="/catalogue/digital-therapeutics">See all products in the catalogue</Link>
             <span className="hs-text-label" style={{ color: 'var(--text-secondary)' }}>
               {' '}
-              · {totalAppCount} {totalAppCount === 1 ? 'product' : 'products'}
+              · {catalogueCount} {catalogueCount === 1 ? 'product' : 'products'}
             </span>
           </p>
         </section>
+
+        {notOnStore.length > 0 ? (
+          <section aria-labelledby="not-on-store-heading" className="nhsuk-u-margin-bottom-7">
+            <h2 id="not-on-store-heading" className="nhsuk-heading-l">
+              Not on the Commissioning Store
+            </h2>
+            <ul className="nhsuk-grid-row nhsuk-card-group">
+              {notOnStore.map((app) => (
+                <li key={app.slug} className="nhsuk-grid-column-one-third nhsuk-card-group__item">
+                  <ClickableChevronCard
+                    variant="primary"
+                    href={`/apps/${app.slug}`}
+                    title={app.app_name}
+                    description={app.supplier_name ?? ''}
+                    headingLevel={3}
+                    className="w-full"
+                  />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         {roadmapConditions.length > 0 ? (
           <section aria-labelledby="coming-soon-heading">

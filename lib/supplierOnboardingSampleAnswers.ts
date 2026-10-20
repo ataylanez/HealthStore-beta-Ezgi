@@ -19,6 +19,9 @@ import {
   CONFIRMED_VALUE,
   MULTI_UPLOAD_CONFIRMED_SUFFIX,
   UPLOAD_REFERENCE_SUFFIX,
+  optionFollowUp,
+  otherDetailsKey,
+  questionHasConditionalInput,
   fieldKey,
   isQuestionAnswered,
   isQuestionVisible,
@@ -42,10 +45,9 @@ const TEXT: Record<string, string> = {
   'b3-users-benefits':
     'Intended users: adults (18+) referred to NHS Talking Therapies with mild to moderate anxiety, and the psychological wellbeing practitioners who supervise them. Benefits: 61% reliable recovery vs 44% treatment as usual in a UK randomised controlled trial (n=412, Lancet Digital Health 2025;7:e112), and time-to-first-treatment reduced from 9.4 to 2.1 weeks in pilot services. Benefits were validated through the RCT and a service evaluation across 3 NHS services (n=1,870).',
   // C1
-  'c1-2-3-crm-system-details':
-    'Clinical risk management is run under our Clinical Risk Management System (CRMS-02, v4.1) which follows DCB 0129. Hazards are identified at design review, logged in the Hazard Log with initial and residual risk ratings, and reviewed monthly by the Clinical Safety Officer. Release gates require CSO sign-off of the Safety Case Report for each product version.',
-  'c1-2-5-cso':
-    'Dr Hannah Okafor, Clinical Psychologist, HCPC registration PYL04471. Trained in DCB 0129/0160 (NHS Digital Clinical Safety Officer course, 2023).',
+  'c1-2-5-cso__full-name': 'Dr Hannah Okafor',
+  'c1-2-5-cso__profession': 'Clinical Psychologist',
+  'c1-2-5-cso__registration-number': 'PYL04471',
   // C2
   'c2-2-6-outside-uk':
     'Anonymised analytics events are processed in the Republic of Ireland (AWS eu-west-1) by our analytics sub-processor. No identifiable patient data leaves the UK. Transfers rely on the UK adequacy regulations for the EEA, with an International Data Transfer Addendum in place as a fallback.',
@@ -61,8 +63,9 @@ const TEXT: Record<string, string> = {
   // Section D
   'd1-4-2-timescale': 'March 2027',
   'd1-4-3-accessibility-statement': 'https://www.aurora-health.example/respira/accessibility',
-  'c2-2-3-privacy-notice-link': 'https://www.aurora-health.example/respira/privacy',
-  'd1-5-availability': '99.96%',
+  'c2-2-3-privacy-notice__other-details': 'https://www.aurora-health.example/respira/privacy',
+  'c2-2-4-terms__other-details': 'https://www.aurora-health.example/respira/terms',
+  'd1-5-availability': '99.96',
 }
 
 const UPLOADS: Record<string, { name: string; reference: string }> = {
@@ -74,31 +77,39 @@ const UPLOADS: Record<string, { name: string; reference: string }> = {
     name: 'Aurora-Health-C1.1.1-PAQ-Form.pdf',
     reference: `${SUPPLIER} — C1.1.1 Pre-acquisition questionnaire — ${SUBMISSION_DATE}`,
   },
-  'c1-2-4-safety-case-report-upload': {
+  'c1-2-3-crm-system': {
+    name: 'Aurora-Health-C1.2.3-Clinical-Risk-Management-System.pdf',
+    reference: `${SUPPLIER} — C1.2.3 Clinical risk management system — ${SUBMISSION_DATE}`,
+  },
+  'c1-2-4-safety-case': {
     name: 'Aurora-Health-C1.2.4-Clinical-Safety-Case-Report.pdf',
     reference: `${SUPPLIER} — C1.2.4 Clinical Safety Case Report — ${SUBMISSION_DATE}`,
   },
-  'c1-2-4-hazard-log-upload': {
+  'c1-2-4-hazard-log': {
     name: 'Aurora-Health-C1.2.4-Hazard-Log.xlsx',
     reference: `${SUPPLIER} — C1.2.4 Hazard Log — ${SUBMISSION_DATE}`,
   },
-  'c2-2-1-ico-upload': {
+  'c2-2-1-ico': {
     name: 'Aurora-Health-C2.2.1-ICO-Registration.pdf',
     reference: `${SUPPLIER} — C2.2.1 ICO registration certificate — ${SUBMISSION_DATE}`,
   },
-  'c2-2-2-dpia-upload': {
+  'c2-2-2-dpia': {
     name: 'Aurora-Health-C2.2.2-DPIA.pdf',
     reference: `${SUPPLIER} — C2.2.2 DPIA — ${SUBMISSION_DATE}`,
+  },
+  'c2-2-3-privacy-notice-upload': {
+    name: 'Aurora-Health-C2.2.3-Transparency-Documentation.pdf',
+    reference: `${SUPPLIER} — C2.2.3 Transparency documentation — ${SUBMISSION_DATE}`,
   },
   'c2-2-4-terms-upload': {
     name: 'Aurora-Health-C2.2.4-Terms-and-EULA.pdf',
     reference: `${SUPPLIER} — C2.2.4 Terms and conditions and EULA — ${SUBMISSION_DATE}`,
   },
-  'c3-1-cyber-essentials-upload': {
+  'c3-1-cyber-essentials': {
     name: 'Aurora-Health-C3.1-Cyber-Essentials-Plus.pdf',
     reference: `${SUPPLIER} — C3.1 Cyber Essentials Plus certificate — ${SUBMISSION_DATE}`,
   },
-  'c3-3-pen-test-upload': {
+  'c3-3-pen-test': {
     name: 'Aurora-Health-C3.3-Pen-Test-Summary.pdf',
     reference: `${SUPPLIER} — C3.3 External penetration test summary — ${SUBMISSION_DATE}`,
   },
@@ -118,26 +129,22 @@ const CHOICES: Record<string, string> = {
   'a4-product-type': 'standalone-application',
   // Section B
   'b1-intended-use': 'patient-care-support',
-  'b4-data-flow': 'provided',
+  'b4-data-flow': 'yes',
   // C1
   'c1-1-1-samd': 'yes',
-  'c1-1-2-standalone': 'yes',
+  'c1-1-2-standalone': 'standalone-device',
   'c1-2-direct-care': 'yes',
   'c1-2-2-crm-activities': 'yes',
-  'c1-2-3-crm-system': 'provided',
-  'c1-2-4-safety-case': 'provided',
   // C2
-  'c2-1-dspt': 'confirmed',
+  'c2-1-dspt': 'yes',
   'c2-2-personal-data': 'yes',
-  'c2-2-1-ico': 'provided',
-  'c2-2-2-dpia': 'provided',
-  'c2-2-3-privacy-notice': 'provided',
-  'c2-2-4-terms': 'provided',
+  'c2-2-1-ico-expiry': '2028-06-15',
+  'c2-2-3-privacy-notice': 'link',
+  'c2-2-4-terms': 'link',
   'c2-2-5-data-location': 'outside-uk',
   // C3
-  'c3-1-cyber-essentials': 'provided',
+  'c3-1-cyber-essentials-expiry': '2028-06-15',
   'c3-2-charter': 'no',
-  'c3-3-pen-test': 'provided',
   'c3-4-code-of-practice': 'confirmed',
   'c3-5-mfa-plan': 'yes',
   'c3-5-1-privileged-mfa': 'yes',
@@ -151,10 +158,11 @@ const CHOICES: Record<string, string> = {
   'c4-2-4-nhs-login': 'no',
   'c4-2-5-dapb3051': 'not-applicable',
   // Section D
-  'd1-1-pathways': 'provided',
+  'd1-1-pathways': 'yes',
   'd1-2-user-testing': 'yes',
-  'd1-3-ais': 'confirm',
-  'd1-4-platforms': ['ios', 'android', 'web'].join(CHECKBOX_SEPARATOR),
+  'd1-3-ais': 'yes',
+  'd1-4-web-or-mobile': 'yes',
+  'd1-4-platforms': ['android', 'ios', 'web'].join(CHECKBOX_SEPARATOR),
   'd1-4-1-wcag': 'no-plan-in-place',
 }
 
@@ -162,9 +170,21 @@ const CHOICES: Record<string, string> = {
 export function sampleAnswerFor(question: OnboardingQuestion): TaskAnswers {
   switch (question.type) {
     case 'radios':
-      return { [question.id]: CHOICES[question.id] ?? question.options.find((o) => !o.hidden)?.value ?? '' }
-    case 'checkboxes':
-      return { [question.id]: CHOICES[question.id] ?? question.options.find((o) => !o.hidden)?.value ?? '' }
+    case 'checkboxes': {
+      const value = CHOICES[question.id] ?? question.options.find((o) => !o.hidden)?.value ?? ''
+      const answers: TaskAnswers = { [question.id]: value }
+      if (questionHasConditionalInput(question)) {
+        const selected = value.split(CHECKBOX_SEPARATOR)
+        const needsFollowUp = selected.some((v) => optionFollowUp(question, v))
+        answers[otherDetailsKey(question.id)] = needsFollowUp
+          ? (TEXT[otherDetailsKey(question.id)] ??
+            (optionFollowUp(question, selected[0])?.inputType === 'url'
+              ? 'https://www.aurora-health.example/respira/privacy'
+              : 'Sample details (prototype).'))
+          : ''
+      }
+      return answers
+    }
     case 'date':
       return { [question.id]: CHOICES[question.id] ?? SUBMISSION_DATE }
     case 'textarea':
@@ -183,9 +203,21 @@ export function sampleAnswerFor(question: OnboardingQuestion): TaskAnswers {
         name: `${question.id}.pdf`,
         reference: `${SUPPLIER} — ${question.code ?? question.label} — ${SUBMISSION_DATE}`,
       }
+      if (question.multiple) {
+        const doc: UploadedDocument = {
+          name: u.name,
+          size: 1_284_000,
+          reference: '',
+          uploadedAt: new Date().toISOString(),
+        }
+        return { [question.id]: serializeUploadedDocuments([doc]) }
+      }
       if (question.noReference) return { [question.id]: u.name }
       return { [question.id]: u.name, [`${question.id}${UPLOAD_REFERENCE_SUFFIX}`]: u.reference }
     }
+    case 'blocked':
+    case 'info':
+      return {}
     case 'multi-upload': {
       const uploadedAt = new Date().toISOString()
       const docs: UploadedDocument[] = GENERIC_DOCUMENTS.map((d) => ({ ...d, uploadedAt }))

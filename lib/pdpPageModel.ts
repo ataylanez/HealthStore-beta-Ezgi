@@ -7,6 +7,7 @@ import { getCommissioningSnapshot, type CommissioningSnapshotCard } from '@/lib/
 import { getDeploymentRegister } from '@/lib/deploymentRegister'
 import { getProductNarrative, resolveProductNarrative } from '@/lib/content/productNarratives'
 import { buildPdpSectionLinks, type PdpSectionLink } from '@/lib/pdpOnThisPage'
+import { isMarketPreview } from '@/lib/marketPreview'
 import { productSummary } from '@/lib/pdpSummary'
 
 export type PdpSearchParams = Record<string, string | string[] | undefined>
@@ -64,8 +65,10 @@ export async function getPdpPageModel(
   const showNarrativeSpine = getProductNarrative(slug) != null
   const heroProposition = productSummary(app, showNarrativeSpine ? narrative : null)
 
-  const linkedFundingIds: string[] = app.linked_funding_ids ?? app.funding_ids ?? []
-  const showLocalValue = showNarrativeSpine && (app.condition_tags?.includes('copd') ?? false)
+  const marketPreview = isMarketPreview(app)
+  const linkedFundingIds: string[] = marketPreview ? [] : (app.linked_funding_ids ?? app.funding_ids ?? [])
+  const showLocalValue =
+    showNarrativeSpine && !marketPreview && (app.condition_tags?.includes('copd') ?? false)
   const hasNhsExperience =
     showNarrativeSpine &&
     (getDeploymentRegister(app).length > 0 || (app.case_studies?.length ?? 0) > 0)

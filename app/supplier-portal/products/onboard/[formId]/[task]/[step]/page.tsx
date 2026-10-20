@@ -26,7 +26,8 @@ export async function generateMetadata({ params }: { params: Params }) {
   if (!match || !step || !match.task.questions[step - 1]) {
     return { title: `${SERVICE_NAME} — NHS HealthStore` }
   }
-  return { title: `${match.task.questions[step - 1].label} — ${match.task.title} — ${SERVICE_NAME}` }
+  const question = match.task.questions[step - 1]
+  return { title: `${question.pageTitle ?? question.label} — ${match.task.title} — ${SERVICE_NAME}` }
 }
 
 /** Question pages 2..n of a multi-question task. Step 1 is the bare task URL. */
@@ -37,5 +38,5 @@ export default async function SupplierOnboardTaskStepPage({ params }: { params: 
   const step = parseStep(rawStep)
   if (!step || !match.task.questions[step - 1]) notFound()
   if (step === 1) redirect(taskHref(formId, match.task))
-  return <TaskQuestionPage formId={formId} task={match.task} step={step} />
+  return <TaskQuestionPage formId={formId} task={match.task} section={match.section} step={step} />
 }

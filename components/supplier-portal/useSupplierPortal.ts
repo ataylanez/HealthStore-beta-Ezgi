@@ -4,18 +4,14 @@ import { useCallback, useEffect, useState } from 'react'
 import { clearOnboardingProgress } from '@/components/supplier-onboard/useOnboardingProgress'
 import { companySectionKeys } from '@/lib/supplierCompany'
 import {
-  PRODUCT_CONTENT_FIELDS,
-  PRODUCT_DOCUMENT_FIELDS,
-  PRODUCT_PAGE_FIELDS,
-  SUPPLIER_PAGE_FIELDS,
-  type ActionNeededReason,
   type ManagedProductStatus,
   type PublishedPageStatus,
 } from '@/lib/supplierPortal'
 
 /**
  * Supplier portal state: sign-in, plus draft and submitted edits to onboarded
- * products and Commissioning Store pages.
+ * products and Commissioning Store pages. Submitting applies the changes
+ * straight away (products become Up to date, pages become Published).
  *
  * Client-side prototype, same approach as useOnboardingProgress: mirrored to
  * localStorage and restored after mount so SSR and first render agree. Every
@@ -35,22 +31,18 @@ export type EditRecord = {
   /** Submitted values (shown as the current version). */
   values?: Record<string, string>
   status?: ManagedProductStatus | PublishedPageStatus
-  /** ISO timestamp of the last submission or approval (pages: also the last save). */
+  /** ISO timestamp of the last submission (pages: also the last save). */
   lastUpdated?: string
-  /** Pages only: approved at least once, so edits leave a live version behind. */
+  /** Pages only: published at least once, so edits leave a live version behind. */
   hasBeenPublished?: boolean
-  /** Field ids included in the submission currently in review. */
-  submittedFieldIds?: string[]
-  /** Field ids a rejected review asked the supplier to change. */
-  actionNeededFields?: string[]
-  /** Why those fields need attention. */
-  actionNeededReason?: ActionNeededReason
+  /** ISO timestamp of the last submission; cleared by the next save. Gates the confirmation page. */
+  justSubmittedAt?: string
 }
 
 /**
  * Company information answers. Each chapter is submitted on its own and
- * applies straight away (no review): `values` is the current version, `draft`
- * holds saved-but-unsubmitted edits.
+ * applies straight away: `values` is the current version, `draft` holds
+ * saved-but-unsubmitted edits.
  */
 export type CompanyRecord = {
   draft?: Record<string, string>
@@ -70,11 +62,28 @@ const EMPTY: PortalState = { products: {}, pages: {} }
 const NO_RECORD: EditRecord = {}
 const NO_COMPANY: CompanyRecord = {}
 
-/** Stored page records from before Unpublished / Unpublished changes used a `draft` status. */
-function normalisePages(pages: Record<string, EditRecord> | undefined): Record<string, EditRecord> {
+/**
+ * Bring records saved by earlier prototype versions in line with the current
+ * statuses: the old page `draft` status, and review statuses (in review,
+ * action needed), which now resolve as accepted or as unsubmitted changes.
+ */
+function normaliseRecords(kind: EditKind, records: Record<string, EditRecord> | undefined): Record<string, EditRecord> {
   const out: Record<string, EditRecord> = {}
-  for (const [id, rec] of Object.entries(pages ?? {})) {
-    out[id] = (rec.status as string) === 'draft' ? { ...rec, status: 'unpublished_changes', hasBeenPublished: true } : rec
+  for (const [id, stored] of Object.entries(records ?? {})) {
+    const rec: EditRecord = { ...stored }
+    for (const legacy of ['submittedFieldIds', 'actionNeededFields', 'actionNeededReason']) {
+      delete (rec as Record<string, unknown>)[legacy]
+    }
+    const status = rec.status as string | undefined
+    if (kind === 'pages' && status === 'draft') {
+      out[id] = { ...rec, status: 'unpublished_changes', hasBeenPublished: true }
+    } else if (status === 'in_review') {
+      out[id] = { ...rec, status: ACCEPTED_STATUS[kind], ...(kind === 'pages' ? { hasBeenPublished: true } : {}) }
+    } else if (status === 'action_needed') {
+      out[id] = { ...rec, status: savedStatus(kind, rec) }
+    } else {
+      out[id] = rec
+    }
   }
   return out
 }
@@ -86,8 +95,8 @@ function read(): PortalState {
     const parsed = JSON.parse(raw)
     if (!parsed || typeof parsed !== 'object') return EMPTY
     return {
-      products: parsed.products ?? {},
-      pages: normalisePages(parsed.pages),
+      products: normaliseRecords('products', parsed.products),
+      pages: normaliseRecords('pages', parsed.pages),
       signedIn: parsed.signedIn,
       company: parsed.company,
     }
@@ -117,36 +126,11 @@ export function clearSupplierPortal() {
   window.dispatchEvent(new Event(CHANGED_EVENT))
 }
 
-const APPROVED_STATUS = { products: 'up_to_date', pages: 'published' } as const
+/** Status once a submission is accepted. */
+const ACCEPTED_STATUS = { products: 'up_to_date', pages: 'published' } as const
 
-const PRODUCT_FIELD_IDS = new Set([
-  ...PRODUCT_CONTENT_FIELDS.map((field) => field.id),
-  ...PRODUCT_DOCUMENT_FIELDS.map((field) => field.id),
-])
-
-const PAGE_FIELD_IDS = new Set([
-  ...PRODUCT_PAGE_FIELDS.map((field) => field.id),
-  ...SUPPLIER_PAGE_FIELDS.map((field) => field.id),
-])
-
-/** Field ids in a saved change set for products or pages. */
-function submittedFieldIdsFor(kind: EditKind, changes: Record<string, string>): string[] {
-  const known = kind === 'products' ? PRODUCT_FIELD_IDS : PAGE_FIELD_IDS
-  return Object.keys(changes).filter((key) => known.has(key))
-}
-
-function needsAction(rec: EditRecord): boolean {
-  return rec.status === 'action_needed' || (rec.actionNeededFields?.length ?? 0) > 0
-}
-
-/**
- * Status after saving without submitting. Products become Draft changes, unless
- * the back office has already asked for action — that stays the primary status
- * (Draft changes is then shown as a second tag). Pages keep Action needed the
- * same way; otherwise Unpublished or Unpublished changes.
- */
+/** Status after saving without submitting: Draft changes, or Unpublished / Unpublished changes for pages. */
 function savedStatus(kind: EditKind, rec: EditRecord): ManagedProductStatus | PublishedPageStatus {
-  if (needsAction(rec)) return 'action_needed'
   if (kind === 'products') return 'draft_changes'
   return rec.hasBeenPublished || rec.status === 'published' ? 'unpublished_changes' : 'unpublished'
 }
@@ -192,6 +176,7 @@ export function useSupplierPortal() {
             ...rec,
             draft: { ...(rec.draft ?? {}), ...changes },
             status: savedStatus(kind, rec),
+            justSubmittedAt: undefined,
             // Pages show "Last updated" from their first save; products only from a submission.
             ...(kind === 'pages' ? { lastUpdated: new Date().toISOString() } : {}),
           },
@@ -200,69 +185,25 @@ export function useSupplierPortal() {
     })
   }, [])
 
-  /** Promote the draft (plus any final changes) to the current version and send for review. */
-  const submitForReview = useCallback((kind: EditKind, id: string, changes: Record<string, string> = {}) => {
+  /**
+   * Make the draft (plus any final changes) the current version. Accepted
+   * immediately: products become Up to date, pages become Published.
+   */
+  const submitChanges = useCallback((kind: EditKind, id: string, changes: Record<string, string> = {}) => {
     write((s) => {
       const rec = s[kind][id] ?? {}
       const submitted = { ...(rec.draft ?? {}), ...changes }
+      const now = new Date().toISOString()
       return {
         ...s,
         [kind]: {
           ...s[kind],
           [id]: {
             values: { ...(rec.values ?? {}), ...submitted },
-            status: 'in_review',
-            lastUpdated: new Date().toISOString(),
-            hasBeenPublished: rec.hasBeenPublished,
-            // Remember which fields this submission contained, so a rejection
-            // can mark those and no earlier ones.
-            submittedFieldIds: submittedFieldIdsFor(kind, submitted),
-          },
-        },
-      }
-    })
-  }, [])
-
-  /** Prototype shortcut standing in for the back office review. */
-  const simulateApproval = useCallback((kind: EditKind, id: string) => {
-    write((s) => {
-      const rest: EditRecord = { ...(s[kind][id] ?? {}) }
-      delete rest.actionNeededFields
-      delete rest.actionNeededReason
-      delete rest.submittedFieldIds
-      return {
-        ...s,
-        [kind]: {
-          ...s[kind],
-          [id]: {
-            ...rest,
-            status: APPROVED_STATUS[kind],
-            lastUpdated: new Date().toISOString(),
+            status: ACCEPTED_STATUS[kind],
+            lastUpdated: now,
+            justSubmittedAt: now,
             ...(kind === 'pages' ? { hasBeenPublished: true } : {}),
-          },
-        },
-      }
-    })
-  }, [])
-
-  /** Prototype shortcut: review rejected — supplier must change something and resubmit. */
-  const simulateRejection = useCallback((kind: EditKind, id: string) => {
-    write((s) => {
-      const rec = s[kind][id] ?? {}
-      const { submittedFieldIds, ...rest } = rec
-      return {
-        ...s,
-        [kind]: {
-          ...s[kind],
-          [id]: {
-            ...rest,
-            // Put submitted values back into the draft so the supplier can edit and resubmit.
-            draft: { ...(rec.values ?? {}), ...(rec.draft ?? {}) },
-            status: 'action_needed',
-            lastUpdated: new Date().toISOString(),
-            hasBeenPublished: rec.hasBeenPublished,
-            actionNeededFields: submittedFieldIds ?? rec.actionNeededFields ?? [],
-            actionNeededReason: 'review_rejection' as const,
           },
         },
       }
@@ -297,10 +238,7 @@ export function useSupplierPortal() {
     })
   }, [])
 
-  /**
-   * Make one chapter's draft its current version. Applies immediately — there
-   * is no review step. Drafts for other chapters are left as they are.
-   */
+  /** Make one chapter's draft its current version. Drafts for other chapters are left as they are. */
   const submitCompanySection = useCallback((sectionId: string) => {
     write((s) => {
       const rec = s.company ?? {}
@@ -325,9 +263,7 @@ export function useSupplierPortal() {
     signOut,
     getRecord,
     saveDraft,
-    submitForReview,
-    simulateApproval,
-    simulateRejection,
+    submitChanges,
     company,
     saveCompanyDraft,
     discardCompanyDraft,

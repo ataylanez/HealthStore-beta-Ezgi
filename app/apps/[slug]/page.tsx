@@ -11,6 +11,7 @@ import { overviewParagraphs, usesSummaryOverview } from '@/lib/pdpSummary'
 import { MaturityBadge, SupervisionBadge, ConditionTag, AlertBox } from '@/components/Badges'
 import { CompareToggleButton } from '@/components/CompareToggleButton'
 import { STORE_ACCENT } from '@/lib/storeAccent'
+import { isMarketPreview } from '@/lib/marketPreview'
 import { PdpShareRegion } from '@/components/PdpSharePrintContext'
 
 export async function generateStaticParams() {
@@ -41,6 +42,7 @@ export default async function AppPage({
 
   const { app, narrative, commissioningCards, hasNhsExperience, hasPdpAlerts, heroProposition, showNarrativeSpine, sections } = model
   const accent = STORE_ACCENT
+  const marketPreview = isMarketPreview(app)
   // Summary-style overview (Luscii only for now): no action buttons or snapshot;
   // one short block per section page instead of the plain-English overview.
   const summaryOverview = usesSummaryOverview(app.slug) && showNarrativeSpine
@@ -81,7 +83,7 @@ export default async function AppPage({
                 <ConditionTag key={t} tag={t} />
               ))}
               {app.supervision_model ? <SupervisionBadge model={app.supervision_model} /> : null}
-              <MaturityBadge level={app.maturity_level} hideEstablished />
+              {app.maturity_level ? <MaturityBadge level={app.maturity_level} hideEstablished /> : null}
               {app.content_confidence && app.content_confidence !== 'Confirmed' && (
                 <span className={`badge ${app.content_confidence === 'Supplier-reported' ? 'badge-blue' : 'badge-amber'}`}>
                   {app.content_confidence}
@@ -94,12 +96,14 @@ export default async function AppPage({
           </div>
           {!summaryOverview && (
             <div className="nhsuk-u-margin-top-5 nhsuk-u-margin-bottom-4 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
-              <Link
-                href={`/apps/${app.slug}/express-interest`}
-                className="nhsuk-button mb-0 inline-flex items-center justify-center gap-2 align-top max-sm:mb-2 max-sm:w-full no-underline"
-              >
-                Get in touch
-              </Link>
+              {!marketPreview && (
+                <Link
+                  href={`/apps/${app.slug}/express-interest`}
+                  className="nhsuk-button mb-0 inline-flex items-center justify-center gap-2 align-top max-sm:mb-2 max-sm:w-full no-underline"
+                >
+                  Get in touch
+                </Link>
+              )}
               <CompareToggleButton
                 appId={app.id}
                 solid
@@ -118,7 +122,7 @@ export default async function AppPage({
 
       {summaryOverview ? (
         <PdpOverviewSummary app={app} narrative={narrative} sections={sections} />
-      ) : (
+      ) : marketPreview ? null : (
         <PdpShareRegion
           shareKey="commissioning-snapshot"
           label="Commissioning snapshot"

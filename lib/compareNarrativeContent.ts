@@ -16,6 +16,7 @@ import {
 } from '@/lib/compareFieldFormat'
 import { appConditionTags, formatConditionLabels } from '@/lib/compareConditions'
 import { supervisionLabels } from '@/lib/data'
+import { isMarketPreview } from '@/lib/marketPreview'
 
 /**
  * Comparison content model — captioned NHS tables whose rows mirror the PDP
@@ -53,6 +54,12 @@ export type CompareTableSectionDef = {
 function text(value: string): CompareCell {
   if (!value || value === NOT_STATED) return { kind: 'text', text: NOT_STATED, missing: true }
   return { kind: 'text', text: value }
+}
+
+/** Commercial and funding cells for a product that cannot be commissioned from the HealthStore. */
+function marketPreviewGap(app: App): CompareCell | null {
+  if (!isMarketPreview(app)) return null
+  return { kind: 'text', text: 'Not held on the HealthStore', missing: true }
 }
 
 function firstSentence(raw: string | undefined | null): string {
@@ -112,6 +119,8 @@ function getNiceGuidanceCell(app: App): CompareCell {
 }
 
 function getEconomicValue(app: App): CompareCell {
+  const gap = marketPreviewGap(app)
+  if (gap) return gap
   const n = narrativeFor(app)
   return text(pickStr(firstSentence(n?.commissioner_economics?.headline), getExpectedBenefit(app)))
 }
@@ -137,6 +146,7 @@ function shortSiteName(site: string): string {
 
 /** Site count + short site names only, e.g. "6 Sites. Airedale NHS, Frimley ICS, …". */
 function getWhereLiveCell(app: App): CompareCell {
+  if (isMarketPreview(app)) return text('Not used in the NHS')
   const rows = getDeploymentRegister(app).filter((r) => r.status !== 'historic')
   const names = rows.map((r) => shortSiteName(r.site)).filter(Boolean)
   if (names.length === 0) return text(NOT_STATED)
@@ -164,6 +174,9 @@ function getTimeToDeploy(app: App): CompareCell {
 }
 
 function getServiceWrapCell(app: App): CompareCell {
+  if (isMarketPreview(app)) {
+    return text('Supplier-published coaching and monitoring. Not an NHS service wrap.')
+  }
   return text(getServiceWrapYn(app))
 }
 
@@ -253,21 +266,29 @@ function getAssurancePackCell(app: App, item: string): CompareCell {
 /* ------------------------------------------------------------------ */
 
 function getIndicativeCost(app: App): CompareCell {
+  const gap = marketPreviewGap(app)
+  if (gap) return gap
   const n = narrativeFor(app)
   return text(pickStr(n?.commercial_readiness?.price_summary, getIndicativePriceShort(app)))
 }
 
 function getCommercialModel(app: App): CompareCell {
+  const gap = marketPreviewGap(app)
+  if (gap) return gap
   const n = narrativeFor(app)
   return text(pickStr(n?.commercial_readiness?.proposition_type, getPricingModelDisplay(app)))
 }
 
 function getProcurementRoute(app: App): CompareCell {
+  const gap = marketPreviewGap(app)
+  if (gap) return gap
   const n = narrativeFor(app)
   return text(pickStr(n?.commercial_readiness?.route_status))
 }
 
 function getFundingLevers(app: App): CompareCell {
+  const gap = marketPreviewGap(app)
+  if (gap) return gap
   const n = narrativeFor(app)
   const levers = n?.commissioner_economics?.funding_levers ?? []
   if (levers.length > 0) {

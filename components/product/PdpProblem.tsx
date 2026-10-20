@@ -14,13 +14,9 @@ export default function PdpProblem({ app, narrative }: { app: App; narrative: Pr
       shareKey="narrative-problem"
       title={pdpSectionTitle('the-problem', { appName: app.app_name })}
     >
-      <p style={{ fontSize: 'var(--text-body)', lineHeight: 1.7, color: 'var(--text-secondary)' }}>
-        {problem}
-      </p>
+      <p className="nhsuk-body-m">{problem}</p>
       {narrative.decision_summary?.why_relevant && (
-        <p className="mt-3" style={{ fontSize: 'var(--text-body)', lineHeight: 1.7, color: 'var(--text-muted)' }}>
-          {narrative.decision_summary.why_relevant}
-        </p>
+        <p className="nhsuk-body-m">{narrative.decision_summary.why_relevant}</p>
       )}
     </PdpSection>
   )

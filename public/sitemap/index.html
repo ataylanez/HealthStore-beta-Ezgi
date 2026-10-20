@@ -207,7 +207,7 @@
       <details>
         <summary>Behind the scenes (technical)</summary>
         <div>
-          <p>There is no server or back office: everything you do in the portal is saved in your browser, and review outcomes are simulated.</p>
+          <p>There is no server or back office: everything you do in the portal is saved in your browser, and anything you submit is accepted straight away.</p>
           <table class="ds-table">
             <thead><tr><th>Where</th><th>What it holds</th></tr></thead>
             <tbody>
@@ -215,12 +215,11 @@
               <tr><td><code>localStorage hs-supplier-portal:onboarding:{formId}</code></td><td>Your answers to a product onboarding form, one entry per form.</td></tr>
             </tbody>
           </table>
-          <p style="margin-top:8px">While a submission is “In review”, <strong>Simulate approval</strong> and <strong>Simulate rejection</strong> buttons stand in for the HealthStore team.</p>
         </div>
       </details>
     </div>
 
-    <div class="ds-note ds-note--source">This map is maintained by hand: when a page is added, changed or taken away, update the <code>SITE</code> (Commissioning Store) or <code>SUPPLIER_SITE</code> (Supplier portal) data inside this file. Last reviewed 14 October 2026.</div>
+    <div class="ds-note ds-note--source">This map is maintained by hand: when a page is added, changed or taken away, update the <code>SITE</code> (Commissioning Store) or <code>SUPPLIER_SITE</code> (Supplier portal) data inside this file. Last reviewed 20 October 2026.</div>
   </div>
 
   <script>
@@ -499,7 +498,7 @@
                       note: 'Section addresses: the-problem, how-it-helps, local-impact (impact and worth together), funding-levers, assurance, implementation, nhs-experience, how-to-buy, resources. A product only has the pages it has content for; a section address a product does not have returns “page not found”.',
                       file: 'app/apps/[slug]/[section]/page.tsx, components/product/Pdp*.tsx, components/PdpSection.tsx',
                       data: 'Narrative sections from lib/content/productNarratives.ts; funding and deployment information from content/apps/{slug}.json; section titles from lib/pdpSections.ts',
-                      tech: 'Products with section pages: luscii, mycopd, myheart, joint-academy.',
+                      tech: 'Products with section pages: luscii, mycopd, myheart, joint-academy, and wellinks (limited view, not commissionable, no funding section).',
                       example: '/apps/luscii/the-problem'
                     },
                     {
@@ -660,7 +659,7 @@
       purpose: 'The home page after signing in. It shows what needs doing and opens every area of the portal.',
       on: [
         'Your company name above the heading “Dashboard”',
-        '“Needs your attention”: a work list showing company information that has never been submitted, an onboarding form that is incomplete or needs action, product documents that need action, and any store page that is unpublished or needs action',
+        '“Needs your attention”: a work list showing company information that has never been submitted, an onboarding form that is incomplete, and any store page that is unpublished',
         'Five cards: Company information, Product management, Published pages, Contact, and Account management'
       ],
       actions: [
@@ -671,9 +670,9 @@
         'Contact → /supplier-portal/contact',
         'Account management → /supplier-portal/account'
       ],
-      note: 'Draft changes, unpublished changes and items already in review stay off the “Needs your attention” list.',
+      note: 'Draft changes and unpublished changes stay off the “Needs your attention” list. Anything you submit is accepted straight away.',
       file: 'app/supplier-portal/page.tsx → DashboardAttentionList.tsx, PortalCardGrid.tsx',
-      data: 'The sample supplier (my mhealth Limited) and its products come from lib/supplierPortal.ts; everything you do is saved in the browser',
+      data: 'The sample supplier (Aurora Health Limited, a made-up company) and its product Respira CBT come from lib/supplierPortal.ts; everything you do is saved in the browser',
       children: [
         {
           route: '/supplier-portal/sign-in', title: 'Sign in',
@@ -696,7 +695,7 @@
             'A submitted chapter shows as a read-only summary with a single Change button'
           ],
           actions: ['Open or Change a chapter → its questions, one per page', 'The last question → Check your answers for that chapter', 'Confirm and submit → a confirmation page, then back here'],
-          note: 'Submitting a chapter applies its answers straight away — there is no HealthStore review for company information. Save and exit part-way keeps a draft; nothing changes until you confirm and submit.',
+          note: 'Submitting a chapter applies its answers straight away. Save and exit part-way keeps a draft; nothing changes until you confirm and submit.',
           file: 'app/supplier-portal/company/page.tsx → components/supplier-portal/CompanyInformationPage.tsx',
           data: 'Questions defined in lib/supplierCompany.ts (the Section A supplier questionnaire); answers saved in the browser',
           children: [
@@ -741,10 +740,10 @@
               route: '/supplier-portal/products/onboard', title: 'Product onboarding',
               access: 'Suppliers, after signing in',
               purpose: 'Lists each new product that has its own onboarding form, with its status.',
-              on: ['The page trail', 'An introduction explaining that answers save as a draft until you submit the form for review', 'A table of onboarding forms: product name, the date it was started, and its status (myCOPD in this prototype)'],
+              on: ['The page trail', 'An introduction explaining that answers save as a draft until you submit the form', 'A table of onboarding forms: product name, the date it was started, and its status (Respira CBT in this prototype)'],
               actions: ['Open a form → /supplier-portal/products/onboard/[formId]'],
               file: 'app/supplier-portal/products/onboard/page.tsx → OnboardingFormsTable.tsx',
-              data: 'Forms listed in lib/supplierPortal.ts (one today: myCOPD)',
+              data: 'Forms listed in lib/supplierPortal.ts (one today: Respira CBT)',
               children: [
                 {
                   route: '/supplier-portal/products/onboard/[formId]', title: 'Onboarding form (task list)',
@@ -752,16 +751,16 @@
                   purpose: 'The onboarding form for one product: four sections and seven tasks, each a run of one-question-per-page screens.',
                   on: [
                     'The product name and the form status',
-                    'A task list across four sections: Product details; Value proposition; Technical questions (clinical safety, data protection, technical security, interoperability); and Key principles for success (usability and accessibility)',
+                    'A task list across four sections: Product details; Value proposition; Assessed standards (clinical safety, data protection, technical security, interoperability); and Key principles for success (usability and accessibility)',
                     'Each task marked Completed or Incomplete',
                     'A Submit button that stays unavailable until every task is completed'
                   ],
                   actions: ['Open a task → its first question', 'Submit → Check your answers, then Confirm and submit, then a confirmation with a reference number'],
-                  note: 'Some questions only appear depending on earlier answers in the same task; questions you are routed past are left out of the Completed check and of Check your answers. After submitting, the HealthStore team reviews the evidence before the product can be listed, and will be in touch within 10 working days if they need more information.',
+                  note: 'Some questions only appear depending on earlier answers in the same task; questions you are routed past are left out of the Completed check and of Check your answers. Clinical safety, Data protection, Technical security and Interoperability each open with an information page and a Continue button before their first question. Submitting the form onboards the product straight away.',
                   file: 'app/supplier-portal/products/onboard/[formId]/page.tsx → components/supplier-onboard/**',
                   data: 'Questions and routing in lib/supplierOnboarding.ts; answers in the browser (localStorage hs-supplier-portal:onboarding:{formId})',
                   tech: 'The question routes (Sections B, C1–C4 and D) are drawn in docs/SUPPLIER_PORTAL_FLOWS.md. “Provided / Not provided” questions are followed by a separate upload or text page when the answer is Provided.',
-                  example: '/supplier-portal/products/onboard/mycopd',
+                  example: '/supplier-portal/products/onboard/respira-cbt',
                   children: [
                     {
                       route: '/supplier-portal/products/onboard/[formId]/[task]/[step]', title: 'Onboarding question',
@@ -776,7 +775,7 @@
                     {
                       route: '/supplier-portal/products/onboard/[formId]/check-answers', title: 'Check your answers (form)',
                       access: 'Suppliers, after signing in',
-                      purpose: 'Shows every answer on your route through the whole form before you submit it for review.',
+                      purpose: 'Shows every answer on your route through the whole form before you submit it.',
                       on: ['Answers grouped by section and task, each with a Change link', 'A Confirm and submit button'],
                       actions: ['Change → the matching question', 'Confirm and submit → the confirmation page'],
                       file: 'app/supplier-portal/products/onboard/[formId]/check-answers/page.tsx'
@@ -784,8 +783,8 @@
                     {
                       route: '/supplier-portal/products/onboard/[formId]/confirmation', title: 'Form submitted',
                       access: 'Suppliers, after signing in',
-                      purpose: 'Confirms the form went through, with a reference number and what happens next.',
-                      on: ['A green confirmation panel with a reference number', '“What happens next”: the team reviews the evidence; the product is not listed until that review is finished'],
+                      purpose: 'Confirms the form went through and the product is onboarded, with a reference number.',
+                      on: ['A green confirmation panel with a reference number', '“What happens next”: the product is onboarded and can be kept up to date from Manage products'],
                       actions: ['→ back to the portal'],
                       file: 'app/supplier-portal/products/onboard/[formId]/confirmation/page.tsx'
                     }
@@ -797,7 +796,7 @@
               route: '/supplier-portal/products/manage', title: 'Manage products',
               access: 'Suppliers, after signing in',
               purpose: 'Lists your products that are already on the HealthStore, with their update status.',
-              on: ['The page trail', 'A heading and a short introduction', 'A table of products with their status (myHeart in this prototype, which starts as Up to date)'],
+              on: ['The page trail', 'A heading and a short introduction', 'A table of products with their status (Respira CBT in this prototype, which starts as Up to date)'],
               actions: ['Open a product → /supplier-portal/products/manage/[productId]'],
               file: 'app/supplier-portal/products/manage/page.tsx → ManagedProductsTable.tsx',
               data: 'Products listed in lib/supplierPortal.ts',
@@ -810,14 +809,13 @@
                     'The product name and its status',
                     'Content rows — product summary, who the product is for, and the support contact email — each with a Change link',
                     'Assurance documents in DTAC order (PAQ form, clinical safety case report and hazard log, ICO registration, Cyber Essentials, penetration test summary, WCAG 2.2 AA audit, completed DTAC form), each with a Change link',
-                    'A Submit for review button, shown once there are draft changes or a review came back asking for changes',
-                    'While a submission is in review: Simulate approval and Simulate rejection buttons stand in for the HealthStore team'
+                    'A Submit changes button, shown once there are draft changes'
                   ],
-                  actions: ['Change → /supplier-portal/products/manage/[productId]/[field]', 'Submit for review → Check your answers, then Confirm and submit, then a confirmation'],
-                  note: 'Draft changes are not seen by the HealthStore team until you submit them. A rejection puts the submitted values back into your draft so they can be edited and sent again, and the product appears under “Needs your attention” on the dashboard.',
+                  actions: ['Change → /supplier-portal/products/manage/[productId]/[field]', 'Submit changes → Check your answers, then Confirm and submit, then a confirmation'],
+                  note: 'Draft changes are not used until you submit them. Submitted changes are accepted straight away and the status returns to Up to date.',
                   file: 'app/supplier-portal/products/manage/[productId]/page.tsx → ProductDocumentsView.tsx',
-                  data: 'Your edits saved in the browser, over the sample defaults in lib/supplierPortal.ts',
-                  example: '/supplier-portal/products/manage/myheart',
+                  data: 'Your edits saved in the browser, over the sample defaults in lib/supplierPortalContent.ts',
+                  example: '/supplier-portal/products/manage/respira-cbt',
                   children: [
                     {
                       route: '/supplier-portal/products/manage/[productId]/[field]', title: 'Change one field',
@@ -831,15 +829,15 @@
                     {
                       route: '/supplier-portal/products/manage/[productId]/check-answers', title: 'Check your answers (product)',
                       access: 'Suppliers, after signing in',
-                      purpose: 'Shows the changes you are about to submit for review.',
+                      purpose: 'Shows the changes you are about to submit.',
                       on: ['The changed fields, each with a Change link', 'A Confirm and submit button'],
-                      actions: ['Change → edit that field', 'Confirm and submit → the confirmation page, and the status becomes In review'],
+                      actions: ['Change → edit that field', 'Confirm and submit → the confirmation page, and the status becomes Up to date'],
                       file: 'app/supplier-portal/products/manage/[productId]/check-answers/page.tsx → ProductCheckAnswers.tsx'
                     },
                     {
                       route: '/supplier-portal/products/manage/[productId]/confirmation', title: 'Changes submitted',
                       access: 'Suppliers, after signing in',
-                      purpose: 'Confirms your changes have gone to the HealthStore team for review.',
+                      purpose: 'Confirms your changes have been applied.',
                       on: ['A green confirmation panel', 'What happens next'],
                       actions: ['→ back to the product or the dashboard'],
                       file: 'app/supplier-portal/products/manage/[productId]/confirmation/page.tsx → ProductSubmissionConfirmation.tsx'
@@ -856,7 +854,7 @@
           purpose: 'The pages commissioners see on the Commissioning Store: one for each product, plus your supplier page.',
           on: ['The page trail', 'An introduction noting that some content comes from product onboarding and cannot be changed here', 'A table of pages: each product page and the supplier page, with a status'],
           actions: ['Open a product page → /supplier-portal/published/products/[productId]', 'Open the supplier page → /supplier-portal/published/supplier'],
-          note: 'A page that has never been published starts as Unpublished, so commissioners cannot see it. After the first approval it is Published; later saves become Unpublished changes, and the live page stays as it was until the new version is approved.',
+          note: 'A page that has never been published starts as Unpublished, so commissioners cannot see it. Submitting publishes it straight away; later saves become Unpublished changes, and the live page stays as it was until the new version is submitted.',
           file: 'app/supplier-portal/published/page.tsx → PublishedPagesTable.tsx',
           data: 'Page fields and statuses in lib/supplierPortal.ts; your edits saved in the browser',
           children: [
@@ -864,24 +862,24 @@
               route: '/supplier-portal/published/products/[productId]', title: 'Product page (store content)',
               access: 'Suppliers, after signing in',
               purpose: 'Edit the public wording of a product’s Commissioning Store page.',
-              on: ['The page status and when it was last updated', 'The fields you can edit — such as the overview and why it matters locally — each with a Change link', '“Information from product onboarding”: read-only rows that can only be changed through Manage products', 'A Submit for review button once there are changes', 'Simulate approval and Simulate rejection while in review'],
-              actions: ['Change a field → edit it on its own page', 'Submit for review → Check your answers, then Confirm and submit, then a confirmation'],
-              note: 'A rejected page becomes Action needed and returns to “Needs your attention”, together with any page that is still unpublished.',
+              on: ['The page status and when it was last updated', 'The fields you can edit — such as the overview and why it matters locally', '“Information from product onboarding”: read-only rows that can only be changed through Manage products', 'Submit changes, Save and exit, and Cancel and exit buttons'],
+              actions: ['Submit changes → Check your answers, then Confirm and submit, then a confirmation', 'Save and exit → back to Published pages with the changes kept'],
+              note: 'A page that is still unpublished appears under “Needs your attention”.',
               file: 'app/supplier-portal/published/products/[productId]/page.tsx → PublishedPageEditor.tsx',
-              example: '/supplier-portal/published/products/myheart',
+              example: '/supplier-portal/published/products/respira-cbt',
               children: [
                 {
                   route: '/supplier-portal/published/products/[productId]/check-answers', title: 'Check your answers (product page)',
                   access: 'Suppliers, after signing in',
-                  purpose: 'Shows the page changes you are about to submit for review.',
+                  purpose: 'Shows the page changes you are about to publish.',
                   on: ['The changed fields, each with a Change link', 'A Confirm and submit button'],
-                  actions: ['Confirm and submit → the confirmation page, and the status becomes In review'],
+                  actions: ['Confirm and submit → the confirmation page, and the status becomes Published'],
                   file: 'app/supplier-portal/published/products/[productId]/check-answers/page.tsx → PublishedPageCheckAnswers.tsx'
                 },
                 {
-                  route: '/supplier-portal/published/products/[productId]/confirmation', title: 'Page submitted',
+                  route: '/supplier-portal/published/products/[productId]/confirmation', title: 'Page published',
                   access: 'Suppliers, after signing in',
-                  purpose: 'Confirms the page has gone to the HealthStore team for review.',
+                  purpose: 'Confirms the page is now live on the Commissioning Store.',
                   on: ['A green confirmation panel', 'What happens next'],
                   actions: ['→ back to Published pages'],
                   file: 'app/supplier-portal/published/products/[productId]/confirmation/page.tsx → PublishedPageConfirmation.tsx'
@@ -892,22 +890,22 @@
               route: '/supplier-portal/published/supplier', title: 'Supplier page (store content)',
               access: 'Suppliers, after signing in',
               purpose: 'Edit the public page about your company on the Commissioning Store.',
-              on: ['The page status and when it was last updated', 'The fields you can edit: about the company, website, and enquiries email', 'Read-only company information from supplier onboarding: registered address, company number and ICO registration', 'A Submit for review button once there are changes', 'Simulate approval and Simulate rejection while in review'],
-              actions: ['Change a field → edit it on its own page', 'Submit for review → Check your answers, then Confirm and submit, then a confirmation'],
+              on: ['The page status and when it was last updated', 'The fields you can edit: about the company, website, and enquiries email', 'Read-only company information from supplier onboarding: company name, registered address, company number and products on the HealthStore', 'Submit changes, Save and exit, and Cancel and exit buttons'],
+              actions: ['Submit changes → Check your answers, then Confirm and submit, then a confirmation', 'Save and exit → back to Published pages with the changes kept'],
               file: 'app/supplier-portal/published/supplier/page.tsx → PublishedPageEditor.tsx',
               children: [
                 {
                   route: '/supplier-portal/published/supplier/check-answers', title: 'Check your answers (supplier page)',
                   access: 'Suppliers, after signing in',
-                  purpose: 'Shows the supplier-page changes you are about to submit for review.',
+                  purpose: 'Shows the supplier-page changes you are about to publish.',
                   on: ['The changed fields, each with a Change link', 'A Confirm and submit button'],
-                  actions: ['Confirm and submit → the confirmation page, and the status becomes In review'],
+                  actions: ['Confirm and submit → the confirmation page, and the status becomes Published'],
                   file: 'app/supplier-portal/published/supplier/check-answers/page.tsx → PublishedPageCheckAnswers.tsx'
                 },
                 {
-                  route: '/supplier-portal/published/supplier/confirmation', title: 'Supplier page submitted',
+                  route: '/supplier-portal/published/supplier/confirmation', title: 'Supplier page published',
                   access: 'Suppliers, after signing in',
-                  purpose: 'Confirms the supplier page has gone to the HealthStore team for review.',
+                  purpose: 'Confirms the supplier page is now live on the Commissioning Store.',
                   on: ['A green confirmation panel', 'What happens next'],
                   actions: ['→ back to Published pages'],
                   file: 'app/supplier-portal/published/supplier/confirmation/page.tsx → PublishedPageConfirmation.tsx'
@@ -938,7 +936,7 @@
           route: '/supplier-portal/statuses', title: 'Statuses (reference)',
           access: 'Suppliers, after signing in',
           purpose: 'A reference list of every status tag used in the portal and the colour it appears in.',
-          on: ['Tables of statuses grouped by where they appear: onboarding forms, managed products, and published pages'],
+          on: ['Tables of statuses grouped by where they appear: company information, onboarding forms, managed products, and published pages'],
           actions: ['Reading only'],
           note: 'Not linked from the dashboard — you have to type the address.',
           file: 'app/supplier-portal/statuses/page.tsx → PortalStatusTag.tsx'

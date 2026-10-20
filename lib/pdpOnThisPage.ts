@@ -4,6 +4,7 @@ import type { CommissionerContext } from '@/lib/context/types'
 import { deriveAssuranceDomains } from '@/lib/content/assuranceDomains'
 import { getDeploymentRegister } from '@/lib/deploymentRegister'
 import { splitPdpEvidence } from '@/lib/pdpEvidence'
+import { isMarketPreview } from '@/lib/marketPreview'
 import { pdpSectionTitle, pdpPatientCohortLabel, resolvePdpLocalArea } from '@/lib/pdpSections'
 import type { PdpSectionId } from '@/lib/pdpSections'
 
@@ -60,14 +61,19 @@ export function buildPdpSectionLinks(input: {
     if (problem) {
       push('the-problem')
     }
-    if (bullets.length > 0 || pathway) {
+    // Limited market view keeps the problem only. Pathway, assurance and
+    // implementation stay off the page so it does not read as a product you can adopt.
+    if (!isMarketPreview(app) && (bullets.length > 0 || pathway)) {
       push('how-it-helps')
     }
     if (showLocalValue) {
       push('local-impact', `${app.app_name}'s local impact and worth`)
     }
     const economics = narrative.commissioner_economics
-    if ((economics?.funding_levers?.length ?? 0) > 0 || !!economics?.tariff_note?.trim() || hasLinkedFunding) {
+    if (
+      !isMarketPreview(app) &&
+      ((economics?.funding_levers?.length ?? 0) > 0 || !!economics?.tariff_note?.trim() || hasLinkedFunding)
+    ) {
       push('funding-levers')
     }
     const hasAssuranceEvidence =
@@ -75,22 +81,27 @@ export function buildPdpSectionLinks(input: {
       evidenceSplit.niceEvidence.length > 0 ||
       (app.nice_guidance_refs?.length ?? 0) > 0
     if (
-      (narrative.assurance_domains?.length ?? 0) > 0 ||
-      deriveAssuranceDomains(app).length > 0 ||
-      hasAssuranceEvidence
+      !isMarketPreview(app) &&
+      ((narrative.assurance_domains?.length ?? 0) > 0 ||
+        deriveAssuranceDomains(app).length > 0 ||
+        hasAssuranceEvidence)
     ) {
       push('assurance')
     }
-    if (narrative.implementation) {
+    if (!isMarketPreview(app) && narrative.implementation) {
       push('implementation')
     }
     if (hasNhsExperience) {
       push('nhs-experience')
     }
-    if (narrative.commercial_readiness) {
+    if (!isMarketPreview(app) && narrative.commercial_readiness) {
       push('how-to-buy')
     }
-    push('resources')
+    const hasResources =
+      (app.product_videos?.length ?? 0) > 0 || app.catalogue_demo_available === true
+    if (!isMarketPreview(app) || hasResources) {
+      push('resources')
+    }
   }
 
   return links

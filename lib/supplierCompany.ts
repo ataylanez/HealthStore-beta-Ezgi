@@ -409,26 +409,26 @@ export function companySectionChanged(sectionId: string, draft: TaskAnswers, val
 
 /* --------------------------- prototype samples -------------------------- */
 
-/** "Fill with sample answers" — my mhealth Limited, matching SAMPLE_SUPPLIER. */
+/** "Fill with sample answers" — Aurora Health Limited, matching SAMPLE_SUPPLIER. */
 export const COMPANY_SAMPLE_ANSWERS: TaskAnswers = {
-  'a1-company-name': 'my mhealth Limited',
+  'a1-company-name': 'Aurora Health Limited',
   'company-trades-differently': 'yes',
-  'company-trading-name': 'my mhealth',
+  'company-trading-name': 'Aurora Health',
   'company-organisation-type': 'private-company',
   'a9-country': 'United Kingdom',
-  'a10-registration': '07614236',
-  [fieldKey('a8-registered-address', { key: 'line1' })]: 'Unit 4, Bournemouth Business Park',
+  'a10-registration': '14285736',
+  [fieldKey('a8-registered-address', { key: 'line1' })]: '14 Canal Wharf',
   [fieldKey('a8-registered-address', { key: 'line2' })]: '',
-  [fieldKey('a8-registered-address', { key: 'town' })]: 'Bournemouth',
-  [fieldKey('a8-registered-address', { key: 'county' })]: 'Dorset',
-  [fieldKey('a8-registered-address', { key: 'postcode' })]: 'BH8 8EZ',
-  'company-website': 'www.mymhealth.com',
+  [fieldKey('a8-registered-address', { key: 'town' })]: 'Leeds',
+  [fieldKey('a8-registered-address', { key: 'county' })]: 'West Yorkshire',
+  [fieldKey('a8-registered-address', { key: 'postcode' })]: 'LS1 4DY',
+  'company-website': 'www.aurora-health.example',
   [fieldKey('a5-relationship-manager', { key: 'first-name' })]: 'Brandson',
   [fieldKey('a5-relationship-manager', { key: 'last-name' })]: 'Sanderson',
   [fieldKey('a5-relationship-manager', { key: 'job-title' })]: 'Head of NHS Partnerships',
-  [fieldKey('a6-relationship-manager-contact', { key: 'email' })]: 'sam.patel@mymhealth.example',
-  [fieldKey('a6-relationship-manager-contact', { key: 'phone' })]: '+44 1202 496 000',
+  [fieldKey('a6-relationship-manager-contact', { key: 'email' })]: 'brandson.sanderson@aurora-health.example',
+  [fieldKey('a6-relationship-manager-contact', { key: 'phone' })]: '+44 113 496 0000',
   'a11-cqc-required': 'yes',
   'a11-cqc-assessment-date': '2026-03-18',
-  'a12-cqc-report-upload': 'my-mhealth-CQC-report-2026.pdf',
+  'a12-cqc-report-upload': 'Aurora-Health-CQC-report-2026.pdf',
 }

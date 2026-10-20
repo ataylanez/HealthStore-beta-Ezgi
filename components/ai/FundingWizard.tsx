@@ -25,7 +25,7 @@ type Props = {
 }
 
 const optionButtonClass =
-  'w-full rounded-xl border px-4 py-4 text-left hs-text-label hs-font-normal transition-colors disabled:opacity-40'
+  'w-full rounded-xl border px-4 py-4 text-left nhsuk-body-m nhsuk-u-margin-bottom-0 transition-colors disabled:opacity-40'
 
 const optionButtonStyle = {
   borderColor: 'var(--border)',
@@ -71,8 +71,8 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
           type="button"
           onClick={onCancel}
           disabled={disabled}
-          className="flex flex-shrink-0 items-center gap-1 hs-text-caption hs-font-normal transition-colors underline hover:no-underline disabled:opacity-40"
-          style={{ color: 'var(--text-secondary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
+          className="flex flex-shrink-0 items-center gap-1 nhsuk-body-m nhsuk-u-margin-bottom-0 transition-colors underline hover:no-underline disabled:opacity-40"
+          style={{ color: 'var(--nhs-blue)', fontFamily: 'Frutiger, Arial, sans-serif' }}
         >
           <X className="h-3.5 w-3.5" />
           Close
@@ -83,7 +83,7 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
       {step === 0 && (
         <div>
           <label
-            className="mb-2 block hs-text-label hs-font-bold"
+            className="mb-2 block nhsuk-body-m nhsuk-u-font-weight-bold"
             style={{ color: 'var(--text-primary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
           >
             Which NHS England region are you in?
@@ -118,14 +118,14 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
               setRegion('')
             }}
             disabled={disabled}
-            className="mb-4 flex items-center gap-1 hs-text-caption hs-font-normal transition-colors underline hover:no-underline disabled:opacity-40"
-            style={{ color: 'var(--text-secondary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
+            className="mb-4 flex items-center gap-1 nhsuk-body-m nhsuk-u-margin-bottom-0 transition-colors underline hover:no-underline disabled:opacity-40"
+            style={{ color: 'var(--nhs-blue)', fontFamily: 'Frutiger, Arial, sans-serif' }}
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back
           </button>
           <label
-            className="mb-2 block hs-text-label hs-font-bold"
+            className="mb-2 block nhsuk-body-m nhsuk-u-font-weight-bold"
             style={{ color: 'var(--text-primary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
           >
             What do you want to find funding for?
@@ -176,14 +176,14 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
               setSelection('')
             }}
             disabled={disabled}
-            className="mb-4 flex items-center gap-1 hs-text-caption hs-font-normal transition-colors underline hover:no-underline disabled:opacity-40"
-            style={{ color: 'var(--text-secondary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
+            className="mb-4 flex items-center gap-1 nhsuk-body-m nhsuk-u-margin-bottom-0 transition-colors underline hover:no-underline disabled:opacity-40"
+            style={{ color: 'var(--nhs-blue)', fontFamily: 'Frutiger, Arial, sans-serif' }}
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back
           </button>
           <label
-            className="mb-2 block hs-text-label hs-font-bold"
+            className="mb-2 block nhsuk-body-m nhsuk-u-font-weight-bold"
             style={{ color: 'var(--text-primary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
           >
             {mode === SEARCH_MODE.CONDITION ? 'Select a condition' : 'Select a DTx app'}
@@ -223,8 +223,8 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
               setSelection('')
             }}
             disabled={disabled}
-            className="mb-4 flex items-center gap-1 hs-text-caption hs-font-normal transition-colors underline hover:no-underline disabled:opacity-40"
-            style={{ color: 'var(--text-secondary)', fontFamily: 'Frutiger, Arial, sans-serif' }}
+            className="mb-4 flex items-center gap-1 nhsuk-body-m nhsuk-u-margin-bottom-0 transition-colors underline hover:no-underline disabled:opacity-40"
+            style={{ color: 'var(--nhs-blue)', fontFamily: 'Frutiger, Arial, sans-serif' }}
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Back
@@ -234,7 +234,7 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
             style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
           >
             <div
-              className="mb-2 hs-text-label hs-font-bold"
+              className="mb-2 nhsuk-body-s nhsuk-u-font-weight-bold nhsuk-u-secondary-text-color"
               style={{ color: 'var(--text-muted)', fontFamily: 'Frutiger, Arial, sans-serif' }}
             >
               Search parameters
@@ -244,15 +244,13 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
                 <div className="hs-text-caption" style={{ color: 'var(--text-muted)' }}>
                   Region
                 </div>
-                <div className="hs-text-label hs-font-bold" style={{ color: 'var(--text-primary)' }}>
-                  {region}
-                </div>
+                <div className="nhsuk-body-m nhsuk-u-font-weight-bold">{region}</div>
               </div>
               <div>
                 <div className="hs-text-caption" style={{ color: 'var(--text-muted)' }}>
                   Search type
                 </div>
-                <div className="hs-text-label hs-font-bold" style={{ color: 'var(--text-primary)' }}>
+                <div className="nhsuk-body-m nhsuk-u-font-weight-bold">
                   {mode === SEARCH_MODE.CONDITION ? 'Condition' : 'DTx app'}
                 </div>
               </div>
@@ -260,9 +258,7 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
                 <div className="hs-text-caption" style={{ color: 'var(--text-muted)' }}>
                   Target
                 </div>
-                <div className="hs-text-label hs-font-bold" style={{ color: 'var(--text-primary)' }}>
-                  {selectionLabel}
-                </div>
+                <div className="nhsuk-body-m nhsuk-u-font-weight-bold">{selectionLabel}</div>
               </div>
             </div>
           </div>
@@ -271,7 +267,7 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
               type="button"
               onClick={confirm}
               disabled={disabled}
-              className="rounded-xl px-6 py-2 hs-text-label hs-font-bold text-white transition-all disabled:opacity-40"
+              className="rounded-xl px-6 py-2 nhsuk-body-m nhsuk-u-margin-bottom-0 nhsuk-u-font-weight-bold text-white transition-all disabled:opacity-40"
               style={{ background: 'var(--nhs-blue)' }}
             >
               Search for funding
@@ -280,11 +276,11 @@ export default function FundingWizard({ onComplete, onCancel, disabled }: Props)
               type="button"
               onClick={startOver}
               disabled={disabled}
-              className="rounded-xl border px-4 py-2 hs-text-label hs-font-normal transition-all disabled:opacity-40"
+              className="rounded-xl border px-4 py-2 nhsuk-body-m nhsuk-u-margin-bottom-0 transition-all disabled:opacity-40"
               style={{
                 borderColor: 'var(--border)',
                 background: 'var(--card)',
-                color: 'var(--text-secondary)',
+                color: 'var(--text-primary)',
                 fontFamily: 'Frutiger, Arial, sans-serif',
               }}
             >

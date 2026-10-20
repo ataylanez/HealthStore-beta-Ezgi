@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getAllAppsUnfiltered, getAppBySlug } from '@/lib/data'
 import { EoiJourneyProvider } from '@/components/eoi/journey/EoiJourneyProvider'
+import { isMarketPreview } from '@/lib/marketPreview'
 
 /**
  * Shared layout for the express-interest journey. Resolves the app once and
@@ -29,7 +30,7 @@ export default async function ExpressInterestLayout({
 }) {
   const { slug } = await params
   const app = getAppBySlug(slug)
-  if (!app) notFound()
+  if (!app || isMarketPreview(app)) notFound()
 
   return (
     <EoiJourneyProvider app={{ id: app.id, name: app.app_name, slug: app.slug }}>

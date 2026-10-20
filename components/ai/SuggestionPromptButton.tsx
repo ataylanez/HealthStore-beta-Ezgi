@@ -19,7 +19,7 @@ export default function SuggestionPromptButton({ label, onClick, disabled }: Pro
       block
       onClick={onClick}
       disabled={disabled}
-      className="gap-2 border border-[var(--border)] px-4 py-4 hs-text-label"
+      className="gap-2 border border-[var(--border)] px-4 py-4 nhsuk-body-m nhsuk-u-margin-bottom-0"
     >
       <Sparkles
         className="mt-1 h-4 w-4 flex-shrink-0"

@@ -11,6 +11,7 @@ import { buildBrowseSearchParams, parseBrowseConditionParam } from '@/lib/catalo
 import { PageBreadcrumb } from '@/components/PageBreadcrumb'
 import { getProductNarrative } from '@/lib/content/productNarratives'
 import { catalogueSummary } from '@/lib/pdpSummary'
+import { isMarketPreview } from '@/lib/marketPreview'
 
 const supervisionOptions = Object.entries(supervisionLabels).map(([id, label]) => ({ id, label }))
 
@@ -24,6 +25,60 @@ const conditionOptions = [
       label: c.id === 'copd' ? 'COPD and pulmonary rehab' : c.label,
     })),
 ]
+function ProductCard({ app }: { app: App }) {
+  const narrative = getProductNarrative(app.slug)
+  const cardDescription = catalogueSummary(app, narrative)
+  return (
+    <li key={app.id}>
+      <article className="nhsuk-card" aria-labelledby={`app-card-${app.id}`}>
+        <div className="nhsuk-card__content">
+          <div className="flex items-start gap-3">
+            {app.logo_path && (
+              <Image src={app.logo_path} alt="" width={40} height={40} className="flex-shrink-0" />
+            )}
+            <div className="min-w-0 flex-1">
+              <h3 id={`app-card-${app.id}`} className="nhsuk-card__heading nhsuk-heading-m nhsuk-u-margin-bottom-1">
+                <Link className="nhsuk-card__link" href={`/apps/${app.slug}`}>{app.app_name}</Link>
+              </h3>
+              <p className="nhsuk-body-s" style={{ color: 'var(--text-secondary)' }}>{app.supplier_name}</p>
+            </div>
+            {app.nhse_125k_eligible && app.slug !== 'clinitouch' && (
+              <span className="badge badge-green" style={{ flexShrink: 0 }}>
+                ★ NHSE £125k
+              </span>
+            )}
+          </div>
+
+          <p className="nhsuk-card__description nhsuk-body-m" style={{ color: 'var(--text-secondary)' }}>
+            {cardDescription}
+          </p>
+
+          <div className="flex flex-wrap gap-1 nhsuk-u-margin-bottom-4">
+            {app.condition_tags.map((t: string) => (
+              <ConditionTag key={t} tag={t} />
+            ))}
+            <SupervisionBadge model={app.supervision_model} />
+            {app.maturity_level ? <MaturityBadge level={app.maturity_level} hideEstablished /> : null}
+            {isMarketPreview(app) && (
+              <span className="badge badge-grey">Not available to commission</span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link
+              href={`/apps/${app.slug}`}
+              className="nhsuk-button nhsuk-u-margin-bottom-0 inline-flex items-center justify-center gap-2 align-top no-underline max-sm:w-full"
+            >
+              View product details
+            </Link>
+            <CompareToggleButton appId={app.id} solid />
+          </div>
+        </div>
+      </article>
+    </li>
+  )
+}
+
 function appMatchesCondition(app: App, conditionId: string): boolean {
   if (conditionId === 'all') return true
   if (conditionId === 'copd') {
@@ -173,6 +228,8 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
       .sort((a, b) => a.app_name.localeCompare(b.app_name))
   }, [apps, supervision, condition])
 
+  const onStore = filteredSorted.filter((app) => !isMarketPreview(app))
+  const notOnStore = filteredSorted.filter((app) => isMarketPreview(app))
   const resultCount = filteredSorted.length
   const resultText = `${resultCount.toLocaleString()} ${resultCount === 1 ? 'result' : 'results'}`
   const resultSummary = `Showing ${resultCount} of ${apps.length} apps`
@@ -307,59 +364,27 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
                 <p className="nhsuk-u-margin-bottom-0">Try adjusting your filter criteria</p>
               </div>
             ) : (
-              // [Provenance: NHS] One NHS card per result, stacked in the two-thirds column.
-              <ul className="nhsuk-list">
-                {filteredSorted.map((app: App) => {
-                  const narrative = getProductNarrative(app.slug)
-                  const cardDescription = catalogueSummary(app, narrative)
-                  return (
-                    <li key={app.id}>
-                      <article className="nhsuk-card" aria-labelledby={`app-card-${app.id}`}>
-                        <div className="nhsuk-card__content">
-                          <div className="flex items-start gap-3">
-                            {app.logo_path && (
-                              <Image src={app.logo_path} alt="" width={40} height={40} className="flex-shrink-0" />
-                            )}
-                            <div className="min-w-0 flex-1">
-                              <h3 id={`app-card-${app.id}`} className="nhsuk-card__heading nhsuk-heading-m nhsuk-u-margin-bottom-1">
-                                <Link className="nhsuk-card__link" href={`/apps/${app.slug}`}>{app.app_name}</Link>
-                              </h3>
-                              <p className="nhsuk-body-s" style={{ color: 'var(--text-secondary)' }}>{app.supplier_name}</p>
-                            </div>
-                            {app.nhse_125k_eligible && app.slug !== 'clinitouch' && (
-                              <span className="badge badge-green" style={{ flexShrink: 0 }}>
-                                ★ NHSE £125k
-                              </span>
-                            )}
-                          </div>
-
-                          <p className="nhsuk-card__description nhsuk-body-m" style={{ color: 'var(--text-secondary)' }}>
-                            {cardDescription}
-                          </p>
-
-                          <div className="flex flex-wrap gap-1 nhsuk-u-margin-bottom-4">
-                            {app.condition_tags.map((t: string) => (
-                              <ConditionTag key={t} tag={t} />
-                            ))}
-                            <SupervisionBadge model={app.supervision_model} />
-                            <MaturityBadge level={app.maturity_level} hideEstablished />
-                          </div>
-
-                          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                            <Link
-                              href={`/apps/${app.slug}`}
-                              className="nhsuk-button nhsuk-u-margin-bottom-0 inline-flex items-center justify-center gap-2 align-top no-underline max-sm:w-full"
-                            >
-                              View product details
-                            </Link>
-                            <CompareToggleButton appId={app.id} solid />
-                          </div>
-                        </div>
-                      </article>
-                    </li>
-                  )
-                })}
-              </ul>
+              <>
+                {onStore.length > 0 && (
+                  <ul className="nhsuk-list">
+                    {onStore.map((app) => (
+                      <ProductCard key={app.id} app={app} />
+                    ))}
+                  </ul>
+                )}
+                {notOnStore.length > 0 && (
+                  <section aria-labelledby="not-on-store-heading" className="nhsuk-u-margin-top-7">
+                    <h2 id="not-on-store-heading" className="nhsuk-heading-l">
+                      Not on the Commissioning Store
+                    </h2>
+                    <ul className="nhsuk-list">
+                      {notOnStore.map((app) => (
+                        <ProductCard key={app.id} app={app} />
+                      ))}
+                    </ul>
+                  </section>
+                )}
+              </>
             )}
           </div>
         </div>
