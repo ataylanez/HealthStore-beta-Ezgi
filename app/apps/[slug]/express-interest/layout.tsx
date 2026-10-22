@@ -33,7 +33,11 @@ export default async function ExpressInterestLayout({
   if (!app || isMarketPreview(app)) notFound()
 
   return (
-    <EoiJourneyProvider app={{ id: app.id, name: app.app_name, slug: app.slug }}>
+    <EoiJourneyProvider
+      app={{ id: app.id, name: app.app_name, slug: app.slug }}
+      flow="v1"
+      basePath={`/apps/${app.slug}/express-interest`}
+    >
       {children}
     </EoiJourneyProvider>
   )

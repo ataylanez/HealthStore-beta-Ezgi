@@ -98,7 +98,7 @@ export default async function AppPage({
             <div className="nhsuk-u-margin-top-5 nhsuk-u-margin-bottom-4 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
               {!marketPreview && (
                 <Link
-                  href={`/apps/${app.slug}/express-interest`}
+                  href={`/apps/${app.slug}/get-in-touch`}
                   className="nhsuk-button mb-0 inline-flex items-center justify-center gap-2 align-top max-sm:mb-2 max-sm:w-full no-underline"
                 >
                   Get in touch

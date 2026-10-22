@@ -2,14 +2,14 @@
 
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { PROTOTYPE_OTP, useEoiJourney, type FieldError } from '../EoiJourneyProvider'
+import { PROTOTYPE_OTP, useEoiJourney, useStepGuard, type FieldError } from '../EoiJourneyProvider'
 import { BackLink, ErrorSummary, useStepHeadingFocus } from '../shared'
 import { Button } from '@/components/ui/Button'
 import { FormField, TextInput } from '@/components/ui/FormField'
 
 export default function VerifyStep() {
   const router = useRouter()
-  const { basePath, data, update, hydrated, detailsComplete } = useEoiJourney()
+  const { data, update, nextHref, backHref } = useEoiJourney()
   const headingRef = useStepHeadingFocus()
 
   const [otp, setOtp] = useState('')
@@ -21,10 +21,7 @@ export default function VerifyStep() {
   /** The imaginary code is first "sent" when the user lands on this step. */
   const codeSentRef = useRef(false)
 
-  // Guard: can't verify before giving details.
-  useEffect(() => {
-    if (hydrated && !detailsComplete) router.replace(`${basePath}/details`)
-  }, [hydrated, detailsComplete, basePath, router])
+  useStepGuard('verify')
 
   useEffect(() => {
     if (!codeSentRef.current) {
@@ -55,14 +52,14 @@ export default function VerifyStep() {
     }
     setErrors([])
     update({ verified: true })
-    router.push(`${basePath}/support`)
+    router.push(nextHref('verify'))
   }
 
   return (
     <div className="nhsuk-width-container nhsuk-main-wrapper">
       <div className="nhsuk-grid-row">
         <div className="nhsuk-grid-column-two-thirds">
-          <BackLink href={`${basePath}/details`} />
+          <BackLink href={backHref('verify')} />
           <ErrorSummary errors={errors} />
           <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
             Verify your email

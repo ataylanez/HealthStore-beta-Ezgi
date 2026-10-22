@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEoi } from '@/components/EoiProvider'
@@ -8,6 +8,7 @@ import {
   HELP_OPTIONS,
   TIMELINE_OPTIONS,
   useEoiJourney,
+  useStepGuard,
   type FieldError,
 } from '../EoiJourneyProvider'
 import { BackLink, ErrorSummary, useStepHeadingFocus } from '../shared'
@@ -18,18 +19,14 @@ const PROTOTYPE_REFERENCE = 'HSC6589L'
 export default function CheckAnswersStep() {
   const router = useRouter()
   const { submit } = useEoi()
-  const { app, basePath, data, hydrated, detailsComplete, completeSubmission } = useEoiJourney()
+  const { app, flow, data, hrefFor, backHref, completeSubmission } = useEoiJourney()
   const headingRef = useStepHeadingFocus()
 
   const [errors, setErrors] = useState<FieldError[]>([])
   const [submitting, setSubmitting] = useState(false)
 
-  // Guard: details and a verified email come first.
-  useEffect(() => {
-    if (!hydrated || submitting) return
-    if (!detailsComplete) router.replace(`${basePath}/details`)
-    else if (!data.verified) router.replace(`${basePath}/verify`)
-  }, [hydrated, submitting, detailsComplete, data.verified, basePath, router])
+  // Paused while submitting: completeSubmission clears the answers.
+  useStepGuard('check-answers', submitting)
 
   const timelineLabel = TIMELINE_OPTIONS.find((o) => o.id === data.timeline)?.label ?? 'Not provided'
   const helpSummary =
@@ -45,6 +42,13 @@ export default function CheckAnswersStep() {
     if (submitting) return
     setErrors([])
     setSubmitting(true)
+    // v2 is a non-functional prototype: nothing is sent or stored, the answers
+    // are cleared and the confirmation page is shown.
+    if (flow === 'v2') {
+      completeSubmission(PROTOTYPE_REFERENCE)
+      router.push(hrefFor('confirmation'))
+      return
+    }
     try {
       const helpLabels = HELP_OPTIONS.filter((o) => data.help.includes(o.id)).map((o) =>
         o.id === 'other' && data.helpOtherDetails.trim()
@@ -70,7 +74,7 @@ export default function CheckAnswersStep() {
         notes: combinedNotes,
       })
       completeSubmission(PROTOTYPE_REFERENCE)
-      router.push(`${basePath}/confirmation`)
+      router.push(hrefFor('confirmation'))
     } catch (err) {
       setErrors([
         {
@@ -84,14 +88,44 @@ export default function CheckAnswersStep() {
   }
 
   function changeHref(step: 'details' | 'support' | 'timing') {
-    return `${basePath}/${step}?from=check`
+    return `${hrefFor(step)}?from=check`
   }
+
+  function row(key: string, value: ReactNode, step: 'details' | 'support' | 'timing', hiddenText: string) {
+    return (
+      <div className="nhsuk-summary-list__row" key={key}>
+        <dt className="nhsuk-summary-list__key">{key}</dt>
+        <dd className="nhsuk-summary-list__value">{value}</dd>
+        <dd className="nhsuk-summary-list__actions">
+          <Link className="hs-link-button" href={changeHref(step)}>
+            Change<span className="nhsuk-u-visually-hidden"> {hiddenText}</span>
+          </Link>
+        </dd>
+      </div>
+    )
+  }
+
+  const detailsRows = [
+    row('Full name', data.name, 'details', 'your details'),
+    row('Email', data.email, 'details', 'email'),
+    row('Role', data.role, 'details', 'role'),
+    row('Organisation', data.organisation, 'details', 'organisation'),
+    row('Phone', data.phone.trim() || 'Not provided', 'details', 'phone'),
+  ]
+  const interestRows = [
+    row('Support requested', helpSummary, 'support', 'what support you need'),
+    row('Desired timeline', timelineLabel, 'timing', 'desired timeline'),
+    row('Patient population', data.population.trim() || 'Not provided', 'timing', 'patient population'),
+    row('Additional context', data.notes.trim() || 'Not provided', 'timing', 'additional context'),
+  ]
+  // Answers appear in the order they were asked.
+  const answerRows = flow === 'v2' ? [...interestRows, ...detailsRows] : [...detailsRows, ...interestRows]
 
   return (
     <div className="nhsuk-width-container nhsuk-main-wrapper">
       <div className="nhsuk-grid-row">
         <div className="nhsuk-grid-column-two-thirds">
-          <BackLink href={`${basePath}/timing`} />
+          <BackLink href={backHref('check-answers')} />
           <ErrorSummary errors={errors} />
           <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
             Check your answers
@@ -101,91 +135,13 @@ export default function CheckAnswersStep() {
               <dt className="nhsuk-summary-list__key">Product</dt>
               <dd className="nhsuk-summary-list__value">{app.name}</dd>
             </div>
-            <div className="nhsuk-summary-list__row">
-              <dt className="nhsuk-summary-list__key">Full name</dt>
-              <dd className="nhsuk-summary-list__value">{data.name}</dd>
-              <dd className="nhsuk-summary-list__actions">
-                <Link className="hs-link-button" href={changeHref('details')}>
-                  Change<span className="nhsuk-u-visually-hidden"> your details</span>
-                </Link>
-              </dd>
-            </div>
-            <div className="nhsuk-summary-list__row">
-              <dt className="nhsuk-summary-list__key">Email</dt>
-              <dd className="nhsuk-summary-list__value">{data.email}</dd>
-              <dd className="nhsuk-summary-list__actions">
-                <Link className="hs-link-button" href={changeHref('details')}>
-                  Change<span className="nhsuk-u-visually-hidden"> email</span>
-                </Link>
-              </dd>
-            </div>
-            <div className="nhsuk-summary-list__row">
-              <dt className="nhsuk-summary-list__key">Role</dt>
-              <dd className="nhsuk-summary-list__value">{data.role}</dd>
-              <dd className="nhsuk-summary-list__actions">
-                <Link className="hs-link-button" href={changeHref('details')}>
-                  Change<span className="nhsuk-u-visually-hidden"> role</span>
-                </Link>
-              </dd>
-            </div>
-            <div className="nhsuk-summary-list__row">
-              <dt className="nhsuk-summary-list__key">Organisation</dt>
-              <dd className="nhsuk-summary-list__value">{data.organisation}</dd>
-              <dd className="nhsuk-summary-list__actions">
-                <Link className="hs-link-button" href={changeHref('details')}>
-                  Change<span className="nhsuk-u-visually-hidden"> organisation</span>
-                </Link>
-              </dd>
-            </div>
-            <div className="nhsuk-summary-list__row">
-              <dt className="nhsuk-summary-list__key">Phone</dt>
-              <dd className="nhsuk-summary-list__value">{data.phone.trim() || 'Not provided'}</dd>
-              <dd className="nhsuk-summary-list__actions">
-                <Link className="hs-link-button" href={changeHref('details')}>
-                  Change<span className="nhsuk-u-visually-hidden"> phone</span>
-                </Link>
-              </dd>
-            </div>
-            <div className="nhsuk-summary-list__row">
-              <dt className="nhsuk-summary-list__key">Support requested</dt>
-              <dd className="nhsuk-summary-list__value">{helpSummary}</dd>
-              <dd className="nhsuk-summary-list__actions">
-                <Link className="hs-link-button" href={changeHref('support')}>
-                  Change<span className="nhsuk-u-visually-hidden"> what support you need</span>
-                </Link>
-              </dd>
-            </div>
-            <div className="nhsuk-summary-list__row">
-              <dt className="nhsuk-summary-list__key">Desired timeline</dt>
-              <dd className="nhsuk-summary-list__value">{timelineLabel}</dd>
-              <dd className="nhsuk-summary-list__actions">
-                <Link className="hs-link-button" href={changeHref('timing')}>
-                  Change<span className="nhsuk-u-visually-hidden"> desired timeline</span>
-                </Link>
-              </dd>
-            </div>
-            <div className="nhsuk-summary-list__row">
-              <dt className="nhsuk-summary-list__key">Patient population</dt>
-              <dd className="nhsuk-summary-list__value">{data.population.trim() || 'Not provided'}</dd>
-              <dd className="nhsuk-summary-list__actions">
-                <Link className="hs-link-button" href={changeHref('timing')}>
-                  Change<span className="nhsuk-u-visually-hidden"> patient population</span>
-                </Link>
-              </dd>
-            </div>
-            <div className="nhsuk-summary-list__row">
-              <dt className="nhsuk-summary-list__key">Additional context</dt>
-              <dd className="nhsuk-summary-list__value">{data.notes.trim() || 'Not provided'}</dd>
-              <dd className="nhsuk-summary-list__actions">
-                <Link className="hs-link-button" href={changeHref('timing')}>
-                  Change<span className="nhsuk-u-visually-hidden"> additional context</span>
-                </Link>
-              </dd>
-            </div>
+            {answerRows}
           </dl>
-          <p style={{ fontSize: 'var(--text-label)', color: 'var(--text-muted)' }}>
-            By continuing you agree that prototype data will be stored for demonstration purposes.
-          </p>
+          {flow === 'v1' ? (
+            <p style={{ fontSize: 'var(--text-label)', color: 'var(--text-muted)' }}>
+              By continuing you agree that prototype data will be stored for demonstration purposes.
+            </p>
+          ) : null}
           <Button onClick={() => void handleSubmit()} loading={submitting}>
             {submitting ? 'Submitting…' : 'Submit'}
           </Button>

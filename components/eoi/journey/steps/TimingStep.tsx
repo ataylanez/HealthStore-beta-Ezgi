@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { TIMELINE_OPTIONS, useEoiJourney } from '../EoiJourneyProvider'
+import { TIMELINE_OPTIONS, useEoiJourney, useStepGuard } from '../EoiJourneyProvider'
 import { BackLink, useStepHeadingFocus } from '../shared'
 import { Button } from '@/components/ui/Button'
 import { FormField, TextInput, Textarea } from '@/components/ui/FormField'
@@ -10,21 +9,16 @@ import { FormField, TextInput, Textarea } from '@/components/ui/FormField'
 export default function TimingStep() {
   const router = useRouter()
   const returnToCheck = useSearchParams().get('from') === 'check'
-  const { basePath, data, update, hydrated, detailsComplete } = useEoiJourney()
+  const { flow, data, update, hrefFor, nextHref, backHref } = useEoiJourney()
   const headingRef = useStepHeadingFocus()
 
-  // Guard: details and a verified email come first.
-  useEffect(() => {
-    if (!hydrated) return
-    if (!detailsComplete) router.replace(`${basePath}/details`)
-    else if (!data.verified) router.replace(`${basePath}/verify`)
-  }, [hydrated, detailsComplete, data.verified, basePath, router])
+  useStepGuard('timing')
 
   return (
     <div className="nhsuk-width-container nhsuk-main-wrapper">
       <div className="nhsuk-grid-row">
         <div className="nhsuk-grid-column-two-thirds">
-          <BackLink href={returnToCheck ? `${basePath}/check-answers` : `${basePath}/support`} />
+          <BackLink href={returnToCheck ? hrefFor('check-answers') : backHref('timing')} />
           <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
             Timing and context
           </h1>
@@ -32,7 +26,7 @@ export default function TimingStep() {
             noValidate
             onSubmit={(e) => {
               e.preventDefault()
-              router.push(`${basePath}/check-answers`)
+              router.push(returnToCheck ? hrefFor('check-answers') : nextHref('timing'))
             }}
           >
             <div className="nhsuk-form-group">
@@ -79,7 +73,11 @@ export default function TimingStep() {
             <FormField
               id="eoi-notes"
               label="Additional context (optional)"
-              hint="Do not enter patient-identifiable information."
+              hint={
+                flow === 'v2'
+                  ? 'Tell us how this would fit your service or clinical workflow. Do not enter patient-identifiable information.'
+                  : 'Do not enter patient-identifiable information.'
+              }
             >
               {(field) => (
                 <Textarea

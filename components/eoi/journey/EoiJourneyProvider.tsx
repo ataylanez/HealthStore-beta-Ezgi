@@ -1,10 +1,22 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
+import {
+  firstIncompleteStep,
+  isDetailsComplete,
+  nextStep,
+  prevStep,
+  type EoiFlow,
+  type EoiStep,
+} from '@/lib/eoiJourneyFlow'
 
 /**
- * Shared state for the express-interest journey, which is split across one
- * route per step (GOV.UK one-question-per-page):
+ * Shared state for the express-interest journeys, which are split across one
+ * route per step (GOV.UK one-question-per-page). Step order lives in
+ * lib/eoiJourneyFlow.ts; v1 (below) and v2 (/apps/[slug]/get-in-touch:
+ * start, support, timing, details, check-answers, confirmation) reuse the same
+ * step components.
  *
  *   /apps/[slug]/express-interest                 start
  *   /apps/[slug]/express-interest/details         your details
@@ -16,9 +28,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
  *
  * The provider lives in the route-group layout, so it stays mounted while the
  * user navigates between steps. Answers are mirrored to sessionStorage so a
- * refresh or browser-back does not lose them. Steps guard themselves: if their
- * prerequisites are missing (e.g. arriving at /support without a verified
- * email) they redirect back to the right step.
+ * refresh or browser-back does not lose them. Steps guard themselves with
+ * useStepGuard: if an earlier step's answers are missing (e.g. arriving at
+ * /support in v1 without a verified email) they redirect back to that step.
  */
 
 export const HELP_OPTIONS = [
@@ -76,8 +88,15 @@ type StoredJourney = { data: EoiJourneyData; reference: string | null }
 
 type EoiJourneyContextValue = {
   app: EoiApp
-  /** `/apps/[slug]/express-interest` */
+  flow: EoiFlow
+  /** e.g. `/apps/[slug]/express-interest` */
   basePath: string
+  /** URL of a step in this journey. */
+  hrefFor: (step: EoiStep) => string
+  /** URL of the step after `step`. */
+  nextHref: (step: EoiStep) => string
+  /** URL of the step before `step`; the product page before the start page. */
+  backHref: (step: EoiStep) => string
   data: EoiJourneyData
   update: (patch: Partial<EoiJourneyData>) => void
   /** Reference number once submitted; null before. */
@@ -92,11 +111,22 @@ type EoiJourneyContextValue = {
 
 const EoiJourneyContext = createContext<EoiJourneyContextValue | null>(null)
 
-function storageKey(slug: string) {
-  return `hs-eoi-journey:${slug}`
+function storageKey(flow: EoiFlow, slug: string) {
+  // v1 keeps its original key so in-progress journeys survive this change.
+  return flow === 'v1' ? `hs-eoi-journey:${slug}` : `hs-eoi-journey:${flow}:${slug}`
 }
 
-export function EoiJourneyProvider({ app, children }: { app: EoiApp; children: ReactNode }) {
+export function EoiJourneyProvider({
+  app,
+  flow,
+  basePath,
+  children,
+}: {
+  app: EoiApp
+  flow: EoiFlow
+  basePath: string
+  children: ReactNode
+}) {
   const [data, setData] = useState<EoiJourneyData>(EMPTY_DATA)
   const [reference, setReference] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
@@ -104,7 +134,7 @@ export function EoiJourneyProvider({ app, children }: { app: EoiApp; children: R
   // Restore after mount (not in the initializer) to keep SSR/client markup consistent.
   useEffect(() => {
     try {
-      const raw = sessionStorage.getItem(storageKey(app.slug))
+      const raw = sessionStorage.getItem(storageKey(flow, app.slug))
       if (raw) {
         const stored = JSON.parse(raw) as StoredJourney
         if (stored.data) setData({ ...EMPTY_DATA, ...stored.data })
@@ -114,16 +144,16 @@ export function EoiJourneyProvider({ app, children }: { app: EoiApp; children: R
       // Ignore corrupt/unavailable storage — start fresh.
     }
     setHydrated(true)
-  }, [app.slug])
+  }, [flow, app.slug])
 
   useEffect(() => {
     if (!hydrated) return
     try {
-      sessionStorage.setItem(storageKey(app.slug), JSON.stringify({ data, reference } satisfies StoredJourney))
+      sessionStorage.setItem(storageKey(flow, app.slug), JSON.stringify({ data, reference } satisfies StoredJourney))
     } catch {
       // Storage full/unavailable — journey still works in memory.
     }
-  }, [hydrated, data, reference, app.slug])
+  }, [hydrated, data, reference, flow, app.slug])
 
   const update = useCallback((patch: Partial<EoiJourneyData>) => {
     setData((d) => ({ ...d, ...patch }))
@@ -134,16 +164,32 @@ export function EoiJourneyProvider({ app, children }: { app: EoiApp; children: R
     setData(EMPTY_DATA)
   }, [])
 
-  const detailsComplete =
-    data.name.trim() !== '' &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim()) &&
-    data.role.trim() !== '' &&
-    data.organisation.trim() !== ''
+  const detailsComplete = isDetailsComplete(data)
+
+  const hrefFor = useCallback(
+    (step: EoiStep) => (step === 'start' ? basePath : `${basePath}/${step}`),
+    [basePath],
+  )
+  const nextHref = useCallback(
+    (step: EoiStep) => hrefFor(nextStep(flow, step) ?? 'start'),
+    [flow, hrefFor],
+  )
+  const backHref = useCallback(
+    (step: EoiStep) => {
+      const prev = prevStep(flow, step)
+      return prev ? hrefFor(prev) : `/apps/${app.slug}`
+    },
+    [flow, hrefFor, app.slug],
+  )
 
   const value = useMemo<EoiJourneyContextValue>(
     () => ({
       app,
-      basePath: `/apps/${app.slug}/express-interest`,
+      flow,
+      basePath,
+      hrefFor,
+      nextHref,
+      backHref,
       data,
       update,
       reference,
@@ -151,7 +197,20 @@ export function EoiJourneyProvider({ app, children }: { app: EoiApp; children: R
       hydrated,
       detailsComplete,
     }),
-    [app, data, update, reference, completeSubmission, hydrated, detailsComplete],
+    [
+      app,
+      flow,
+      basePath,
+      hrefFor,
+      nextHref,
+      backHref,
+      data,
+      update,
+      reference,
+      completeSubmission,
+      hydrated,
+      detailsComplete,
+    ],
   )
 
   return <EoiJourneyContext.Provider value={value}>{children}</EoiJourneyContext.Provider>
@@ -161,4 +220,19 @@ export function useEoiJourney(): EoiJourneyContextValue {
   const ctx = useContext(EoiJourneyContext)
   if (!ctx) throw new Error('useEoiJourney must be used within EoiJourneyProvider')
   return ctx
+}
+
+/**
+ * Redirects to the earliest earlier step whose required answers are missing.
+ * Pass `paused` to hold off (e.g. while check answers is submitting and the
+ * stored answers are being cleared).
+ */
+export function useStepGuard(step: EoiStep, paused = false) {
+  const router = useRouter()
+  const { flow, data, hydrated, hrefFor } = useEoiJourney()
+  const missing = hydrated && !paused ? firstIncompleteStep(flow, step, data) : null
+
+  useEffect(() => {
+    if (missing) router.replace(hrefFor(missing))
+  }, [missing, hrefFor, router])
 }

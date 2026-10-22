@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEoiJourney, type FieldError } from '../EoiJourneyProvider'
+import { useEoiJourney, useStepGuard, type FieldError } from '../EoiJourneyProvider'
 import { BackLink, ErrorSummary, useStepHeadingFocus } from '../shared'
 import { Button } from '@/components/ui/Button'
 import { FormField, TextInput } from '@/components/ui/FormField'
@@ -10,8 +10,9 @@ import { FormField, TextInput } from '@/components/ui/FormField'
 export default function DetailsStep() {
   const router = useRouter()
   const returnToCheck = useSearchParams().get('from') === 'check'
-  const { basePath, data, update } = useEoiJourney()
+  const { data, update, hrefFor, nextHref, backHref } = useEoiJourney()
   const headingRef = useStepHeadingFocus()
+  useStepGuard('details')
   const [errors, setErrors] = useState<FieldError[]>([])
 
   function errorFor(field: string): string | undefined {
@@ -35,14 +36,14 @@ export default function DetailsStep() {
       setErrors(errs)
       return
     }
-    router.push(returnToCheck ? `${basePath}/check-answers` : `${basePath}/verify`)
+    router.push(returnToCheck ? hrefFor('check-answers') : nextHref('details'))
   }
 
   return (
     <div className="nhsuk-width-container nhsuk-main-wrapper">
       <div className="nhsuk-grid-row">
         <div className="nhsuk-grid-column-two-thirds">
-          <BackLink href={returnToCheck ? `${basePath}/check-answers` : basePath} />
+          <BackLink href={returnToCheck ? hrefFor('check-answers') : backHref('details')} />
           <ErrorSummary errors={errors} />
           <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
             Your details

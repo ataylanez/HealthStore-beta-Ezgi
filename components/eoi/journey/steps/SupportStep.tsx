@@ -1,8 +1,8 @@
 'use client'
 
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { HELP_OPTIONS, useEoiJourney, type FieldError } from '../EoiJourneyProvider'
+import { HELP_OPTIONS, useEoiJourney, useStepGuard, type FieldError } from '../EoiJourneyProvider'
 import { BackLink, ErrorSummary, useStepHeadingFocus } from '../shared'
 import { Button } from '@/components/ui/Button'
 import { FormField, TextInput } from '@/components/ui/FormField'
@@ -10,16 +10,11 @@ import { FormField, TextInput } from '@/components/ui/FormField'
 export default function SupportStep() {
   const router = useRouter()
   const returnToCheck = useSearchParams().get('from') === 'check'
-  const { basePath, data, update, hydrated, detailsComplete } = useEoiJourney()
+  const { data, update, hrefFor, nextHref, backHref } = useEoiJourney()
   const headingRef = useStepHeadingFocus()
   const [errors, setErrors] = useState<FieldError[]>([])
 
-  // Guard: details and a verified email come first.
-  useEffect(() => {
-    if (!hydrated) return
-    if (!detailsComplete) router.replace(`${basePath}/details`)
-    else if (!data.verified) router.replace(`${basePath}/verify`)
-  }, [hydrated, detailsComplete, data.verified, basePath, router])
+  useStepGuard('support')
 
   function errorFor(field: string): string | undefined {
     return errors.find((e) => e.field === field)?.message
@@ -43,14 +38,14 @@ export default function SupportStep() {
       setErrors(errs)
       return
     }
-    router.push(returnToCheck ? `${basePath}/check-answers` : `${basePath}/timing`)
+    router.push(returnToCheck ? hrefFor('check-answers') : nextHref('support'))
   }
 
   return (
     <div className="nhsuk-width-container nhsuk-main-wrapper">
       <div className="nhsuk-grid-row">
         <div className="nhsuk-grid-column-two-thirds">
-          <BackLink href={returnToCheck ? `${basePath}/check-answers` : `${basePath}/verify`} />
+          <BackLink href={returnToCheck ? hrefFor('check-answers') : backHref('support')} />
           <ErrorSummary errors={errors} />
           <form
             noValidate

@@ -19,7 +19,19 @@
     </div>
 
     <h2>Pages using this template</h2>
-    <p>Each step is its own route under <code>/apps/[slug]/express-interest</code>:</p>
+    <p>The product page "Get in touch" buttons open the v2 journey under <code>/apps/[slug]/get-in-touch</code>. It asks why you are interested first, asks for your details last and has no email code:</p>
+    <table class="ds-table">
+      <thead><tr><th>Route</th><th>Step</th></tr></thead>
+      <tbody>
+        <tr><td><code>/apps/[slug]/get-in-touch</code></td><td>Start</td></tr>
+        <tr><td><code>&hellip;/support</code></td><td>What support do you need</td></tr>
+        <tr><td><code>&hellip;/timing</code></td><td>Timing and context</td></tr>
+        <tr><td><code>&hellip;/details</code></td><td>Your details</td></tr>
+        <tr><td><code>&hellip;/check-answers</code></td><td>Check your answers</td></tr>
+        <tr><td><code>&hellip;/confirmation</code></td><td>Confirmation of submission</td></tr>
+      </tbody>
+    </table>
+    <p>The original v1 journey is still reachable for comparison. Each step is its own route under <code>/apps/[slug]/express-interest</code>:</p>
     <table class="ds-table">
       <thead><tr><th>Route</th><th>Step</th></tr></thead>
       <tbody>
