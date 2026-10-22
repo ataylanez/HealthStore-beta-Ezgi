@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
-import type { FieldError } from './EoiJourneyProvider'
+import { useEoiJourney, type FieldError } from './EoiJourneyProvider'
 
 /** NHS back link — always a real link now that each step has its own URL. */
 export function BackLink({ href }: { href: string }) {
@@ -63,4 +63,14 @@ export function useStepHeadingFocus() {
     headingRef.current?.focus()
   }, [])
   return headingRef
+}
+
+/** NHS caption above each question naming the journey (question-pages pattern). */
+export function StepCaption() {
+  const { app, flow } = useEoiJourney()
+  return (
+    <span className="nhsuk-caption-l">
+      {flow === 'v2' ? `Get in touch about ${app.name}` : `Express interest in ${app.name}`}
+    </span>
+  )
 }

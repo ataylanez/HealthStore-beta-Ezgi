@@ -3,6 +3,7 @@
 import { forwardRef, useId } from 'react'
 import type {
   InputHTMLAttributes,
+  Ref,
   ReactNode,
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
@@ -19,6 +20,10 @@ import type {
  *
  * NHS guidance avoids required asterisks (it marks optional fields instead); we
  * keep `aria-required` for assistive tech but no longer render a red asterisk.
+ *
+ * `asPageHeading` follows the NHS question-page pattern for a single question:
+ * the label is wrapped in the page `<h1 class="nhsuk-label-wrapper">` and styled
+ * `nhsuk-label--l`. `headingRef` lets the page focus that heading on load.
  */
 type FieldRenderProps = {
   id: string
@@ -34,6 +39,8 @@ export function FormField({
   required,
   id: idProp,
   className = '',
+  asPageHeading = false,
+  headingRef,
   children,
 }: {
   label?: ReactNode
@@ -42,6 +49,8 @@ export function FormField({
   required?: boolean
   id?: string
   className?: string
+  asPageHeading?: boolean
+  headingRef?: Ref<HTMLHeadingElement>
   children: (field: FieldRenderProps) => ReactNode
 }) {
   const autoId = useId()
@@ -52,7 +61,13 @@ export function FormField({
 
   return (
     <div className={`nhsuk-form-group${error ? ' nhsuk-form-group--error' : ''}${className ? ` ${className}` : ''}`}>
-      {label ? (
+      {label && asPageHeading ? (
+        <h1 ref={headingRef} tabIndex={-1} className="nhsuk-label-wrapper outline-none">
+          <label htmlFor={id} className="nhsuk-label nhsuk-label--l">
+            {label}
+          </label>
+        </h1>
+      ) : label ? (
         <label htmlFor={id} className="nhsuk-label">
           {label}
         </label>

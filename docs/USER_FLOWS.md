@@ -161,7 +161,7 @@ flowchart TD
 - **`/apps`** — [`app/apps/page.tsx`](../app/apps/page.tsx), [`AppsDiscoveryClient`](../app/apps/AppsDiscoveryClient.tsx).
 - **`/apps/condition-catalogue`** — [`CatalogueClient`](../app/apps/CatalogueClient.tsx): filters, search, cards, compare toggles.
 - **`/apps/[slug]`** — [`app/apps/[slug]/page.tsx`](../app/apps/[slug]/page.tsx): PDP sections, compare, share, express interest.
-- **`/apps/[slug]/get-in-touch`** — v2 express interest, opened by the PDP "Get in touch" buttons: start → support → timing → details → check answers → confirmation, with no email code. The step order is in [`lib/eoiJourneyFlow.ts`](../lib/eoiJourneyFlow.ts). v1 (`/apps/[slug]/express-interest`, with the email code) is still reachable by URL.
+- **`/apps/[slug]/get-in-touch`** — v2 express interest, opened by the PDP "Get in touch" buttons: start → support → timeline → population → workflow → details → check answers → confirmation, one question per page with the question as the h1, and no email code. The step order is in [`lib/eoiJourneyFlow.ts`](../lib/eoiJourneyFlow.ts). v1 (`/apps/[slug]/express-interest`, with the email code) is still reachable by URL.
 
 ### Edge cases
 

@@ -3,7 +3,7 @@
 import { Fragment, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { HELP_OPTIONS, useEoiJourney, useStepGuard, type FieldError } from '../EoiJourneyProvider'
-import { BackLink, ErrorSummary, useStepHeadingFocus } from '../shared'
+import { BackLink, ErrorSummary, StepCaption, useStepHeadingFocus } from '../shared'
 import { Button } from '@/components/ui/Button'
 import { FormField, TextInput } from '@/components/ui/FormField'
 
@@ -47,6 +47,7 @@ export default function SupportStep() {
         <div className="nhsuk-grid-column-two-thirds">
           <BackLink href={returnToCheck ? hrefFor('check-answers') : backHref('support')} />
           <ErrorSummary errors={errors} />
+          <StepCaption />
           <form
             noValidate
             onSubmit={(e) => {
@@ -57,13 +58,12 @@ export default function SupportStep() {
             <div
               className={`nhsuk-form-group${errorFor(`eoi-help-${HELP_OPTIONS[0].id}`) ? ' nhsuk-form-group--error' : ''}`}
             >
-              <fieldset className="nhsuk-fieldset" aria-describedby="eoi-help-hint">
-                <legend className="nhsuk-fieldset__legend">
-                  <h1
-                    ref={headingRef}
-                    tabIndex={-1}
-                    className="nhsuk-heading-xl outline-none nhsuk-fieldset__heading"
-                  >
+              <fieldset
+                className="nhsuk-fieldset"
+                aria-describedby={`eoi-help-hint${errorFor(`eoi-help-${HELP_OPTIONS[0].id}`) ? ' eoi-help-error' : ''}`}
+              >
+                <legend className="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+                  <h1 ref={headingRef} tabIndex={-1} className="nhsuk-fieldset__heading outline-none">
                     What support do you need?
                   </h1>
                 </legend>
@@ -71,8 +71,9 @@ export default function SupportStep() {
                   Select all that apply.
                 </div>
                 {errorFor(`eoi-help-${HELP_OPTIONS[0].id}`) ? (
-                  <span className="nhsuk-error-message" role="alert">
-                    <span className="nhsuk-u-visually-hidden">Error:</span> Select what help you need
+                  <span id="eoi-help-error" className="nhsuk-error-message">
+                    <span className="nhsuk-u-visually-hidden">Error:</span>{' '}
+                    {errorFor(`eoi-help-${HELP_OPTIONS[0].id}`)}
                   </span>
                 ) : null}
                 <div className="nhsuk-checkboxes nhsuk-checkboxes--conditional">

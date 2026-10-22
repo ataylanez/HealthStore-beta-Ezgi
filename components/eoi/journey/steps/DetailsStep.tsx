@@ -3,14 +3,14 @@
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEoiJourney, useStepGuard, type FieldError } from '../EoiJourneyProvider'
-import { BackLink, ErrorSummary, useStepHeadingFocus } from '../shared'
+import { BackLink, ErrorSummary, StepCaption, useStepHeadingFocus } from '../shared'
 import { Button } from '@/components/ui/Button'
 import { FormField, TextInput } from '@/components/ui/FormField'
 
 export default function DetailsStep() {
   const router = useRouter()
   const returnToCheck = useSearchParams().get('from') === 'check'
-  const { data, update, hrefFor, nextHref, backHref } = useEoiJourney()
+  const { app, data, update, hrefFor, nextHref, backHref } = useEoiJourney()
   const headingRef = useStepHeadingFocus()
   useStepGuard('details')
   const [errors, setErrors] = useState<FieldError[]>([])
@@ -45,9 +45,14 @@ export default function DetailsStep() {
         <div className="nhsuk-grid-column-two-thirds">
           <BackLink href={returnToCheck ? hrefFor('check-answers') : backHref('details')} />
           <ErrorSummary errors={errors} />
-          <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
+          <StepCaption />
+          <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-l outline-none">
             Your details
           </h1>
+          <p style={{ fontSize: 'var(--text-body)' }}>
+            We will use these details to contact you about your interest in {app.name}. We will not
+            share them with the supplier without asking you first.
+          </p>
           <form
             noValidate
             onSubmit={(e) => {
@@ -98,7 +103,7 @@ export default function DetailsStep() {
                 />
               )}
             </FormField>
-            <FormField id="eoi-phone" label="Phone (optional)">
+            <FormField id="eoi-phone" label="Phone number (optional)">
               {(field) => (
                 <TextInput
                   {...field}

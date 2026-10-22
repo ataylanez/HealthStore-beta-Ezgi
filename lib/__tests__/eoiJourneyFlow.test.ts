@@ -14,6 +14,7 @@ const EMPTY: EoiStepAnswers = {
   organisation: '',
   help: [],
   helpOtherDetails: '',
+  timeline: '',
   verified: false,
 }
 
@@ -29,8 +30,10 @@ describe('nextStep / prevStep', () => {
 
   it('v2 asks the questions first, details last, with no code', () => {
     expect(nextStep('v2', 'start')).toBe('support')
-    expect(nextStep('v2', 'support')).toBe('timing')
-    expect(nextStep('v2', 'timing')).toBe('details')
+    expect(nextStep('v2', 'support')).toBe('timeline')
+    expect(nextStep('v2', 'timeline')).toBe('population')
+    expect(nextStep('v2', 'population')).toBe('workflow')
+    expect(nextStep('v2', 'workflow')).toBe('details')
     expect(nextStep('v2', 'details')).toBe('check-answers')
     expect(prevStep('v2', 'support')).toBe('start')
     expect(prevStep('v2', 'check-answers')).toBe('details')
@@ -64,16 +67,35 @@ describe('firstIncompleteStep', () => {
     expect(firstIncompleteStep('v2', 'details', EMPTY)).toBe('support')
   })
 
-  it('v2 check answers needs details once support is answered', () => {
-    expect(firstIncompleteStep('v2', 'check-answers', { ...EMPTY, help: ['assess_fit'] })).toBe('details')
+  it('v2 requires a timeline, then details, before check answers', () => {
+    expect(firstIncompleteStep('v2', 'check-answers', { ...EMPTY, help: ['assess_fit'] })).toBe('timeline')
     expect(
-      firstIncompleteStep('v2', 'check-answers', { ...EMPTY, ...DETAILS, help: ['assess_fit'] }),
+      firstIncompleteStep('v2', 'check-answers', { ...EMPTY, help: ['assess_fit'], timeline: 'medium' }),
+    ).toBe('details')
+    expect(
+      firstIncompleteStep('v2', 'check-answers', { ...EMPTY, ...DETAILS, help: ['assess_fit'], timeline: 'medium' }),
     ).toBeNull()
+  })
+
+  it('v2 lets the optional population and workflow pages be skipped', () => {
+    expect(firstIncompleteStep('v2', 'details', { ...EMPTY, help: ['assess_fit'], timeline: 'medium' })).toBeNull()
   })
 
   it('v2 never requires the one-time code', () => {
     expect(
-      firstIncompleteStep('v2', 'check-answers', { ...EMPTY, ...DETAILS, help: ['assess_fit'], verified: false }),
+      firstIncompleteStep('v2', 'check-answers', {
+        ...EMPTY,
+        ...DETAILS,
+        help: ['assess_fit'],
+        timeline: 'medium',
+        verified: false,
+      }),
+    ).toBeNull()
+  })
+
+  it('v1 keeps the timeline optional', () => {
+    expect(
+      firstIncompleteStep('v1', 'check-answers', { ...EMPTY, ...DETAILS, help: ['assess_fit'], verified: true }),
     ).toBeNull()
   })
 

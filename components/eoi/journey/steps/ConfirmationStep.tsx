@@ -24,7 +24,7 @@ export default function ConfirmationStep() {
         <div className="nhsuk-grid-column-two-thirds">
           <div className="nhsuk-panel" style={{ textAlign: 'center' }}>
             <h1 ref={headingRef} tabIndex={-1} className="nhsuk-panel__title outline-none">
-              Expression of interest submitted
+              Expression of interest in {app.name} submitted
             </h1>
             <div className="nhsuk-panel__body">
               Your reference number

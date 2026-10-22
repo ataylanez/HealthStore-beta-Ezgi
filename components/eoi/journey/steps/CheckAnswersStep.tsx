@@ -11,8 +11,9 @@ import {
   useStepGuard,
   type FieldError,
 } from '../EoiJourneyProvider'
-import { BackLink, ErrorSummary, useStepHeadingFocus } from '../shared'
+import { BackLink, ErrorSummary, StepCaption, useStepHeadingFocus } from '../shared'
 import { Button } from '@/components/ui/Button'
+import type { EoiStep } from '@/lib/eoiJourneyFlow'
 
 const PROTOTYPE_REFERENCE = 'HSC6589L'
 
@@ -87,11 +88,11 @@ export default function CheckAnswersStep() {
     }
   }
 
-  function changeHref(step: 'details' | 'support' | 'timing') {
+  function changeHref(step: EoiStep) {
     return `${hrefFor(step)}?from=check`
   }
 
-  function row(key: string, value: ReactNode, step: 'details' | 'support' | 'timing', hiddenText: string) {
+  function row(key: string, value: ReactNode, step: EoiStep, hiddenText: string) {
     return (
       <div className="nhsuk-summary-list__row" key={key}>
         <dt className="nhsuk-summary-list__key">{key}</dt>
@@ -112,12 +113,21 @@ export default function CheckAnswersStep() {
     row('Organisation', data.organisation, 'details', 'organisation'),
     row('Phone', data.phone.trim() || 'Not provided', 'details', 'phone'),
   ]
-  const interestRows = [
-    row('Support requested', helpSummary, 'support', 'what support you need'),
-    row('Desired timeline', timelineLabel, 'timing', 'desired timeline'),
-    row('Patient population', data.population.trim() || 'Not provided', 'timing', 'patient population'),
-    row('Additional context', data.notes.trim() || 'Not provided', 'timing', 'additional context'),
-  ]
+  // v2 asks each of these on its own page, so each Change link goes to that page.
+  const interestRows =
+    flow === 'v2'
+      ? [
+          row('Support needed', helpSummary, 'support', 'what support you need'),
+          row('When you would like to start', timelineLabel, 'timeline', 'when you would like to start'),
+          row('Number of patients', data.population.trim() || 'Not provided', 'population', 'number of patients'),
+          row('How it would fit your service', data.notes.trim() || 'Not provided', 'workflow', 'how it would fit your service'),
+        ]
+      : [
+          row('Support requested', helpSummary, 'support', 'what support you need'),
+          row('Desired timeline', timelineLabel, 'timing', 'desired timeline'),
+          row('Patient population', data.population.trim() || 'Not provided', 'timing', 'patient population'),
+          row('Additional context', data.notes.trim() || 'Not provided', 'timing', 'additional context'),
+        ]
   // Answers appear in the order they were asked.
   const answerRows = flow === 'v2' ? [...interestRows, ...detailsRows] : [...detailsRows, ...interestRows]
 
@@ -127,7 +137,8 @@ export default function CheckAnswersStep() {
         <div className="nhsuk-grid-column-two-thirds">
           <BackLink href={backHref('check-answers')} />
           <ErrorSummary errors={errors} />
-          <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-xl outline-none">
+          <StepCaption />
+          <h1 ref={headingRef} tabIndex={-1} className="nhsuk-heading-l outline-none">
             Check your answers
           </h1>
           <dl className="nhsuk-summary-list" id="eoi-check-answers">

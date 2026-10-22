@@ -3,7 +3,8 @@
  * ordering and guard rules can be unit tested.
  *
  *   v1  /apps/[slug]/express-interest  details first, then a one-time code
- *   v2  /apps/[slug]/get-in-touch      why you're interested first, details last, no code
+ *   v2  /apps/[slug]/get-in-touch      why you're interested first, one question per page,
+ *                                      details last, no code
  */
 
 export type EoiStep =
@@ -12,6 +13,9 @@ export type EoiStep =
   | 'verify'
   | 'support'
   | 'timing'
+  | 'timeline'
+  | 'population'
+  | 'workflow'
   | 'check-answers'
   | 'confirmation'
 
@@ -19,7 +23,7 @@ export type EoiFlow = 'v1' | 'v2'
 
 export const EOI_FLOWS: Record<EoiFlow, readonly EoiStep[]> = {
   v1: ['start', 'details', 'verify', 'support', 'timing', 'check-answers', 'confirmation'],
-  v2: ['start', 'support', 'timing', 'details', 'check-answers', 'confirmation'],
+  v2: ['start', 'support', 'timeline', 'population', 'workflow', 'details', 'check-answers', 'confirmation'],
 }
 
 /** The answers the guards need; the journey provider's data satisfies this. */
@@ -30,6 +34,7 @@ export type EoiStepAnswers = {
   organisation: string
   help: string[]
   helpOtherDetails: string
+  timeline: string
   verified: boolean
 }
 
@@ -52,6 +57,9 @@ export function isStepComplete(step: EoiStep, a: EoiStepAnswers): boolean {
       return isDetailsComplete(a)
     case 'verify':
       return a.verified
+    case 'timeline':
+      // v2 asks this on its own page, so it is required there; v1's timing page keeps it optional.
+      return a.timeline !== ''
     case 'support':
       return a.help.length > 0 && (!a.help.includes('other') || a.helpOtherDetails.trim() !== '')
     default:
