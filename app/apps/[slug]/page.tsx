@@ -113,6 +113,10 @@ export default async function AppPage({
         </div>
       </PdpShareRegion>
 
+      <PdpShareRegion shareKey="express-interest-top" label="Express interest callout" excludeFromShareUi className="mb-6">
+        <PdpExpressInterestCallout accent={accent} slug={app.slug} />
+      </PdpShareRegion>
+
       {hasPdpAlerts ? (
         <PdpShareRegion shareKey="alerts" label="Alerts and notices" excludeFromShareUi className="mb-6 space-y-6">
           {app.clinical_safety_alert && <div><AlertBox type="danger"><strong>Clinical safety: </strong>{app.clinical_safety_alert}</AlertBox></div>}
