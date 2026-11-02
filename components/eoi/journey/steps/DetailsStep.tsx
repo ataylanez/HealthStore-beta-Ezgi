@@ -23,7 +23,7 @@ export default function DetailsStep() {
     const errs: FieldError[] = []
     if (!data.name.trim()) errs.push({ field: 'eoi-name', message: 'Enter your full name' })
     if (!data.email.trim()) {
-      errs.push({ field: 'eoi-email', message: 'Enter your NHS work email address' })
+      errs.push({ field: 'eoi-email', message: 'Enter your email address' })
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) {
       errs.push({
         field: 'eoi-email',
@@ -73,7 +73,7 @@ export default function DetailsStep() {
             </FormField>
             <FormField
               id="eoi-email"
-              label="NHS work email address"
+              label="Email address"
               required
               error={errorFor('eoi-email')}
             >

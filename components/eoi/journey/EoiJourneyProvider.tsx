@@ -34,12 +34,27 @@ import {
  */
 
 export const HELP_OPTIONS = [
-  { id: 'assess_fit', label: 'Assess pathway fit' },
-  { id: 'business_case', label: 'Build or review a business case' },
-  { id: 'assurance', label: 'Clarify assurance and local work' },
-  { id: 'commercial_route', label: 'Commercial route and buyer pack' },
-  { id: 'implementation', label: 'Implementation planning' },
-  { id: 'other', label: 'Other' },
+  {
+    id: 'assurance',
+    label: 'Assurance',
+    hint: 'For example, understanding the DTAC, clinical safety or data protection evidence and what local checks are still needed.',
+  },
+  {
+    id: 'funding_commercial',
+    label: 'Funding and commercial',
+    hint: 'For example, pricing, funding routes, building a business case or which procurement framework to use.',
+  },
+  {
+    id: 'technical',
+    label: 'Technical',
+    hint: 'For example, integration with your clinical systems, hosting, interoperability or implementation planning.',
+  },
+  {
+    id: 'procure',
+    label: 'Express interest to procure',
+    hint: 'You are ready to buy, or close to it, and want to start the procurement conversation.',
+  },
+  { id: 'other', label: 'Other', hint: 'Anything else you need help with.' },
 ] as const
 
 export const TIMELINE_OPTIONS = [
@@ -70,11 +85,13 @@ export type EoiJourneyData = {
   verified: boolean
 }
 
+// Prototype: name, email and organisation are already known from the signed-in
+// account, so the details step opens pre-filled with these.
 const EMPTY_DATA: EoiJourneyData = {
-  name: '',
-  email: '',
+  name: 'Sam Lee',
+  email: 'sam.lee@nhs.net',
   role: '',
-  organisation: '',
+  organisation: 'NHS Example ICB',
   phone: '',
   help: [],
   helpOtherDetails: '',

@@ -87,6 +87,7 @@ export default function SupportStep() {
                             id={`eoi-help-${o.id}`}
                             type="checkbox"
                             checked={data.help.includes(o.id)}
+                            aria-describedby={`eoi-help-${o.id}-hint`}
                             aria-controls={isOther ? 'conditional-eoi-help-other' : undefined}
                             aria-expanded={isOther ? data.help.includes('other') : undefined}
                             onChange={(e) =>
@@ -103,6 +104,12 @@ export default function SupportStep() {
                           >
                             {o.label}
                           </label>
+                          <div
+                            id={`eoi-help-${o.id}-hint`}
+                            className="nhsuk-hint nhsuk-checkboxes__hint"
+                          >
+                            {o.hint}
+                          </div>
                         </div>
                         {isOther && data.help.includes('other') ? (
                           <div className="nhsuk-checkboxes__conditional" id="conditional-eoi-help-other">

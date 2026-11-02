@@ -30,7 +30,7 @@ export default function StartStep() {
               <ul className="nhsuk-list nhsuk-list--bullet">
                 <li>why you are interested and what support you need</li>
                 <li>when you would like to start and how it would fit your service</li>
-                <li>for your name, role, organisation and NHS work email address</li>
+                <li>for your name, role, organisation and email address</li>
               </ul>
               <p style={{ fontSize: 'var(--text-body)' }}>It takes about 2 minutes.</p>
             </>

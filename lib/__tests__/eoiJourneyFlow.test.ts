@@ -68,17 +68,17 @@ describe('firstIncompleteStep', () => {
   })
 
   it('v2 requires a timeline, then details, before check answers', () => {
-    expect(firstIncompleteStep('v2', 'check-answers', { ...EMPTY, help: ['assess_fit'] })).toBe('timeline')
+    expect(firstIncompleteStep('v2', 'check-answers', { ...EMPTY, help: ['assurance'] })).toBe('timeline')
     expect(
-      firstIncompleteStep('v2', 'check-answers', { ...EMPTY, help: ['assess_fit'], timeline: 'medium' }),
+      firstIncompleteStep('v2', 'check-answers', { ...EMPTY, help: ['assurance'], timeline: 'medium' }),
     ).toBe('details')
     expect(
-      firstIncompleteStep('v2', 'check-answers', { ...EMPTY, ...DETAILS, help: ['assess_fit'], timeline: 'medium' }),
+      firstIncompleteStep('v2', 'check-answers', { ...EMPTY, ...DETAILS, help: ['assurance'], timeline: 'medium' }),
     ).toBeNull()
   })
 
   it('v2 lets the optional population and workflow pages be skipped', () => {
-    expect(firstIncompleteStep('v2', 'details', { ...EMPTY, help: ['assess_fit'], timeline: 'medium' })).toBeNull()
+    expect(firstIncompleteStep('v2', 'details', { ...EMPTY, help: ['assurance'], timeline: 'medium' })).toBeNull()
   })
 
   it('v2 never requires the one-time code', () => {
@@ -86,7 +86,7 @@ describe('firstIncompleteStep', () => {
       firstIncompleteStep('v2', 'check-answers', {
         ...EMPTY,
         ...DETAILS,
-        help: ['assess_fit'],
+        help: ['assurance'],
         timeline: 'medium',
         verified: false,
       }),
@@ -95,7 +95,7 @@ describe('firstIncompleteStep', () => {
 
   it('v1 keeps the timeline optional', () => {
     expect(
-      firstIncompleteStep('v1', 'check-answers', { ...EMPTY, ...DETAILS, help: ['assess_fit'], verified: true }),
+      firstIncompleteStep('v1', 'check-answers', { ...EMPTY, ...DETAILS, help: ['assurance'], verified: true }),
     ).toBeNull()
   })
 

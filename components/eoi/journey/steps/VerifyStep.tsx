@@ -40,7 +40,7 @@ export default function VerifyStep() {
     if (resendCooldown > 0) return
     setResendCooldown(30)
     setResendConfirmation(
-      `We have sent a new code to ${data.email.trim() || 'your NHS work email address'}. In this prototype the code is still ${PROTOTYPE_OTP}.`,
+      `We have sent a new code to ${data.email.trim() || 'your email address'}. In this prototype the code is still ${PROTOTYPE_OTP}.`,
     )
   }
 
@@ -68,7 +68,7 @@ export default function VerifyStep() {
             <span className="nhsuk-u-visually-hidden">Information: </span>
             <p>
               Prototype: enter code <strong>{PROTOTYPE_OTP}</strong>. In a live service we would
-              email a one-time code to {data.email.trim() || 'your NHS work email address'}.
+              email a one-time code to {data.email.trim() || 'your email address'}.
             </p>
           </div>
           <form noValidate onSubmit={handleVerify}>
