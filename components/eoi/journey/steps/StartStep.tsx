@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useEoiJourney } from '../EoiJourneyProvider'
 import { BackLink, useStepHeadingFocus } from '../shared'
@@ -7,8 +8,16 @@ import { Button } from '@/components/ui/Button'
 
 export default function StartStep() {
   const router = useRouter()
-  const { app, flow, nextHref, backHref } = useEoiJourney()
+  const { app, flow, nextHref, backHref, hrefFor, reference, hydrated } = useEoiJourney()
   const headingRef = useStepHeadingFocus()
+
+  // Already submitted in this session: show the confirmation and reference
+  // number instead of starting the form again.
+  useEffect(() => {
+    if (hydrated && reference) router.replace(hrefFor('confirmation'))
+  }, [hydrated, reference, hrefFor, router])
+
+  if (!hydrated || reference) return null
 
   return (
     <div className="nhsuk-width-container nhsuk-main-wrapper">
