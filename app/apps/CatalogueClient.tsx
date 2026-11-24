@@ -3,7 +3,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEven
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { getConditionAreas, supervisionLabels, type App } from '@/lib/data'
+import { type App } from '@/lib/data'
 import { MaturityBadge, SupervisionBadge, ConditionTag } from '@/components/Badges'
 import { CompareToggleButton } from '@/components/CompareToggleButton'
 import { X } from 'lucide-react'
@@ -12,19 +12,24 @@ import { PageBreadcrumb } from '@/components/PageBreadcrumb'
 import { getProductNarrative } from '@/lib/content/productNarratives'
 import { catalogueSummary } from '@/lib/pdpSummary'
 import { isMarketPreview } from '@/lib/marketPreview'
+import {
+  activeFilterGroups,
+  emptySelection,
+  filterApps,
+  hasActiveSelection,
+  selectedTags,
+  withToggledValue,
+  withoutValue,
+  type FilterGroup,
+  type FilterSelection,
+  type SelectedTag,
+} from '@/lib/catalogueFilters'
 
-const supervisionOptions = Object.entries(supervisionLabels).map(([id, label]) => ({ id, label }))
+/** Prefix the group name on tags only when more than one group can be selected. */
+const showGroupInTags = activeFilterGroups.length > 1
 
-const conditionAreas = getConditionAreas()
-const conditionOptions = [
-  { id: 'all', label: 'All conditions' },
-  ...conditionAreas
-    .filter(c => c.id !== 'pulmonary_rehab')
-    .map(c => ({
-      id: c.id,
-      label: c.id === 'copd' ? 'COPD and pulmonary rehab' : c.label,
-    })),
-]
+const tagKey = (t: Pick<SelectedTag, 'groupId' | 'value'>) => `${t.groupId}:${t.value}`
+
 function ProductCard({ app }: { app: App }) {
   const narrative = getProductNarrative(app.slug)
   const cardDescription = catalogueSummary(app, narrative)
@@ -79,22 +84,26 @@ function ProductCard({ app }: { app: App }) {
   )
 }
 
-function appMatchesCondition(app: App, conditionId: string): boolean {
-  if (conditionId === 'all') return true
-  if (conditionId === 'copd') {
-    return app.condition_tags.includes('copd') || app.condition_tags.includes('pulmonary_rehab')
-  }
-  return app.condition_tags.includes(conditionId)
-}
-
 /**
  * Nested facet accordion — mirrors GOV.UK `.app-c-filter-section` (details/summary
- * with a chevron that flips when open). Collapsed by default, like the live
- * gov.uk/search/all panel.
+ * with a chevron that flips when open).
  */
-function FilterSection({ title, children }: { title: string; children: ReactNode }) {
+function FilterSection({
+  title,
+  defaultOpen = false,
+  children,
+}: {
+  title: string
+  defaultOpen?: boolean
+  children: ReactNode
+}) {
+  const [open, setOpen] = useState(defaultOpen)
   return (
-    <details className="hs-filter-section group">
+    <details
+      className="hs-filter-section group"
+      open={open}
+      onToggle={e => setOpen((e.currentTarget as HTMLDetailsElement).open)}
+    >
       <summary className="hs-filter-section__summary">
         <span className="hs-filter-section__heading">{title}</span>
       </summary>
@@ -103,136 +112,204 @@ function FilterSection({ title, children }: { title: string; children: ReactNode
   )
 }
 
-function FilterPill({ label, onRemove }: { label: string; onRemove: () => void }) {
+/** One filter group as an NHS radios (single) or checkboxes (multi) fieldset. */
+function FilterGroupFieldset({
+  group,
+  selection,
+  onChange,
+}: {
+  group: FilterGroup
+  selection: FilterSelection
+  onChange: (group: FilterGroup, value: string) => void
+}) {
+  const kind = group.type === 'single' ? 'radios' : 'checkboxes'
+  const values = selection[group.id] ?? []
+  const isChecked = (id: string) =>
+    group.type === 'single' ? (values[0] ?? group.defaultValue) === id : values.includes(id)
+
   return (
-    <span
-      className="pill hs-text-caption"
-      style={{
-        background: '#E6F0FB',
-        color: 'var(--nhs-dark)',
-        border: '1px solid var(--nhs-dark)',
-      }}
-    >
-      {label}
-      <button
-        type="button"
-        onClick={onRemove}
-        className="rounded-sm p-1 transition-colors hover:bg-[#E6F0FB] hover:opacity-90"
-        aria-label={`Remove ${label} filter`}
-        style={{ color: 'var(--nhs-dark)' }}
-      >
-        <X className="w-3 h-3" />
-      </button>
-    </span>
+    <fieldset className="nhsuk-fieldset">
+      <legend className="nhsuk-u-visually-hidden">{group.legend}</legend>
+      <div className={`nhsuk-${kind} nhsuk-${kind}--small`}>
+        {group.options.map(o => {
+          const inputId = `filter-${group.id}-${o.id}`
+          return (
+            <div key={o.id} className={`nhsuk-${kind}__item`}>
+              <input
+                id={inputId}
+                className={`nhsuk-${kind}__input`}
+                name={`filter-${group.id}`}
+                type={group.type === 'single' ? 'radio' : 'checkbox'}
+                value={o.id}
+                checked={isChecked(o.id)}
+                onChange={() => onChange(group, o.id)}
+              />
+              <label className={`nhsuk-${kind}__label`} htmlFor={inputId}>
+                {o.label}
+              </label>
+            </div>
+          )
+        })}
+      </div>
+    </fieldset>
   )
 }
+
+/**
+ * Applied filters as labelled removable tags. [Provenance: Bespoke, based on the
+ * GOV.UK "selected filters" pattern.] Each tag is one full-size button whose
+ * accessible name is "Remove filter: <label>"; the X icon is decorative.
+ */
+function SelectedFilters({
+  tags,
+  headingId,
+  registerTag,
+  onRemove,
+  onClearAll,
+}: {
+  tags: SelectedTag[]
+  headingId: string
+  registerTag: (key: string, el: HTMLButtonElement | null) => void
+  onRemove: (tag: SelectedTag) => void
+  onClearAll: () => void
+}) {
+  if (tags.length === 0) return null
+  return (
+    <div role="region" aria-labelledby={headingId} className="hs-selected-filters">
+      <h2 id={headingId} className="nhsuk-heading-s nhsuk-u-margin-bottom-2">
+        Selected filters
+      </h2>
+      <ul role="list" className="hs-selected-filters__list">
+        {tags.map(t => (
+          <li key={tagKey(t)}>
+            <button
+              type="button"
+              ref={el => registerTag(tagKey(t), el)}
+              className="hs-filter-tag"
+              onClick={() => onRemove(t)}
+            >
+              <span className="nhsuk-u-visually-hidden">Remove filter: </span>
+              {showGroupInTags && <span className="hs-filter-tag__group">{t.groupLegend}: </span>}
+              {t.label}
+              <X className="hs-filter-tag__icon" aria-hidden="true" focusable="false" />
+            </button>
+          </li>
+        ))}
+      </ul>
+      {tags.length > 1 && (
+        <button type="button" className="hs-filter-panel__clear" onClick={onClearAll}>
+          Clear all filters
+        </button>
+      )}
+    </div>
+  )
+}
+
+const resultsPhrase = (n: number) => `${n.toLocaleString()} ${n === 1 ? 'result' : 'results'}`
 
 export default function CatalogueClient({ apps }: { apps: App[] }) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const filterPanelId = useId()
 
-  /** Applied filters — drive the result list. */
-  const [condition, setCondition] = useState('all')
-  const [supervision, setSupervision] = useState<string[]>([])
-
+  /** Applied filters drive the result list. */
+  const [applied, setApplied] = useState<FilterSelection>(() => emptySelection())
   /**
-   * Draft filters — edited inside the panel. Applied only when the user clicks
-   * Apply, matching GOV.UK's filter-panel submit interaction.
+   * Draft filters are edited inside the panel and applied only when the user
+   * clicks Apply, matching GOV.UK's filter-panel submit interaction.
    */
-  const [draftCondition, setDraftCondition] = useState('all')
-  const [draftSupervision, setDraftSupervision] = useState<string[]>([])
+  const [draft, setDraft] = useState<FilterSelection>(() => emptySelection())
 
-  /** Panel starts collapsed (`aria-expanded=false`), same as GOV.UK. */
+  /** Panel starts collapsed on small screens (`aria-expanded=false`), same as GOV.UK. */
   const [filtersOpen, setFiltersOpen] = useState(false)
 
-  const liveRegion = useRef<HTMLDivElement>(null)
+  /** Text for the polite live region. Empty on first render so nothing is announced on load. */
+  const [announcement, setAnnouncement] = useState('')
+
+  const countRef = useRef<HTMLParagraphElement>(null)
+  const tagRefs = useRef(new Map<string, HTMLButtonElement>())
+  /** Where focus should go after the next render: a tag key, 'count', or null. */
+  const pendingFocus = useRef<string | null>(null)
+  const setPendingFocus = (key: string) => {
+    pendingFocus.current = key
+  }
+
+  const registerTag = useCallback((key: string, el: HTMLButtonElement | null) => {
+    if (el) tagRefs.current.set(key, el)
+    else tagRefs.current.delete(key)
+  }, [])
 
   const replaceBrowseUrl = useCallback(
-    (nextCondition: string) => {
-      const suffix = buildBrowseSearchParams(nextCondition, '')
+    (selection: FilterSelection) => {
+      const suffix = buildBrowseSearchParams(selection.condition?.[0] ?? 'all', '')
       router.replace(`/catalogue/digital-therapeutics${suffix}`, { scroll: false })
     },
     [router],
   )
 
+  // Condition is the only group mirrored in the URL (?condition=). Others are client-only.
   useEffect(() => {
     const c = parseBrowseConditionParam(searchParams.get('condition'))
-    setCondition(c)
-    setDraftCondition(c)
+    const values = c === 'all' ? [] : [c]
+    setApplied(prev => ({ ...prev, condition: values }))
+    setDraft(prev => ({ ...prev, condition: values }))
   }, [searchParams])
 
-  const toggleDraftSupervision = (id: string) => {
-    setDraftSupervision(prev => (prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]))
+  const filtered = useMemo(
+    () => filterApps(apps, applied).sort((a, b) => a.app_name.localeCompare(b.app_name)),
+    [apps, applied],
+  )
+  const tags = useMemo(() => selectedTags(applied), [applied])
+
+  // After a tag is removed or filters are cleared, the button that had focus is
+  // gone. Move focus to the neighbouring tag, or to the result count.
+  useEffect(() => {
+    const key = pendingFocus.current
+    if (!key) return
+    pendingFocus.current = null
+    const target = key === 'count' ? countRef.current : tagRefs.current.get(key)
+    ;(target ?? countRef.current)?.focus()
+  })
+
+  /** Apply a selection to the results, the URL and the live region. */
+  const commit = (next: FilterSelection, message: string) => {
+    setApplied(next)
+    setDraft(next)
+    replaceBrowseUrl(next)
+    setAnnouncement(`${message} ${resultsPhrase(filterApps(apps, next).length)}.`)
   }
 
   const openFilters = () => {
     // Sync draft from applied so reopening shows the current selection.
-    setDraftCondition(condition)
-    setDraftSupervision(supervision)
+    setDraft(applied)
     setFiltersOpen(true)
   }
 
-  const closeFilters = () => setFiltersOpen(false)
-
   const toggleFilters = () => {
-    if (filtersOpen) closeFilters()
+    if (filtersOpen) setFiltersOpen(false)
     else openFilters()
   }
 
   const applyFilters = (e?: FormEvent) => {
     e?.preventDefault()
-    setCondition(draftCondition)
-    setSupervision(draftSupervision)
-    replaceBrowseUrl(draftCondition)
+    commit(draft, 'Filters applied.')
     setFiltersOpen(false)
   }
 
   const clearAllFilters = () => {
-    setSupervision([])
-    setDraftSupervision([])
-    setCondition('all')
-    setDraftCondition('all')
-    router.replace('/catalogue/digital-therapeutics', { scroll: false })
+    commit(emptySelection(), 'All filters cleared.')
+    setPendingFocus('count')
   }
 
-  const activeFilters: { label: string; clear: () => void }[] = []
-  if (condition !== 'all') {
-    activeFilters.push({
-      label: conditionOptions.find(o => o.id === condition)!.label,
-      clear: () => {
-        setCondition('all')
-        setDraftCondition('all')
-        replaceBrowseUrl('all')
-      },
-    })
-  }
-  for (const s of supervision) {
-    activeFilters.push({
-      label: supervisionLabels[s] ?? s,
-      clear: () => {
-        const next = supervision.filter(id => id !== s)
-        setSupervision(next)
-        setDraftSupervision(next)
-      },
-    })
+  const removeTag = (tag: SelectedTag) => {
+    const i = tags.findIndex(t => tagKey(t) === tagKey(tag))
+    const neighbour = tags[i + 1] ?? tags[i - 1]
+    commit(withoutValue(applied, tag.groupId, tag.value), `Filter removed: ${tag.label}.`)
+    setPendingFocus(neighbour ? tagKey(neighbour) : 'count')
   }
 
-  const filteredSorted = useMemo(() => {
-    return apps
-      .filter((app: App) => {
-        if (supervision.length > 0 && !supervision.includes(app.supervision_model)) return false
-        if (condition !== 'all' && !appMatchesCondition(app, condition)) return false
-        return true
-      })
-      .sort((a, b) => a.app_name.localeCompare(b.app_name))
-  }, [apps, supervision, condition])
-
-  const onStore = filteredSorted.filter((app) => !isMarketPreview(app))
-  const notOnStore = filteredSorted.filter((app) => isMarketPreview(app))
-  const resultCount = filteredSorted.length
-  const resultText = `${resultCount.toLocaleString()} ${resultCount === 1 ? 'result' : 'results'}`
-  const resultSummary = `Showing ${resultCount} of ${apps.length} apps`
+  const onStore = filtered.filter(app => !isMarketPreview(app))
+  const notOnStore = filtered.filter(app => isMarketPreview(app))
 
   return (
     <div className="nhsuk-width-container">
@@ -252,8 +329,8 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
             {/*
               Filter panel. On small screens it collapses behind a "Filter" toggle
               (GOV.UK finder interaction); from tablet the toggle is hidden and the
-              panel is always open in the sidebar. Form controls are nhsuk-radios /
-              nhsuk-checkboxes; sections use the NHS Details disclosure.
+              panel is always open in the sidebar. Groups come from
+              lib/catalogueFilters.ts — add or re-enable a group there.
             */}
             <div className="hs-filter-panel">
               <div className="hs-filter-panel__header">
@@ -274,62 +351,23 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
                 id={`${filterPanelId}-content`}
                 className={`hs-filter-panel__content${filtersOpen ? ' hs-filter-panel__content--open' : ''}`}
               >
-                <form onSubmit={applyFilters}>
-                  <FilterSection title="Condition">
-                    <fieldset className="nhsuk-fieldset">
-                      <legend className="nhsuk-u-visually-hidden">Condition</legend>
-                      <div className="nhsuk-radios nhsuk-radios--small">
-                        {conditionOptions.map(o => (
-                          <div key={o.id} className="nhsuk-radios__item">
-                            <input
-                              id={`filter-condition-${o.id}`}
-                              className="nhsuk-radios__input"
-                              name="filter-condition"
-                              type="radio"
-                              checked={draftCondition === o.id}
-                              onChange={() => setDraftCondition(o.id)}
-                            />
-                            <label className="nhsuk-radios__label" htmlFor={`filter-condition-${o.id}`}>
-                              {o.label}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </fieldset>
-                  </FilterSection>
-
-                  <FilterSection title="Supervision model">
-                    <fieldset className="nhsuk-fieldset">
-                      <legend className="nhsuk-u-visually-hidden">Supervision model</legend>
-                      <div className="nhsuk-checkboxes nhsuk-checkboxes--small">
-                        {supervisionOptions.map(o => (
-                          <div key={o.id} className="nhsuk-checkboxes__item">
-                            <input
-                              id={`filter-supervision-${o.id}`}
-                              className="nhsuk-checkboxes__input"
-                              type="checkbox"
-                              checked={draftSupervision.includes(o.id)}
-                              onChange={() => toggleDraftSupervision(o.id)}
-                            />
-                            <label className="nhsuk-checkboxes__label" htmlFor={`filter-supervision-${o.id}`}>
-                              {o.label}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </fieldset>
-                  </FilterSection>
+                <form onSubmit={applyFilters} aria-label="Filter products">
+                  {activeFilterGroups.map((group, i) => (
+                    <FilterSection key={group.id} title={group.legend} defaultOpen={i === 0}>
+                      <FilterGroupFieldset
+                        group={group}
+                        selection={draft}
+                        onChange={(g, v) => setDraft(prev => withToggledValue(prev, g, v))}
+                      />
+                    </FilterSection>
+                  ))}
 
                   <div className="hs-filter-panel__actions">
                     <button type="submit" className="nhsuk-button nhsuk-u-margin-bottom-0">
                       Apply filters
                     </button>
-                    {(draftCondition !== 'all' || draftSupervision.length > 0) && (
-                      <button
-                        type="button"
-                        className="hs-filter-panel__clear"
-                        onClick={clearAllFilters}
-                      >
+                    {hasActiveSelection(draft) && (
+                      <button type="button" className="hs-filter-panel__clear" onClick={clearAllFilters}>
                         Clear filters
                       </button>
                     )}
@@ -340,23 +378,28 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
           </div>
 
           <div className="nhsuk-grid-column-two-thirds">
-            <p className="nhsuk-body-m" id={`${filterPanelId}-count`}>
-              <strong>{resultText}</strong>
+            <p
+              className="nhsuk-body-m hs-results-count"
+              id={`${filterPanelId}-count`}
+              ref={countRef}
+              tabIndex={-1}
+            >
+              <strong>{resultsPhrase(filtered.length)}</strong>
             </p>
 
-            {activeFilters.length > 0 && (
-              <div className="flex flex-wrap gap-2 nhsuk-u-margin-bottom-4">
-                {activeFilters.map((f, i) => (
-                  <FilterPill key={`${i}-${f.label}`} label={f.label} onRemove={f.clear} />
-                ))}
-              </div>
-            )}
+            <SelectedFilters
+              tags={tags}
+              headingId={`${filterPanelId}-selected`}
+              registerTag={registerTag}
+              onRemove={removeTag}
+              onClearAll={clearAllFilters}
+            />
 
-            <div ref={liveRegion} aria-live="polite" aria-atomic="true" className="sr-only">
-              {resultSummary}
+            <div aria-live="polite" aria-atomic="true" className="sr-only">
+              {announcement}
             </div>
 
-            {filteredSorted.length === 0 ? (
+            {filtered.length === 0 ? (
               // [Provenance: NHS] Inset text for the empty state.
               <div className="nhsuk-inset-text">
                 <span className="nhsuk-u-visually-hidden">Information: </span>
@@ -367,7 +410,7 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
               <>
                 {onStore.length > 0 && (
                   <ul className="nhsuk-list">
-                    {onStore.map((app) => (
+                    {onStore.map(app => (
                       <ProductCard key={app.id} app={app} />
                     ))}
                   </ul>
@@ -378,7 +421,7 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
                       Not on the Commissioning Store
                     </h2>
                     <ul className="nhsuk-list">
-                      {notOnStore.map((app) => (
+                      {notOnStore.map(app => (
                         <ProductCard key={app.id} app={app} />
                       ))}
                     </ul>
@@ -391,5 +434,4 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
       </div>
     </div>
   )
-
 }
