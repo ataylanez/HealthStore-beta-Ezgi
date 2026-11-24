@@ -1,5 +1,5 @@
 'use client'
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -105,46 +105,42 @@ function FilterSection({
   )
 }
 
-/** One filter group as an NHS radios (single) or checkboxes (multi) fieldset. */
-function FilterGroupFieldset({
+/**
+ * One filter group as a row of toggle chips. Clicking a chip applies it at once;
+ * clicking a selected chip again clears it. `aria-pressed` carries the state.
+ */
+function FilterChipGroup({
   group,
   selection,
-  onChange,
+  onToggle,
 }: {
   group: FilterGroup
   selection: FilterSelection
-  onChange: (group: FilterGroup, value: string) => void
+  onToggle: (group: FilterGroup, value: string) => void
 }) {
-  const kind = group.type === 'single' ? 'radios' : 'checkboxes'
   const values = selection[group.id] ?? []
-  const isChecked = (id: string) =>
-    group.type === 'single' ? (values[0] ?? group.defaultValue) === id : values.includes(id)
-
   return (
-    <fieldset className="nhsuk-fieldset">
-      <legend className="nhsuk-u-visually-hidden">{group.legend}</legend>
-      <div className={`nhsuk-${kind} nhsuk-${kind}--small`}>
-        {group.options.map(o => {
-          const inputId = `filter-${group.id}-${o.id}`
-          return (
-            <div key={o.id} className={`nhsuk-${kind}__item`}>
-              <input
-                id={inputId}
-                className={`nhsuk-${kind}__input`}
-                name={`filter-${group.id}`}
-                type={group.type === 'single' ? 'radio' : 'checkbox'}
-                value={o.id}
-                checked={isChecked(o.id)}
-                onChange={() => onChange(group, o.id)}
-              />
-              <label className={`nhsuk-${kind}__label`} htmlFor={inputId}>
-                {o.label}
-              </label>
-            </div>
-          )
-        })}
-      </div>
-    </fieldset>
+    <div role="group" aria-label={group.legend} className="hs-filter-chips">
+      {group.options.map(o => {
+        const selected = values.includes(o.id)
+        return (
+          <button
+            key={o.id}
+            type="button"
+            className="hs-filter-chip"
+            aria-pressed={selected}
+            onClick={() => onToggle(group, o.id)}
+          >
+            {selected && (
+              <span aria-hidden="true" className="hs-filter-chip__check">
+                ✓
+              </span>
+            )}
+            {o.label}
+          </button>
+        )
+      })}
+    </div>
   )
 }
 
@@ -166,16 +162,11 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
   const searchParams = useSearchParams()
   const filterPanelId = useId()
 
-  /** Applied filters drive the result list. */
+  /** Applied filters drive the result list. Chips apply immediately. */
   const [applied, setApplied] = useState<FilterSelection>(() => emptySelection())
-  /**
-   * Draft filters are edited inside the panel and applied only when the user
-   * clicks Apply, matching GOV.UK's filter-panel submit interaction.
-   */
-  const [draft, setDraft] = useState<FilterSelection>(() => emptySelection())
 
-  /** Panel starts collapsed on small screens (`aria-expanded=false`), same as GOV.UK. */
-  const [filtersOpen, setFiltersOpen] = useState(false)
+  /** Filter panel above the results; starts open and can be collapsed at any width. */
+  const [filtersOpen, setFiltersOpen] = useState(true)
 
   /** Text for the polite live region. Empty on first render so nothing is announced on load. */
   const [announcement, setAnnouncement] = useState('')
@@ -197,7 +188,6 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
     const c = parseBrowseConditionParam(searchParams.get('condition'))
     const values = c === 'all' ? [] : [c]
     setApplied(prev => ({ ...prev, condition: values }))
-    setDraft(prev => ({ ...prev, condition: values }))
   }, [searchParams])
 
   const filtered = useMemo(
@@ -217,7 +207,6 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
   /** Apply a selection to the results, the URL and the live region. */
   const commit = (next: FilterSelection, cleared = false) => {
     setApplied(next)
-    setDraft(next)
     replaceBrowseUrl(next)
     const count = filterApps(apps, next).length
     setAnnouncement(
@@ -225,21 +214,8 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
     )
   }
 
-  const openFilters = () => {
-    // Sync draft from applied so reopening shows the current selection.
-    setDraft(applied)
-    setFiltersOpen(true)
-  }
-
-  const toggleFilters = () => {
-    if (filtersOpen) setFiltersOpen(false)
-    else openFilters()
-  }
-
-  const applyFilters = (e?: FormEvent) => {
-    e?.preventDefault()
-    commit(draft)
-    setFiltersOpen(false)
+  const toggleChip = (group: FilterGroup, value: string) => {
+    commit(withToggledValue(applied, group, value))
   }
 
   const clearAllFilters = () => {
@@ -262,113 +238,86 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
       <div className="nhsuk-main-wrapper nhsuk-main-wrapper--s">
         <h1 className="nhsuk-heading-xl">Digital therapeutics</h1>
 
-        {/* NHS layout: filters in a one-third column, results in a two-thirds column. */}
-        <div className="nhsuk-grid-row">
-          <div className="nhsuk-grid-column-one-third">
-            {/*
-              Filter panel. On small screens it collapses behind a "Filter" toggle
-              (GOV.UK finder interaction); from tablet the toggle is hidden and the
-              panel is always open in the sidebar. Groups come from
-              lib/catalogueFilters.ts — add or re-enable a group there.
-            */}
-            <div className="hs-filter-panel">
-              <div className="hs-filter-panel__header">
-                <button
-                  type="button"
-                  id={`${filterPanelId}-button`}
-                  className="hs-filter-panel__button"
-                  aria-expanded={filtersOpen}
-                  aria-controls={`${filterPanelId}-content`}
-                  onClick={toggleFilters}
-                >
-                  <span className="hs-filter-panel__button-inner">Filter</span>
-                </button>
-                <h2 className="nhsuk-heading-s hs-filter-panel__title">Filter</h2>
-              </div>
-
-              <div
-                id={`${filterPanelId}-content`}
-                className={`hs-filter-panel__content${filtersOpen ? ' hs-filter-panel__content--open' : ''}`}
-              >
-                <form onSubmit={applyFilters} aria-label="Filter products">
-                  {activeFilterGroups.map((group, i) => (
-                    <FilterSection key={group.id} title={group.legend} defaultOpen={i === 0}>
-                      <FilterGroupFieldset
-                        group={group}
-                        selection={draft}
-                        onChange={(g, v) => setDraft(prev => withToggledValue(prev, g, v))}
-                      />
-                    </FilterSection>
-                  ))}
-
-                  <div className="hs-filter-panel__actions">
-                    <button type="submit" className="nhsuk-button nhsuk-u-margin-bottom-0">
-                      Apply filters
-                    </button>
-                    {hasActiveSelection(draft) && (
-                      <button type="button" className="hs-filter-panel__clear" onClick={clearAllFilters}>
-                        Clear filters
-                      </button>
-                    )}
-                  </div>
-                </form>
-              </div>
-            </div>
+        {/*
+          Filter panel above the results, collapsible at every width behind the
+          "Filter" toggle. Each option is a toggle chip that applies immediately.
+          Groups come from lib/catalogueFilters.ts — add or re-enable a group there.
+        */}
+        <div className="hs-filter-panel">
+          <div className="hs-filter-panel__header">
+            <button
+              type="button"
+              id={`${filterPanelId}-button`}
+              className="hs-filter-panel__button"
+              aria-expanded={filtersOpen}
+              aria-controls={`${filterPanelId}-content`}
+              onClick={() => setFiltersOpen(o => !o)}
+            >
+              <span className="hs-filter-panel__button-inner">Filter</span>
+            </button>
+            {hasActiveSelection(applied) && (
+              <button type="button" className="hs-filter-panel__clear" onClick={clearAllFilters}>
+                Clear filters
+              </button>
+            )}
           </div>
 
-          <div className="nhsuk-grid-column-two-thirds">
-            <h2
-              className="nhsuk-heading-m nhsuk-u-margin-bottom-2 hs-results-count"
-              id={`${filterPanelId}-count`}
-              ref={countRef}
-              tabIndex={-1}
-            >
-              {resultsTitle(tags)}
-            </h2>
+          <div
+            id={`${filterPanelId}-content`}
+            className={`hs-filter-panel__content${filtersOpen ? ' hs-filter-panel__content--open' : ''}`}
+          >
+            {activeFilterGroups.map(group => (
+              <FilterSection key={group.id} title={group.legend} defaultOpen>
+                <FilterChipGroup group={group} selection={applied} onToggle={toggleChip} />
+              </FilterSection>
+            ))}
+          </div>
+        </div>
 
-            {tags.length > 0 && (
-              <p className="nhsuk-u-margin-bottom-4">
-                <button type="button" className="hs-filter-panel__clear" onClick={clearAllFilters}>
-                  Clear filters
-                </button>
-              </p>
-            )}
+        <div>
+          <h2
+            className="nhsuk-heading-m nhsuk-u-margin-bottom-2 hs-results-count"
+            id={`${filterPanelId}-count`}
+            ref={countRef}
+            tabIndex={-1}
+          >
+            {resultsTitle(tags)}
+          </h2>
 
-            <div aria-live="polite" aria-atomic="true" className="sr-only">
-              {announcement}
+          <div aria-live="polite" aria-atomic="true" className="sr-only">
+            {announcement}
+          </div>
+
+          {filtered.length === 0 ? (
+            // [Provenance: NHS] Inset text for the empty state.
+            <div className="nhsuk-inset-text">
+              <span className="nhsuk-u-visually-hidden">Information: </span>
+              <p className="nhsuk-u-font-weight-bold nhsuk-u-margin-bottom-1">No apps match your filters</p>
+              <p className="nhsuk-u-margin-bottom-0">Try adjusting your filter criteria</p>
             </div>
-
-            {filtered.length === 0 ? (
-              // [Provenance: NHS] Inset text for the empty state.
-              <div className="nhsuk-inset-text">
-                <span className="nhsuk-u-visually-hidden">Information: </span>
-                <p className="nhsuk-u-font-weight-bold nhsuk-u-margin-bottom-1">No apps match your filters</p>
-                <p className="nhsuk-u-margin-bottom-0">Try adjusting your filter criteria</p>
-              </div>
-            ) : (
-              <>
-                {onStore.length > 0 && (
+          ) : (
+            <>
+              {onStore.length > 0 && (
+                <ul className="nhsuk-list">
+                  {onStore.map(app => (
+                    <ProductCard key={app.id} app={app} />
+                  ))}
+                </ul>
+              )}
+              {notOnStore.length > 0 && (
+                <section aria-labelledby="not-on-store-heading" className="nhsuk-u-margin-top-7">
+                  <h2 id="not-on-store-heading" className="nhsuk-heading-l">
+                    Not on the Commissioning Store
+                  </h2>
                   <ul className="nhsuk-list">
-                    {onStore.map(app => (
+                    {notOnStore.map(app => (
                       <ProductCard key={app.id} app={app} />
                     ))}
                   </ul>
-                )}
-                {notOnStore.length > 0 && (
-                  <section aria-labelledby="not-on-store-heading" className="nhsuk-u-margin-top-7">
-                    <h2 id="not-on-store-heading" className="nhsuk-heading-l">
-                      Not on the Commissioning Store
-                    </h2>
-                    <ul className="nhsuk-list">
-                      {notOnStore.map(app => (
-                        <ProductCard key={app.id} app={app} />
-                      ))}
-                    </ul>
-                  </section>
-                )}
-              </>
-            )}
-          </div>
+                </section>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -62,6 +62,7 @@ describe('catalogueFilters', () => {
     sel = withToggledValue(sel, condition, 'heart_failure')
     expect(sel.condition).toEqual(['heart_failure'])
     expect(withoutValue(sel, 'condition', 'heart_failure').condition).toEqual([])
+    expect(withToggledValue(sel, condition, 'heart_failure').condition).toEqual([])
 
     let multi = withToggledValue({ supervision: [] }, supervision, 'a')
     multi = withToggledValue(multi, supervision, 'b')

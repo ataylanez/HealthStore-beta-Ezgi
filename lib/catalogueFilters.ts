@@ -121,14 +121,17 @@ export function withoutValue(selection: FilterSelection, groupId: string, value:
   return { ...selection, [groupId]: (selection[groupId] ?? []).filter(v => v !== value) }
 }
 
-/** Set a radio value or toggle a checkbox value. */
+/**
+ * Toggle a value. Single-choice groups hold at most one value: picking another
+ * replaces it, picking the selected one again clears the group.
+ */
 export function withToggledValue(
   selection: FilterSelection,
   group: FilterGroup,
   value: string,
 ): FilterSelection {
   const current = selection[group.id] ?? []
-  if (group.type === 'single') return { ...selection, [group.id]: [value] }
+  if (group.type === 'single') return { ...selection, [group.id]: current.includes(value) ? [] : [value] }
   return {
     ...selection,
     [group.id]: current.includes(value) ? current.filter(v => v !== value) : [...current, value],

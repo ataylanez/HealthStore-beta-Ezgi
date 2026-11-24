@@ -818,8 +818,8 @@
    * Content: expands vertically; nested details sections; Apply submits draft.
    * [Provenance: GOV.UK filter-panel pattern]
    */
-  /* Filter panel — sits in a one-third NHS grid column. Collapsible behind a
-     "Filter" toggle on small screens; always open from tablet. */
+  /* Filter panel — full width above the results, collapsible at every width
+     behind the "Filter" toggle. Options are toggle chips (.hs-filter-chip). */
   .hs-filter-panel {
     margin-bottom: var(--space-5);
   }
@@ -830,14 +830,6 @@
     align-items: baseline;
     gap: var(--space-2);
   }
-  .hs-filter-panel__title {
-    display: none;
-    margin: 0 0 var(--space-3);
-  }
-  @media (min-width: 48.0625em) {
-    .hs-filter-panel__button { display: none; }
-    .hs-filter-panel__title { display: block; }
-  }
   .hs-filter-panel__button {
     background: transparent;
     color: var(--nhs-blue);
@@ -846,7 +838,7 @@
     padding: 0;
     cursor: pointer;
     font-size: var(--text-body);
-    font-weight: 400;
+    font-weight: 700;
     font-family: inherit;
     line-height: 1.3;
   }
@@ -875,31 +867,57 @@
   .hs-filter-panel__content {
     display: none;
     background-color: var(--surface);
-    padding: 0 var(--space-3);
+    padding: var(--space-2) var(--space-3);
     margin-top: var(--space-2);
   }
   .hs-filter-panel__content--open { display: block; }
-  @media (min-width: 48.0625em) {
-    .hs-filter-panel__content { display: block; margin-top: 0; }
-  }
-  /* White control faces on the grey surface, matching GOV.UK's treatment. */
-  .hs-filter-panel__content .nhsuk-checkboxes__label::before,
-  .hs-filter-panel__content .nhsuk-radios__label::before {
-    background-color: #fff;
-  }
-  .hs-filter-panel__actions {
+
+  /* Toggle chips — pill-shaped (see `.pill`) because they are interactive.
+     Selected = filled NHS blue; aria-pressed carries the state. */
+  .hs-filter-chips {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-4) 0;
+    gap: var(--space-2);
+    padding-top: var(--space-1);
   }
-  @media (max-width: 639px) {
-    .hs-filter-panel__actions {
-      flex-direction: column;
-      align-items: stretch;
-      gap: var(--space-2);
-    }
+  .hs-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    background: #fff;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: var(--text-badge);
+    font-weight: 600;
+    line-height: 1.3;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .hs-filter-chip:hover {
+    border-color: var(--nhs-blue);
+    color: var(--nhs-blue);
+  }
+  .hs-filter-chip[aria-pressed="true"] {
+    background: var(--nhs-blue);
+    border-color: var(--nhs-blue);
+    color: #fff;
+  }
+  .hs-filter-chip[aria-pressed="true"]:hover {
+    background: #003087;
+    border-color: #003087;
+  }
+  .hs-filter-chip:focus-visible {
+    outline: 4px solid transparent;
+    background: #ffeb3b;
+    border-color: #212b32;
+    color: #212b32;
+    box-shadow: 0 4px 0 #212b32;
+  }
+  .hs-filter-chip__check {
+    font-weight: 700;
   }
   .hs-filter-panel__clear {
     flex: 0 0 auto;
