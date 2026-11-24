@@ -33,15 +33,14 @@ export type SelectedTag = {
   label: string
 }
 
-const conditionOptions: FilterOption[] = [
-  { id: 'all', label: 'All conditions' },
-  ...getConditionAreas()
-    .filter(c => c.id !== 'pulmonary_rehab')
-    .map(c => ({
-      id: c.id,
-      label: c.id === 'copd' ? 'COPD and pulmonary rehab' : c.label,
-    })),
-]
+// No "All conditions" option: nothing selected means all products are shown,
+// and "Clear filters" returns to that state.
+const conditionOptions: FilterOption[] = getConditionAreas()
+  .filter(c => c.id !== 'pulmonary_rehab')
+  .map(c => ({
+    id: c.id,
+    label: c.id === 'copd' ? 'COPD and pulmonary rehab' : c.label,
+  }))
 
 export function appMatchesCondition(app: App, conditionId: string): boolean {
   if (conditionId === 'all') return true
@@ -56,7 +55,6 @@ export const catalogueFilterGroups: FilterGroup[] = [
     legend: 'Condition',
     type: 'single',
     options: conditionOptions,
-    defaultValue: 'all',
     enabled: true,
     matches: appMatchesCondition,
   },

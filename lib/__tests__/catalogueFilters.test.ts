@@ -27,8 +27,11 @@ describe('catalogueFilters', () => {
 
   it('returns everything when nothing is selected', () => {
     expect(filterApps(apps, emptySelection())).toHaveLength(3)
-    expect(filterApps(apps, { condition: ['all'] })).toHaveLength(3)
-    expect(hasActiveSelection({ condition: ['all'] })).toBe(false)
+    expect(hasActiveSelection(emptySelection())).toBe(false)
+  })
+
+  it('has no "All conditions" option', () => {
+    expect(condition.options.some(o => o.id === 'all')).toBe(false)
   })
 
   it('treats COPD as including pulmonary rehab', () => {
@@ -49,7 +52,7 @@ describe('catalogueFilters', () => {
   })
 
   it('builds labelled tags and skips the default value', () => {
-    expect(selectedTags({ condition: ['all'] })).toEqual([])
+    expect(selectedTags(emptySelection())).toEqual([])
     const [tag] = selectedTags({ condition: ['copd'] })
     expect(tag).toMatchObject({ groupId: 'condition', value: 'copd', label: 'COPD and pulmonary rehab' })
   })

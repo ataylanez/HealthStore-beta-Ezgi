@@ -150,16 +150,15 @@ function FilterGroupFieldset({
 
 const resultsPhrase = (n: number) => `${n.toLocaleString()} ${n === 1 ? 'result' : 'results'}`
 
-/** "'A'", "'A' and 'B'", "'A', 'B' and 'C'" */
-function quotedList(labels: string[]): string {
-  const q = labels.map(l => `‘${l}’`)
-  return q.length > 1 ? `${q.slice(0, -1).join(', ')} and ${q[q.length - 1]}` : q[0] ?? ''
+/** "A", "A and B", "A, B and C" */
+function joinList(labels: string[]): string {
+  return labels.length > 1 ? `${labels.slice(0, -1).join(', ')} and ${labels[labels.length - 1]}` : labels[0] ?? ''
 }
 
-/** Result count line, e.g. "Filters applied: 3 results shown for 'COPD and pulmonary rehab'". */
-function resultsSummary(count: number, tags: SelectedTag[]): string {
-  if (tags.length === 0) return resultsPhrase(count)
-  return `Filters applied: ${resultsPhrase(count)} shown for ${quotedList(tags.map(t => t.label))}`
+/** Results title: "Showing all products", or e.g. "COPD and pulmonary rehab products". */
+function resultsTitle(tags: SelectedTag[]): string {
+  if (tags.length === 0) return 'Showing all products'
+  return `${joinList(tags.map(t => t.label))} products`
 }
 
 export default function CatalogueClient({ apps }: { apps: App[] }) {
@@ -181,7 +180,7 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
   /** Text for the polite live region. Empty on first render so nothing is announced on load. */
   const [announcement, setAnnouncement] = useState('')
 
-  const countRef = useRef<HTMLParagraphElement>(null)
+  const countRef = useRef<HTMLHeadingElement>(null)
   /** Set when the focused control is about to disappear; focus moves to the result count. */
   const focusCountNext = useRef(false)
 
@@ -222,7 +221,7 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
     replaceBrowseUrl(next)
     const count = filterApps(apps, next).length
     setAnnouncement(
-      cleared ? `Filters cleared: ${resultsPhrase(count)} shown.` : `${resultsSummary(count, selectedTags(next))}.`,
+      `${cleared ? 'Filters cleared. ' : ''}${resultsTitle(selectedTags(next))}: ${resultsPhrase(count)}.`,
     )
   }
 
@@ -318,14 +317,14 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
           </div>
 
           <div className="nhsuk-grid-column-two-thirds">
-            <p
-              className="nhsuk-body-m hs-results-count"
+            <h2
+              className="nhsuk-heading-m nhsuk-u-margin-bottom-2 hs-results-count"
               id={`${filterPanelId}-count`}
               ref={countRef}
               tabIndex={-1}
             >
-              <strong>{resultsSummary(filtered.length, tags)}</strong>
-            </p>
+              {resultsTitle(tags)}
+            </h2>
 
             {tags.length > 0 && (
               <p className="nhsuk-u-margin-bottom-4">
