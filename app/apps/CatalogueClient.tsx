@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { type App } from '@/lib/data'
 import { MaturityBadge, SupervisionBadge, ConditionTag } from '@/components/Badges'
 import { CompareToggleButton } from '@/components/CompareToggleButton'
-import { X } from 'lucide-react'
 import { buildBrowseSearchParams, parseBrowseConditionParam } from '@/lib/catalogueSearch'
 import { PageBreadcrumb } from '@/components/PageBreadcrumb'
 import { getProductNarrative } from '@/lib/content/productNarratives'
@@ -19,16 +18,10 @@ import {
   hasActiveSelection,
   selectedTags,
   withToggledValue,
-  withoutValue,
   type FilterGroup,
   type FilterSelection,
   type SelectedTag,
 } from '@/lib/catalogueFilters'
-
-/** Prefix the group name on tags only when more than one group can be selected. */
-const showGroupInTags = activeFilterGroups.length > 1
-
-const tagKey = (t: Pick<SelectedTag, 'groupId' | 'value'>) => `${t.groupId}:${t.value}`
 
 function ProductCard({ app }: { app: App }) {
   const narrative = getProductNarrative(app.slug)
@@ -155,57 +148,19 @@ function FilterGroupFieldset({
   )
 }
 
-/**
- * Applied filters as labelled removable tags. [Provenance: Bespoke, based on the
- * GOV.UK "selected filters" pattern.] Each tag is one full-size button whose
- * accessible name is "Remove filter: <label>"; the X icon is decorative.
- */
-function SelectedFilters({
-  tags,
-  headingId,
-  registerTag,
-  onRemove,
-  onClearAll,
-}: {
-  tags: SelectedTag[]
-  headingId: string
-  registerTag: (key: string, el: HTMLButtonElement | null) => void
-  onRemove: (tag: SelectedTag) => void
-  onClearAll: () => void
-}) {
-  if (tags.length === 0) return null
-  return (
-    <div role="region" aria-labelledby={headingId} className="hs-selected-filters">
-      <h2 id={headingId} className="nhsuk-heading-s nhsuk-u-margin-bottom-2">
-        Selected filters
-      </h2>
-      <ul role="list" className="hs-selected-filters__list">
-        {tags.map(t => (
-          <li key={tagKey(t)}>
-            <button
-              type="button"
-              ref={el => registerTag(tagKey(t), el)}
-              className="hs-filter-tag"
-              onClick={() => onRemove(t)}
-            >
-              <span className="nhsuk-u-visually-hidden">Remove filter: </span>
-              {showGroupInTags && <span className="hs-filter-tag__group">{t.groupLegend}: </span>}
-              {t.label}
-              <X className="hs-filter-tag__icon" aria-hidden="true" focusable="false" />
-            </button>
-          </li>
-        ))}
-      </ul>
-      {tags.length > 1 && (
-        <button type="button" className="hs-filter-panel__clear" onClick={onClearAll}>
-          Clear all filters
-        </button>
-      )}
-    </div>
-  )
+const resultsPhrase = (n: number) => `${n.toLocaleString()} ${n === 1 ? 'result' : 'results'}`
+
+/** "'A'", "'A' and 'B'", "'A', 'B' and 'C'" */
+function quotedList(labels: string[]): string {
+  const q = labels.map(l => `‘${l}’`)
+  return q.length > 1 ? `${q.slice(0, -1).join(', ')} and ${q[q.length - 1]}` : q[0] ?? ''
 }
 
-const resultsPhrase = (n: number) => `${n.toLocaleString()} ${n === 1 ? 'result' : 'results'}`
+/** Result count line, e.g. "Filters applied: 3 results shown for 'COPD and pulmonary rehab'". */
+function resultsSummary(count: number, tags: SelectedTag[]): string {
+  if (tags.length === 0) return resultsPhrase(count)
+  return `Filters applied: ${resultsPhrase(count)} shown for ${quotedList(tags.map(t => t.label))}`
+}
 
 export default function CatalogueClient({ apps }: { apps: App[] }) {
   const router = useRouter()
@@ -227,17 +182,8 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
   const [announcement, setAnnouncement] = useState('')
 
   const countRef = useRef<HTMLParagraphElement>(null)
-  const tagRefs = useRef(new Map<string, HTMLButtonElement>())
-  /** Where focus should go after the next render: a tag key, 'count', or null. */
-  const pendingFocus = useRef<string | null>(null)
-  const setPendingFocus = (key: string) => {
-    pendingFocus.current = key
-  }
-
-  const registerTag = useCallback((key: string, el: HTMLButtonElement | null) => {
-    if (el) tagRefs.current.set(key, el)
-    else tagRefs.current.delete(key)
-  }, [])
+  /** Set when the focused control is about to disappear; focus moves to the result count. */
+  const focusCountNext = useRef(false)
 
   const replaceBrowseUrl = useCallback(
     (selection: FilterSelection) => {
@@ -261,22 +207,23 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
   )
   const tags = useMemo(() => selectedTags(applied), [applied])
 
-  // After a tag is removed or filters are cleared, the button that had focus is
-  // gone. Move focus to the neighbouring tag, or to the result count.
+  // After filters are cleared the "Clear filters" link that had focus is gone,
+  // so move focus to the result count rather than losing it to <body>.
   useEffect(() => {
-    const key = pendingFocus.current
-    if (!key) return
-    pendingFocus.current = null
-    const target = key === 'count' ? countRef.current : tagRefs.current.get(key)
-    ;(target ?? countRef.current)?.focus()
+    if (!focusCountNext.current) return
+    focusCountNext.current = false
+    countRef.current?.focus()
   })
 
   /** Apply a selection to the results, the URL and the live region. */
-  const commit = (next: FilterSelection, message: string) => {
+  const commit = (next: FilterSelection, cleared = false) => {
     setApplied(next)
     setDraft(next)
     replaceBrowseUrl(next)
-    setAnnouncement(`${message} ${resultsPhrase(filterApps(apps, next).length)}.`)
+    const count = filterApps(apps, next).length
+    setAnnouncement(
+      cleared ? `Filters cleared: ${resultsPhrase(count)} shown.` : `${resultsSummary(count, selectedTags(next))}.`,
+    )
   }
 
   const openFilters = () => {
@@ -292,20 +239,13 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
 
   const applyFilters = (e?: FormEvent) => {
     e?.preventDefault()
-    commit(draft, 'Filters applied.')
+    commit(draft)
     setFiltersOpen(false)
   }
 
   const clearAllFilters = () => {
-    commit(emptySelection(), 'All filters cleared.')
-    setPendingFocus('count')
-  }
-
-  const removeTag = (tag: SelectedTag) => {
-    const i = tags.findIndex(t => tagKey(t) === tagKey(tag))
-    const neighbour = tags[i + 1] ?? tags[i - 1]
-    commit(withoutValue(applied, tag.groupId, tag.value), `Filter removed: ${tag.label}.`)
-    setPendingFocus(neighbour ? tagKey(neighbour) : 'count')
+    commit(emptySelection(), true)
+    focusCountNext.current = true
   }
 
   const onStore = filtered.filter(app => !isMarketPreview(app))
@@ -384,16 +324,16 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
               ref={countRef}
               tabIndex={-1}
             >
-              <strong>{resultsPhrase(filtered.length)}</strong>
+              <strong>{resultsSummary(filtered.length, tags)}</strong>
             </p>
 
-            <SelectedFilters
-              tags={tags}
-              headingId={`${filterPanelId}-selected`}
-              registerTag={registerTag}
-              onRemove={removeTag}
-              onClearAll={clearAllFilters}
-            />
+            {tags.length > 0 && (
+              <p className="nhsuk-u-margin-bottom-4">
+                <button type="button" className="hs-filter-panel__clear" onClick={clearAllFilters}>
+                  Clear filters
+                </button>
+              </p>
+            )}
 
             <div aria-live="polite" aria-atomic="true" className="sr-only">
               {announcement}

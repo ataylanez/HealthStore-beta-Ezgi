@@ -971,55 +971,6 @@
     padding: 0 0 15px;
   }
 
-  /* Selected filters: labelled, removable tags above the results.
-     Each tag is one full-size button (44px target, NHS / WCAG 2.5.5). */
-  .hs-selected-filters {
-    margin-bottom: var(--space-4);
-  }
-  .hs-selected-filters__list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    list-style: none;
-    margin: 0 0 var(--space-2);
-    padding: 0;
-  }
-  .hs-filter-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 6px 14px;
-    background: #E6F0FB;
-    color: var(--nhs-dark);
-    border: 1px solid var(--nhs-dark);
-    border-radius: var(--radius-pill);
-    font-family: inherit;
-    font-size: var(--text-body);
-    font-weight: 600;
-    line-height: 1.3;
-    text-align: left;
-    cursor: pointer;
-  }
-  .hs-filter-tag:hover {
-    background: #d2e3f6;
-    text-decoration: underline;
-    text-underline-offset: 0.1578em;
-  }
-  .hs-filter-tag:focus-visible {
-    outline: 4px solid transparent;
-    background: #ffeb3b;
-    color: #212b32;
-    box-shadow: 0 -2px #ffeb3b, 0 4px #212b32;
-  }
-  .hs-filter-tag__group {
-    font-weight: 400;
-  }
-  .hs-filter-tag__icon {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-  }
   /* Programmatic focus target only (tabindex=-1); no ring for a non-interactive element. */
   .hs-results-count:focus {
     outline: none;
