@@ -74,8 +74,8 @@ const HOW_IT_WORKS = [
 ]
 
 const PATHWAYS = [
-  { href: '/catalogue/digital-therapeutics?condition=copd', title: 'COPD and pulmonary rehab', detail: 'Remote monitoring and self-management', tags: ['NICE HTG736', 'NICE HTG718'] },
-  { href: '/catalogue/digital-therapeutics?condition=cardiac_rehab', title: 'Cardiac rehabilitation', detail: 'Digital post-event rehab programme', tags: ['NICE HTG761'] },
+  { href: '/catalogue/digital-therapeutics#condition-copd', title: 'COPD and pulmonary rehab', detail: 'Remote monitoring and self-management', tags: ['NICE HTG736', 'NICE HTG718'] },
+  { href: '/catalogue/digital-therapeutics#condition-cardiac_rehab', title: 'Cardiac rehabilitation', detail: 'Digital post-event rehab programme', tags: ['NICE HTG761'] },
 ]
 
 /**

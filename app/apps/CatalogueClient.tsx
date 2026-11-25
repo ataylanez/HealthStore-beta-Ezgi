@@ -1,13 +1,13 @@
 'use client'
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { getConditionAreas, supervisionLabels, type App } from '@/lib/data'
 import { MaturityBadge, SupervisionBadge, ConditionTag } from '@/components/Badges'
 import { CompareToggleButton } from '@/components/CompareToggleButton'
 import { X } from 'lucide-react'
-import { buildBrowseSearchParams, parseBrowseConditionParam } from '@/lib/catalogueSearch'
+import { parseBrowseConditionParam } from '@/lib/catalogueSearch'
 import { PageBreadcrumb } from '@/components/PageBreadcrumb'
 import { getProductNarrative } from '@/lib/content/productNarratives'
 import { catalogueSummary } from '@/lib/pdpSummary'
@@ -16,15 +16,15 @@ import { isMarketPreview } from '@/lib/marketPreview'
 const supervisionOptions = Object.entries(supervisionLabels).map(([id, label]) => ({ id, label }))
 
 const conditionAreas = getConditionAreas()
-const conditionOptions = [
-  { id: 'all', label: 'All conditions' },
-  ...conditionAreas
-    .filter(c => c.id !== 'pulmonary_rehab')
-    .map(c => ({
-      id: c.id,
-      label: c.id === 'copd' ? 'COPD and pulmonary rehab' : c.label,
-    })),
-]
+/** Condition sections, in conditions.json order. Pulmonary rehab is folded into COPD. */
+const conditionSections = conditionAreas
+  .filter(c => c.id !== 'pulmonary_rehab')
+  .map(c => ({
+    id: c.id,
+    label: c.id === 'copd' ? 'COPD and pulmonary rehab' : c.label,
+    anchor: `condition-${c.id}`,
+  }))
+
 function ProductCard({ app }: { app: App }) {
   const narrative = getProductNarrative(app.slug)
   const cardDescription = catalogueSummary(app, narrative)
@@ -89,12 +89,11 @@ function appMatchesCondition(app: App, conditionId: string): boolean {
 
 /**
  * Nested facet accordion — mirrors GOV.UK `.app-c-filter-section` (details/summary
- * with a chevron that flips when open). Collapsed by default, like the live
- * gov.uk/search/all panel.
+ * with a chevron that flips when open). Collapsed unless `open` is set.
  */
-function FilterSection({ title, children }: { title: string; children: ReactNode }) {
+function FilterSection({ title, open, children }: { title: string; open?: boolean; children: ReactNode }) {
   return (
-    <details className="hs-filter-section group">
+    <details className="hs-filter-section group" open={open}>
       <summary className="hs-filter-section__summary">
         <span className="hs-filter-section__heading">{title}</span>
       </summary>
@@ -128,19 +127,16 @@ function FilterPill({ label, onRemove }: { label: string; onRemove: () => void }
 }
 
 export default function CatalogueClient({ apps }: { apps: App[] }) {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const filterPanelId = useId()
 
-  /** Applied filters — drive the result list. */
-  const [condition, setCondition] = useState('all')
+  /** Applied supervision filter — drives the result list. */
   const [supervision, setSupervision] = useState<string[]>([])
 
   /**
-   * Draft filters — edited inside the panel. Applied only when the user clicks
-   * Apply, matching GOV.UK's filter-panel submit interaction.
+   * Draft supervision filter — edited inside the panel. Applied only when the
+   * user clicks Apply, matching GOV.UK's filter-panel submit interaction.
    */
-  const [draftCondition, setDraftCondition] = useState('all')
   const [draftSupervision, setDraftSupervision] = useState<string[]>([])
 
   /** Panel starts collapsed (`aria-expanded=false`), same as GOV.UK. */
@@ -148,91 +144,73 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
 
   const liveRegion = useRef<HTMLDivElement>(null)
 
-  const replaceBrowseUrl = useCallback(
-    (nextCondition: string) => {
-      const suffix = buildBrowseSearchParams(nextCondition, '')
-      router.replace(`/catalogue/digital-therapeutics${suffix}`, { scroll: false })
-    },
-    [router],
-  )
-
+  /** Legacy `?condition=` links: jump to that condition's section. */
   useEffect(() => {
     const c = parseBrowseConditionParam(searchParams.get('condition'))
-    setCondition(c)
-    setDraftCondition(c)
+    if (c === 'all') return
+    document.getElementById(`condition-${c}`)?.scrollIntoView()
   }, [searchParams])
 
   const toggleDraftSupervision = (id: string) => {
     setDraftSupervision(prev => (prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]))
   }
 
-  const openFilters = () => {
-    // Sync draft from applied so reopening shows the current selection.
-    setDraftCondition(condition)
-    setDraftSupervision(supervision)
-    setFiltersOpen(true)
-  }
-
-  const closeFilters = () => setFiltersOpen(false)
-
   const toggleFilters = () => {
-    if (filtersOpen) closeFilters()
-    else openFilters()
+    if (filtersOpen) {
+      setFiltersOpen(false)
+    } else {
+      // Sync draft from applied so reopening shows the current selection.
+      setDraftSupervision(supervision)
+      setFiltersOpen(true)
+    }
   }
 
   const applyFilters = (e?: FormEvent) => {
     e?.preventDefault()
-    setCondition(draftCondition)
     setSupervision(draftSupervision)
-    replaceBrowseUrl(draftCondition)
     setFiltersOpen(false)
   }
 
   const clearAllFilters = () => {
     setSupervision([])
     setDraftSupervision([])
-    setCondition('all')
-    setDraftCondition('all')
-    router.replace('/catalogue/digital-therapeutics', { scroll: false })
   }
 
-  const activeFilters: { label: string; clear: () => void }[] = []
-  if (condition !== 'all') {
-    activeFilters.push({
-      label: conditionOptions.find(o => o.id === condition)!.label,
-      clear: () => {
-        setCondition('all')
-        setDraftCondition('all')
-        replaceBrowseUrl('all')
-      },
+  const activeFilters = supervision.map(s => ({
+    label: supervisionLabels[s] ?? s,
+    clear: () => {
+      const next = supervision.filter(id => id !== s)
+      setSupervision(next)
+      setDraftSupervision(next)
+    },
+  }))
+
+  /**
+   * One section per condition. Conditions with products come first; the order is
+   * based on all apps (not the filtered ones) so sections don't jump when filtering.
+   */
+  const sections = useMemo(() => {
+    const built = conditionSections.map(c => {
+      const all = apps.filter(app => appMatchesCondition(app, c.id))
+      const matching = all
+        .filter(app => supervision.length === 0 || supervision.includes(app.supervision_model))
+        .sort((a, b) => a.app_name.localeCompare(b.app_name))
+      return {
+        ...c,
+        hasProducts: all.length > 0,
+        onStore: matching.filter(app => !isMarketPreview(app)),
+        notOnStore: matching.filter(app => isMarketPreview(app)),
+      }
     })
-  }
-  for (const s of supervision) {
-    activeFilters.push({
-      label: supervisionLabels[s] ?? s,
-      clear: () => {
-        const next = supervision.filter(id => id !== s)
-        setSupervision(next)
-        setDraftSupervision(next)
-      },
-    })
-  }
+    return [...built.filter(s => s.hasProducts), ...built.filter(s => !s.hasProducts)]
+  }, [apps, supervision])
 
-  const filteredSorted = useMemo(() => {
-    return apps
-      .filter((app: App) => {
-        if (supervision.length > 0 && !supervision.includes(app.supervision_model)) return false
-        if (condition !== 'all' && !appMatchesCondition(app, condition)) return false
-        return true
-      })
-      .sort((a, b) => a.app_name.localeCompare(b.app_name))
-  }, [apps, supervision, condition])
-
-  const onStore = filteredSorted.filter((app) => !isMarketPreview(app))
-  const notOnStore = filteredSorted.filter((app) => isMarketPreview(app))
-  const resultCount = filteredSorted.length
-  const resultText = `${resultCount.toLocaleString()} ${resultCount === 1 ? 'result' : 'results'}`
-  const resultSummary = `Showing ${resultCount} of ${apps.length} apps`
+  const resultCount = useMemo(
+    () => apps.filter(app => supervision.length === 0 || supervision.includes(app.supervision_model)).length,
+    [apps, supervision],
+  )
+  const resultText = `${resultCount.toLocaleString()} ${resultCount === 1 ? 'product' : 'products'}`
+  const resultSummary = `Showing ${resultCount} of ${apps.length} products`
 
   return (
     <div className="nhsuk-width-container">
@@ -246,14 +224,33 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
       <div className="nhsuk-main-wrapper nhsuk-main-wrapper--s">
         <h1 className="nhsuk-heading-xl">Digital therapeutics</h1>
 
-        {/* NHS layout: filters in a one-third column, results in a two-thirds column. */}
+        {/* NHS layout: navigation and filter in a one-third column, results in a two-thirds column. */}
         <div className="nhsuk-grid-row">
           <div className="nhsuk-grid-column-one-third">
             {/*
+              Condition navigation — the NHS Contents list, each item an in-page
+              link to that condition's section on the right.
+              [Provenance: NHS] service-manual.nhs.uk/design-system/components/contents-list
+            */}
+            <nav className="nhsuk-contents-list hs-condition-nav" role="navigation" aria-labelledby={`${filterPanelId}-nav-heading`}>
+              <h2 id={`${filterPanelId}-nav-heading`} className="nhsuk-heading-s nhsuk-u-margin-bottom-3">
+                Product list
+              </h2>
+              <ol className="nhsuk-contents-list__list">
+                {sections.map(s => (
+                  <li key={s.id} className="nhsuk-contents-list__item">
+                    <a className="nhsuk-contents-list__link" href={`#${s.anchor}`}>
+                      {s.label}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+
+            {/*
               Filter panel. On small screens it collapses behind a "Filter" toggle
               (GOV.UK finder interaction); from tablet the toggle is hidden and the
-              panel is always open in the sidebar. Form controls are nhsuk-radios /
-              nhsuk-checkboxes; sections use the NHS Details disclosure.
+              panel is always open in the sidebar.
             */}
             <div className="hs-filter-panel">
               <div className="hs-filter-panel__header">
@@ -275,30 +272,7 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
                 className={`hs-filter-panel__content${filtersOpen ? ' hs-filter-panel__content--open' : ''}`}
               >
                 <form onSubmit={applyFilters}>
-                  <FilterSection title="Condition">
-                    <fieldset className="nhsuk-fieldset">
-                      <legend className="nhsuk-u-visually-hidden">Condition</legend>
-                      <div className="nhsuk-radios nhsuk-radios--small">
-                        {conditionOptions.map(o => (
-                          <div key={o.id} className="nhsuk-radios__item">
-                            <input
-                              id={`filter-condition-${o.id}`}
-                              className="nhsuk-radios__input"
-                              name="filter-condition"
-                              type="radio"
-                              checked={draftCondition === o.id}
-                              onChange={() => setDraftCondition(o.id)}
-                            />
-                            <label className="nhsuk-radios__label" htmlFor={`filter-condition-${o.id}`}>
-                              {o.label}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </fieldset>
-                  </FilterSection>
-
-                  <FilterSection title="Supervision model">
+                  <FilterSection title="Supervision model" open>
                     <fieldset className="nhsuk-fieldset">
                       <legend className="nhsuk-u-visually-hidden">Supervision model</legend>
                       <div className="nhsuk-checkboxes nhsuk-checkboxes--small">
@@ -324,7 +298,7 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
                     <button type="submit" className="nhsuk-button nhsuk-u-margin-bottom-0">
                       Apply filters
                     </button>
-                    {(draftCondition !== 'all' || draftSupervision.length > 0) && (
+                    {(draftSupervision.length > 0 || supervision.length > 0) && (
                       <button
                         type="button"
                         className="hs-filter-panel__clear"
@@ -356,40 +330,64 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
               {resultSummary}
             </div>
 
-            {filteredSorted.length === 0 ? (
-              // [Provenance: NHS] Inset text for the empty state.
-              <div className="nhsuk-inset-text">
-                <span className="nhsuk-u-visually-hidden">Information: </span>
-                <p className="nhsuk-u-font-weight-bold nhsuk-u-margin-bottom-1">No apps match your filters</p>
-                <p className="nhsuk-u-margin-bottom-0">Try adjusting your filter criteria</p>
-              </div>
-            ) : (
-              <>
-                {onStore.length > 0 && (
-                  <ul className="nhsuk-list">
-                    {onStore.map((app) => (
-                      <ProductCard key={app.id} app={app} />
-                    ))}
-                  </ul>
-                )}
-                {notOnStore.length > 0 && (
-                  <section aria-labelledby="not-on-store-heading" className="nhsuk-u-margin-top-7">
-                    <h2 id="not-on-store-heading" className="nhsuk-heading-l">
-                      Not on the Commissioning Store
-                    </h2>
-                    <ul className="nhsuk-list">
-                      {notOnStore.map((app) => (
-                        <ProductCard key={app.id} app={app} />
-                      ))}
-                    </ul>
-                  </section>
-                )}
-              </>
-            )}
+            {sections.map(s => {
+              const headingId = `${s.anchor}-heading`
+              const hasMatches = s.onStore.length > 0 || s.notOnStore.length > 0
+              return (
+                <section
+                  key={s.id}
+                  id={s.anchor}
+                  aria-labelledby={headingId}
+                  className="hs-condition-section nhsuk-u-margin-bottom-7"
+                >
+                  <h2 id={headingId} className="nhsuk-heading-l">{s.label}</h2>
+
+                  {!s.hasProducts ? (
+                    // [Provenance: NHS] Inset text for the empty state.
+                    <div className="nhsuk-inset-text nhsuk-u-margin-top-0">
+                      <span className="nhsuk-u-visually-hidden">Information: </span>
+                      <p className="nhsuk-u-font-weight-bold nhsuk-u-margin-bottom-1">Coming soon</p>
+                      <p className="nhsuk-u-margin-bottom-0">
+                        Products for this condition will be added to the catalogue soon.
+                      </p>
+                    </div>
+                  ) : !hasMatches ? (
+                    <div className="nhsuk-inset-text nhsuk-u-margin-top-0">
+                      <span className="nhsuk-u-visually-hidden">Information: </span>
+                      <p className="nhsuk-u-font-weight-bold nhsuk-u-margin-bottom-1">
+                        No products match the selected supervision model
+                      </p>
+                      <button type="button" className="hs-filter-panel__clear" onClick={clearAllFilters}>
+                        Clear filter
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {s.onStore.length > 0 && (
+                        <ul className="nhsuk-list">
+                          {s.onStore.map(app => (
+                            <ProductCard key={app.id} app={app} />
+                          ))}
+                        </ul>
+                      )}
+                      {s.notOnStore.length > 0 && (
+                        <>
+                          <h3 className="nhsuk-heading-m">Not on the Commissioning Store</h3>
+                          <ul className="nhsuk-list">
+                            {s.notOnStore.map(app => (
+                              <ProductCard key={app.id} app={app} />
+                            ))}
+                          </ul>
+                        </>
+                      )}
+                    </>
+                  )}
+                </section>
+              )
+            })}
           </div>
         </div>
       </div>
     </div>
   )
-
 }

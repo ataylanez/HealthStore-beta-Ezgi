@@ -823,6 +823,13 @@
   .hs-filter-panel {
     margin-bottom: var(--space-5);
   }
+  /* Condition anchor nav above the filter panel; sections it links to. */
+  .hs-condition-nav {
+    margin-bottom: var(--space-5);
+  }
+  .hs-condition-section {
+    scroll-margin-top: var(--space-4);
+  }
   .hs-filter-panel__header {
     display: flex;
     flex-wrap: wrap;

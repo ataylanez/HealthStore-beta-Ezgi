@@ -93,7 +93,7 @@ export default function AppsDiscoveryClient({
               <li key={c.id} className="nhsuk-grid-column-one-third nhsuk-card-group__item">
                 <ClickableChevronCard
                   variant="primary"
-                  href={`/catalogue/digital-therapeutics?condition=${encodeURIComponent(c.id)}`}
+                  href={`/catalogue/digital-therapeutics#condition-${c.id}`}
                   title={c.label}
                   description={`${c.count} ${c.count === 1 ? 'product' : 'products'}`}
                   headingLevel={3}
