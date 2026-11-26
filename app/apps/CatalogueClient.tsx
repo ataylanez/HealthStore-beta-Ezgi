@@ -224,7 +224,7 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
       <div className="nhsuk-main-wrapper nhsuk-main-wrapper--s">
         <h1 className="nhsuk-heading-xl">Digital therapeutics</h1>
 
-        {/* NHS layout: navigation and filter in a one-third column, results in a two-thirds column. */}
+        {/* NHS layout: navigation in a one-third column; filter and results in a two-thirds column. */}
         <div className="nhsuk-grid-row">
           <div className="nhsuk-grid-column-one-third">
             {/*
@@ -246,11 +246,13 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
                 ))}
               </ol>
             </nav>
+          </div>
 
+          <div className="nhsuk-grid-column-two-thirds">
             {/*
-              Filter panel. On small screens it collapses behind a "Filter" toggle
-              (GOV.UK finder interaction); from tablet the toggle is hidden and the
-              panel is always open in the sidebar.
+              Filter panel — GOV.UK search "Filter and sort" layout. A toggle with the
+              result count beside it; the grey panel opens below on click, with each
+              facet as a collapsed section and a full-width Apply button.
             */}
             <div className="hs-filter-panel">
               <div className="hs-filter-panel__header">
@@ -264,7 +266,9 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
                 >
                   <span className="hs-filter-panel__button-inner">Filter</span>
                 </button>
-                <h2 className="nhsuk-heading-s hs-filter-panel__title">Filter</h2>
+                <span className="hs-filter-panel__count" id={`${filterPanelId}-count`}>
+                  {resultText}
+                </span>
               </div>
 
               <div
@@ -272,7 +276,7 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
                 className={`hs-filter-panel__content${filtersOpen ? ' hs-filter-panel__content--open' : ''}`}
               >
                 <form onSubmit={applyFilters}>
-                  <FilterSection title="Supervision model" open>
+                  <FilterSection title="Supervision model">
                     <fieldset className="nhsuk-fieldset">
                       <legend className="nhsuk-u-visually-hidden">Supervision model</legend>
                       <div className="nhsuk-checkboxes nhsuk-checkboxes--small">
@@ -295,7 +299,7 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
                   </FilterSection>
 
                   <div className="hs-filter-panel__actions">
-                    <button type="submit" className="nhsuk-button nhsuk-u-margin-bottom-0">
+                    <button type="submit" className="nhsuk-button nhsuk-u-margin-bottom-0 hs-filter-panel__apply">
                       Apply filters
                     </button>
                     {(draftSupervision.length > 0 || supervision.length > 0) && (
@@ -311,12 +315,6 @@ export default function CatalogueClient({ apps }: { apps: App[] }) {
                 </form>
               </div>
             </div>
-          </div>
-
-          <div className="nhsuk-grid-column-two-thirds">
-            <p className="nhsuk-body-m" id={`${filterPanelId}-count`}>
-              <strong>{resultText}</strong>
-            </p>
 
             {activeFilters.length > 0 && (
               <div className="flex flex-wrap gap-2 nhsuk-u-margin-bottom-4">

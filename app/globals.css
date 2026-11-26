@@ -818,10 +818,13 @@
    * Content: expands vertically; nested details sections; Apply submits draft.
    * [Provenance: GOV.UK filter-panel pattern]
    */
-  /* Filter panel — sits in a one-third NHS grid column. Collapsible behind a
-     "Filter" toggle on small screens; always open from tablet. */
+  /* Filter panel — top of the results column, GOV.UK search "Filter and sort"
+     layout. Collapsed behind the "Filter" toggle at every width; a rule
+     separates it from the results. */
   .hs-filter-panel {
     margin-bottom: var(--space-5);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border);
   }
   /* Condition anchor nav above the filter panel; sections it links to. */
   .hs-condition-nav {
@@ -834,16 +837,13 @@
     display: flex;
     flex-wrap: wrap;
     place-content: space-between;
-    align-items: baseline;
+    align-items: center;
     gap: var(--space-2);
   }
-  .hs-filter-panel__title {
-    display: none;
-    margin: 0 0 var(--space-3);
-  }
-  @media (min-width: 48.0625em) {
-    .hs-filter-panel__button { display: none; }
-    .hs-filter-panel__title { display: block; }
+  .hs-filter-panel__count {
+    color: var(--text-secondary);
+    font-size: var(--text-body);
+    line-height: 1.3;
   }
   .hs-filter-panel__button {
     background: transparent;
@@ -882,31 +882,25 @@
   .hs-filter-panel__content {
     display: none;
     background-color: var(--surface);
-    padding: 0 var(--space-3);
-    margin-top: var(--space-2);
+    padding: 0 var(--space-4);
+    margin-top: var(--space-3);
   }
   .hs-filter-panel__content--open { display: block; }
-  @media (min-width: 48.0625em) {
-    .hs-filter-panel__content { display: block; margin-top: 0; }
-  }
   /* White control faces on the grey surface, matching GOV.UK's treatment. */
   .hs-filter-panel__content .nhsuk-checkboxes__label::before,
   .hs-filter-panel__content .nhsuk-radios__label::before {
     background-color: #fff;
   }
+  /* Full-width Apply, with "Clear filters" beneath it. */
   .hs-filter-panel__actions {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-3);
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
     padding: var(--space-4) 0;
   }
-  @media (max-width: 639px) {
-    .hs-filter-panel__actions {
-      flex-direction: column;
-      align-items: stretch;
-      gap: var(--space-2);
-    }
+  .hs-filter-panel__apply {
+    width: 100%;
   }
   .hs-filter-panel__clear {
     flex: 0 0 auto;
@@ -929,9 +923,6 @@
   .hs-filter-section {
     border-bottom: 1px solid var(--border);
   }
-  .hs-filter-section:last-of-type {
-    border-bottom: 0;
-  }
   .hs-filter-section__summary {
     display: flex;
     align-items: center;
@@ -939,7 +930,7 @@
     cursor: pointer;
     color: var(--text-primary);
     list-style: none;
-    padding: 5px 0;
+    padding: var(--space-4) 0;
   }
   .hs-filter-section__summary::-webkit-details-marker,
   .hs-filter-section__summary::marker {
